@@ -3,7 +3,7 @@
 import argparse
 from pathlib import Path
 
-from metal_inference import DocumentIndex, EmbeddingModel, ModelProfile, read_documents
+from tessery import DocumentIndex, EmbeddingModel, ModelProfile, read_documents
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--model-dir", required=True)

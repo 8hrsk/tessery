@@ -19,7 +19,7 @@ policy stable when indexing/querying. See the [BGE model card](https://huggingfa
 ## Load a named profile
 
 ```python
-from metal_inference import EmbeddingModel, get_profile, list_profiles
+from tessery import EmbeddingModel, get_profile, list_profiles
 
 print(list_profiles())
 profile = get_profile("bge-small-en-v1.5")
@@ -44,7 +44,7 @@ Run from the checkout:
 
 ```python
 from pathlib import Path
-from metal_inference import EmbeddingModel, ModelProfile
+from tessery import EmbeddingModel, ModelProfile
 
 profile = ModelProfile.from_file("model-manifests/bge-small-en-v1.5-hf-cache.json")
 blobs = Path.home() / ".cache/huggingface/hub/models--BAAI--bge-small-en-v1.5/blobs"
@@ -53,7 +53,7 @@ with EmbeddingModel.load(blobs, profile=profile) as model:
 ```
 
 ```sh
-metal-inference inspect \
+tessery inspect \
   --model-dir "$HOME/.cache/huggingface/hub/models--BAAI--bge-small-en-v1.5/blobs" \
   --profile-file model-manifests/bge-small-en-v1.5-hf-cache.json
 ```
@@ -64,7 +64,7 @@ and its cache filename mapping have the same compatibility ID.
 ## Describe another compatible model
 
 Export a profile with `get_profile(name).to_dict()`, or use
-`metal-inference profiles`. Its JSON schema is strict, version 1, with these fields:
+`tessery profiles`. Its JSON schema is strict, version 1, with these fields:
 
 * `model_id`, `revision`: model identity and immutable revision metadata.
 * `architecture`, `tokenizer`, `pooling`: one of the supported table combinations.
@@ -75,7 +75,7 @@ Export a profile with `get_profile(name).to_dict()`, or use
   single basenames within the selected directory; paths and traversal are refused.
 
 ```python
-from metal_inference import ModelProfile, get_profile
+from tessery import ModelProfile, get_profile
 
 # Supply sizes/digests from your reviewed model artifacts, not arbitrary values.
 base = get_profile("bge-small-en-v1.5")

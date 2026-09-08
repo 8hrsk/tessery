@@ -1,7 +1,7 @@
-# Standalone API, 0.5 alpha
+# Standalone API, 0.5.1 alpha
 
 ```python
-from metal_inference import EmbeddingModel, MetalRuntime, cosine_search
+from tessery import EmbeddingModel, MetalRuntime, cosine_search
 model = EmbeddingModel.load(
     "/absolute/local/model", dimensions=384, max_length=512, max_pending=8,
 )
@@ -88,7 +88,7 @@ this is not a lazy graph, asynchronous GPU queue or kernel fusion API.
 
 ```python
 import numpy as np
-from metal_inference import MetalRuntime
+from tessery import MetalRuntime
 
 with MetalRuntime() as gpu:
     with gpu.tensor(np.ones((3, 4), np.float32)) as x:
@@ -124,7 +124,7 @@ Model commands accept either `--profile NAME` or
 now returns a `profile` object with artifact filenames, sizes and hashes.
 See [model profiles](MODEL_PROFILES.md) for manifest trust and supported formats.
 
-Invoke commands with `metal-inference` or `python -I -m metal_inference`.
+Invoke commands with `tessery` or `python -I -m tessery`.
 Exit codes: 0 success; 2 invalid arguments, model/input/I/O or inference error.
 Runtime failures contain stable safe codes. `embed` intentionally emits vectors
 to the caller-selected destination. The library does not log/persist prompts or
@@ -134,3 +134,13 @@ UDS, TLS and a Go supervisor are not part of this alpha.
 
 Runtime counters, bounded load tests and benchmark interpretation are documented
 in [performance diagnostics](PERFORMANCE.md).
+
+## Public package name
+
+Use `from tessery import EmbeddingModel, list_profiles` and other documented root
+exports. Stable exceptions are available from `tessery.errors`, and the local
+server from `tessery.server`. These are explicit re-exports of the existing engine:
+class/exception identity, model lifecycle and compatibility IDs are unchanged.
+Importing `tessery` does not initialize Metal or load/download a model.
+`metal_inference` remains a compatibility namespace; implementation-only submodules
+are not mirrored under `tessery`. See [distribution migration](PUBLISHING.md).

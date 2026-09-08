@@ -34,16 +34,16 @@ def main():
         "dataLicense": "CC0-1.0",
         "SPDXID": "SPDXRef-DOCUMENT",
         "name": args.artifact.name,
-        "documentNamespace": f"https://spdx.org/spdxdocs/metal-inference-{digest}",
+        "documentNamespace": f"https://spdx.org/spdxdocs/tessery-{digest}",
         "creationInfo": {
-            "creators": ["Tool: metal-inference-sbom-0.5.0a1"],
+            "creators": ["Tool: tessery-sbom-0.5.1a1"],
             "created": datetime.fromtimestamp(args.epoch, UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         },
         "packages": [
             {
                 "SPDXID": "SPDXRef-Foundation",
-                "name": "metal-inference",
-                "versionInfo": "0.5.0a1",
+                "name": "tessery",
+                "versionInfo": "0.5.1a1",
                 "downloadLocation": "NOASSERTION",
                 "filesAnalyzed": False,
                 "licenseConcluded": "Apache-2.0",

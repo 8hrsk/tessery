@@ -1,6 +1,6 @@
 # Local HTTP API
 
-The standalone `metal-inference serve` command loads one model once and serves
+The standalone `tessery serve` command loads one model once and serves
 embeddings to trusted applications on the same Mac. It binds **127.0.0.1 only**.
 This alpha uses Python's standard-library HTTP server with bounded worker threads;
 it is not an internet-facing production server, TLS endpoint or process supervisor.
@@ -8,13 +8,13 @@ Python documents that boundary in its [HTTP server reference](https://docs.pytho
 No external server package or model download is required.
 
 ```sh
-metal-inference serve --model-dir /absolute/model --port 8765
+tessery serve --model-dir /absolute/model --port 8765
 ```
 
 Existing BGE cache:
 
 ```sh
-metal-inference serve \
+tessery serve \
   --model-dir "$HOME/.cache/huggingface/hub/models--BAAI--bge-small-en-v1.5/blobs" \
   --profile-file model-manifests/bge-small-en-v1.5-hf-cache.json
 ```
@@ -84,8 +84,8 @@ CORS is not enabled. Do not expose the service through a forwarding proxy.
 ## Embedding in another Python application
 
 ```python
-from metal_inference import EmbeddingModel
-from metal_inference.server import EmbeddingServer
+from tessery import EmbeddingModel
+from tessery.server import EmbeddingServer
 
 with EmbeddingModel.load('/absolute/model') as model:
     with EmbeddingServer(model, port=8765) as server:

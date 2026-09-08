@@ -23,7 +23,7 @@ BGE is an English model. Use the existing Qwen profile for multilingual document
 ## Reuse in another project
 
 ```python
-from metal_inference import DocumentIndex, EmbeddingModel, read_documents
+from tessery import DocumentIndex, EmbeddingModel, read_documents
 
 with EmbeddingModel.load('/absolute/model') as model:
     index = DocumentIndex.build(model, read_documents('/absolute/documents'))
@@ -75,9 +75,9 @@ Index files contain your document text and should be stored accordingly.
 ## CLI
 
 ```sh
-metal-inference index --model-dir /absolute/model \
+tessery index --model-dir /absolute/model \
   --documents /absolute/documents --index /absolute/new-index.sqlite
-metal-inference search --model-dir /absolute/model \
+tessery search --model-dir /absolute/model \
   --index /absolute/new-index.sqlite --query 'Your question' --top-k 5
 ```
 

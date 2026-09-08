@@ -9,9 +9,9 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from metal_inference import Artifact, EmbeddingModel, ModelProfile, get_profile
 from metal_inference.errors import ManifestError, UnsupportedProfileError
 from metal_inference.tokenizer import QWEN_SPLIT, byte_alphabet
+from tessery import Artifact, EmbeddingModel, ModelProfile, get_profile
 
 pytestmark = [
     pytest.mark.metal,

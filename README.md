@@ -12,6 +12,18 @@ multiplication, transpose and SiLU. This is an inference-focused foundation;
 autograd, training, a general lazy tensor graph and generation are not implemented.
 Local HTTP embeddings and persisted exact retrieval indexes are available.
 
+The public Python package and distribution are **`tessery`** (0.5.1a1):
+
+```python
+from tessery import EmbeddingModel, list_profiles
+
+print(list_profiles())
+```
+
+Build/install locally today; after publication, install with `pip install --pre tessery`.
+See [PyPI publishing and migration](docs/PUBLISHING.md). The previous
+`metal_inference` imports and `metal-inference` CLI remain compatible.
+
 ## Embeddings and retrieval
 
 Requirements: macOS 14+, Apple Silicon, Python 3.12+. Xcode Command Line Tools
@@ -19,7 +31,7 @@ are required to build from source; a prebuilt native wheel needs no compiler.
 No model is downloaded automatically.
 
 ```python
-from metal_inference import EmbeddingModel, cosine_search
+from tessery import EmbeddingModel, cosine_search
 
 with EmbeddingModel.load("/absolute/path/to/Qwen3-Embedding-0.6B-4bit-DWQ") as model:
     vectors = model.encode([
@@ -40,7 +52,7 @@ load once. GPU forwards are serialized with bounded admission.
 ## Model profiles
 
 ```python
-from metal_inference import EmbeddingModel, list_profiles
+from tessery import EmbeddingModel, list_profiles
 
 print(list_profiles())
 with EmbeddingModel.load("/absolute/path/to/bge-small-en-v1.5", profile="bge-small-en-v1.5") as model:
@@ -58,7 +70,7 @@ See [profile format and existing cache reuse](docs/MODEL_PROFILES.md).
 
 ```python
 import numpy as np
-from metal_inference import MetalRuntime
+from tessery import MetalRuntime
 
 with MetalRuntime() as gpu:
     a = gpu.tensor(np.ones((2, 64), dtype=np.float32))
@@ -78,9 +90,9 @@ remain available. See the [tensor API](docs/API.md#metal-tensors) for limits.
 
 ```sh
 uv sync --locked --group dev
-uv run metal-inference inspect --model-dir /absolute/model
-printf '["Привет", "Hello"]' | uv run metal-inference embed --model-dir /absolute/model
-uv run metal-inference benchmark --model-dir /absolute/model --tokens 32 --iterations 10
+uv run tessery inspect --model-dir /absolute/model
+printf '["Привет", "Hello"]' | uv run tessery embed --model-dir /absolute/model
+uv run tessery benchmark --model-dir /absolute/model --tokens 32 --iterations 10
 uv build
 ```
 

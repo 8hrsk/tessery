@@ -22,7 +22,7 @@ from .weights import read_artifact
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="metal-inference")
+    parser = argparse.ArgumentParser(prog="tessery")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("profiles", help="List built-in model profiles")
     for name in ("inspect", "embed", "benchmark", "index", "search", "serve"):

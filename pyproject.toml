@@ -3,8 +3,8 @@ requires = ["setuptools==80.9.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "metal-inference"
-version = "0.5.0a1"
+name = "tessery"
+version = "0.5.1a1"
 description = "Independent Metal compute and local embedding inference on Apple Silicon"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,7 +13,13 @@ license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.txt"]
 dependencies = ["numpy==2.5.2", "regex==2025.9.18"]
 classifiers = ["Development Status :: 2 - Pre-Alpha", "Typing :: Typed"]
 
+[project.urls]
+Homepage = "https://github.com/8hrsk/tessery"
+Repository = "https://github.com/8hrsk/tessery"
+Issues = "https://github.com/8hrsk/tessery/issues"
+
 [project.scripts]
+tessery = "metal_inference.cli:main"
 metal-inference = "metal_inference.cli:main"
 yuri-mlx-embeddings = "yuri_mlx_embeddings.cli:main"
 
@@ -44,7 +50,7 @@ mypy_path = "stubs"
 
 [tool.coverage.run]
 branch = true
-source = ["yuri_mlx_embeddings", "metal_inference"]
+source = ["tessery", "yuri_mlx_embeddings", "metal_inference"]
 omit = ["*/__main__.py"]
 
 [tool.coverage.report]

@@ -5,8 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pytest
 
-from metal_inference import MetalRuntime, Tensor
 from metal_inference.errors import ClosedError, InferenceError
+from tessery import MetalRuntime, Tensor
 
 pytestmark = [
     pytest.mark.metal,

@@ -31,7 +31,7 @@ def check(root=ROOT):
         record = policy["packages"][name]
         if record["version"] != version or record["license"] not in allowed:
             raise ValueError("unreviewed_license_or_version")
-        if name == "metal-inference":
+        if name == project["project"]["name"]:
             continue
         if package["source"] != {"registry": "https://pypi.org/simple"}:
             raise ValueError("unreviewed_dependency_source")

@@ -7,6 +7,10 @@ specification is preserved as historical input.
 
 ## Implemented
 
+* Public `tessery` Python package and CLI, distribution name `tessery`; old
+  `metal_inference` imports retain class identity. PyPI publication is a separate
+  action; see [the publishing guide](PUBLISHING.md).
+
 * Objective-C++ runtime: owned shared Metal buffers, pipeline cache, serialized
   command encoding, explicit synchronization and resource release.
 * Original Metal kernels: uint4 embedding/linear, float32 matrix multiplication,

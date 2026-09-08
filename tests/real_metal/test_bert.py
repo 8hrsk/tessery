@@ -6,10 +6,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from metal_inference import EmbeddingModel, ModelProfile, cosine_search, get_profile
 from metal_inference.errors import InvalidInputError
 from metal_inference.weights import read_json
 from metal_inference.wordpiece import WordPieceTokenizer
+from tessery import EmbeddingModel, ModelProfile, cosine_search, get_profile
 
 pytestmark = [
     pytest.mark.metal,
@@ -109,8 +109,8 @@ def test_persisted_retrieval_and_http_use_same_real_model(model, tmp_path):
     import http.client
     import threading
 
-    from metal_inference import DocumentIndex
-    from metal_inference.server import EmbeddingServer
+    from tessery import DocumentIndex
+    from tessery.server import EmbeddingServer
 
     documents = {
         "france.txt": "Paris is the capital of France.",

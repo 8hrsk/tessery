@@ -55,5 +55,5 @@ setup(
     if portable_tests
     else [Extension("metal_inference._native", sources=["src/metal_inference/native/runtime.mm"])],
     cmdclass={} if portable_tests else {"build_ext": BuildMetal, "bdist_wheel": PlatformWheel},
-    package_data={"metal_inference": ["native/kernels.metal", "py.typed"]},
+    package_data={"tessery": ["py.typed"], "metal_inference": ["native/kernels.metal", "py.typed"]},
 )

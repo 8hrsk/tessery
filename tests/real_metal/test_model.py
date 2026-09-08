@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from metal_inference import EmbeddingModel, cosine_search
 from metal_inference.tokenizer import QwenTokenizer
 from metal_inference.weights import read_json
+from tessery import EmbeddingModel, cosine_search
 
 pytestmark = [
     pytest.mark.metal,

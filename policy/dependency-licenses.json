@@ -30,8 +30,8 @@
       "version": "2.3.0",
       "license": "MIT"
     },
-    "metal-inference": {
-      "version": "0.5.0a1",
+    "tessery": {
+      "version": "0.5.1a1",
       "license": "Apache-2.0"
     },
     "mypy": {
