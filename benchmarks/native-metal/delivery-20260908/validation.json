@@ -1,0 +1,24 @@
+{
+  "version": "0.5.0a1",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "tests_passed": 333,
+  "python_coverage_percent": 94.61,
+  "ruff": "passed",
+  "mypy": "passed",
+  "frozen_inputs": "passed",
+  "dependency_policy": "passed",
+  "installed_wheel": "both_models_embeddings_workspace_rag_http_passed",
+  "network": "external_connections_and_dns_blocked_in_wheel_smoke_loopback_allowed",
+  "artifacts": [
+    {
+      "file": "metal_inference-0.5.0a1-py3-none-macosx_14_0_arm64.whl",
+      "bytes": 65318,
+      "sha256": "17fba708b39cce0dc084cefd37acef5a4d3bc31469f6f0d28358ed973f78041a"
+    },
+    {
+      "file": "metal_inference-0.5.0a1.tar.gz",
+      "bytes": 192287,
+      "sha256": "8947d6813a81742bbc9c2c873060aa9ff7d2a6b8fccc062a7d0d011688703751"
+    }
+  ]
+}

@@ -97,3 +97,51 @@ def test_model_error(monkeypatch, capsys):
     monkeypatch.setattr(cli.sys, "stdin", SimpleNamespace(buffer=io.BytesIO(b'["text"]')))
     assert cli.main(["embed", "--model-dir", "/model"]) == 2
     assert json.loads(capsys.readouterr().err) == {"error": {"code": "metal_unavailable"}}
+
+
+def test_index_build_search_and_server_cli(tmp_path, monkeypatch, capsys):
+    from metal_inference import ModelDescriptor
+
+    model = FakeModel()
+    model.descriptor = ModelDescriptor()
+    model.dimensions = 384
+    model.max_length = 512
+    model._tokenizer = SimpleNamespace(
+        batch=lambda texts, max_length: (None, np.array([3] * len(texts)))
+    )
+    monkeypatch.setattr(cli.EmbeddingModel, "load", lambda *a, **k: model)
+    documents = tmp_path / "docs"
+    documents.mkdir()
+    (documents / "file.txt").write_text("Some text")
+    index = tmp_path / "index.sqlite"
+    common = ["--model-dir", "/model"]
+    assert cli.main(["index", *common, "--documents", str(documents), "--index", str(index)]) == 0
+    assert json.loads(capsys.readouterr().out)["chunks"] == 1
+    assert cli.main(["search", *common, "--index", str(index), "--query", "Some text"]) == 0
+    assert json.loads(capsys.readouterr().out)["hits"][0]["chunk"]["source"] == "file.txt"
+
+    class Server:
+        server_port = 8765
+
+        def __init__(self, *args, **kwargs):
+            self.options = kwargs
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+        def serve_forever(self, **kwargs):
+            raise KeyboardInterrupt
+
+    monkeypatch.setattr(cli, "EmbeddingServer", Server)
+    assert cli.main(["serve", *common]) == 0
+    assert "127.0.0.1:8765" in capsys.readouterr().err
+    token = tmp_path / "token"
+    token.write_text("test-token-0123456789\n")
+    assert cli.main(["serve", *common, "--token-file", str(token)]) == 0
+    token.write_bytes(b"\xff")
+    assert cli.main(["serve", *common, "--token-file", str(token)]) == 2
+    token.write_text("x" * 4097)
+    assert cli.main(["serve", *common, "--token-file", str(token)]) == 2

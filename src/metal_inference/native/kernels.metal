@@ -214,3 +214,36 @@ kernel void matmul_f32_tiled(device const float *a [[buffer(0)]],
     }
     simdgroup_store(accum, out + row*p.cols + col, p.cols);
 }
+
+// Original 8x32 output tile. Decode 32x32 weights into 4 KiB shared memory;
+// never materialize the model's full F32 weights. All shapes must be aligned.
+kernel void linear4_tiled(device const float *x [[buffer(0)]],
+                          device const uint *w [[buffer(1)]],
+                          device const ushort *s [[buffer(2)]],
+                          device const ushort *b [[buffer(3)]],
+                          device float *out [[buffer(4)]],
+                          constant Params &p [[buffer(8)]],
+                          uint tile [[threadgroup_position_in_grid]],
+                          uint tid [[thread_index_in_threadgroup]],
+                          uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*8, channel = (tile % (p.cols/32))*32;
+    threadgroup float weights[32*32];
+    simdgroup_float8x8 accum(0.0f), left, right;
+    for (uint base = 0; base < p.k; base += 32) {
+        uint c = channel + tid/4, col = base + (tid%4)*8;
+        uint packed = w[c*(p.k/8)+col/8], g = c*(p.k/64)+col/64;
+        float scale = bf16(s[g]), bias = bf16(b[g]);
+        for (uint j = 0; j < 8; ++j)
+            weights[tid*8+j] = float((packed >> (j*4)) & 15)*scale+bias;
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        simdgroup_float8x8 partial(0.0f);
+        for (uint j = 0; j < 32; j += 8) {
+            simdgroup_load(left, x + row*p.k + base+j, p.k);
+            simdgroup_load(right, weights + sg*8*32+j, 32, ulong2(0), true);
+            simdgroup_multiply_accumulate(partial, left, right, partial);
+        }
+        for (uint e = 0; e < 2; ++e) accum.thread_elements()[e] += partial.thread_elements()[e];
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    simdgroup_store(accum, out + row*p.cols + channel+sg*8, p.cols);
+}

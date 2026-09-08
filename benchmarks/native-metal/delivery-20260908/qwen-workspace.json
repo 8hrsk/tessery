@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "label": "uint4-workspace",
+  "scope": "single_host_diagnostic_not_release_gate",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python": "3.12.13",
+  "chip": "Apple M1",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "946fe5586d23939c371c881b43d631eb94449b97ede25a5cd23bceb353ffb308",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "src/metal_inference/api.py": "6e449420439338d636778a8cf618337942109ceb000bd53b167ba653b912842d",
+    "src/metal_inference/backend.py": "9b492f9adbe8bea3e538b46cd7f50af193d6b81771b743b3ec20694f1912bd99",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cli.py": "3734b25263e88c2c1d3685685392065af703b864b9347bb04ad4d7d39abdaedc",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a37944cd104ed0efdfaa3ca70aad8c989958926b099ddfc16413cc24cf909e71",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "d0d5f700410c936a6eaa8a6f317d49d1c3d6d214f3950fed767f158731894984",
+    "src/metal_inference/native/kernels.metal": "7ca48e3192a2c3390c089f8780ec1a3139cd51776400303297a1b22b1fb362fc",
+    "src/metal_inference/native/runtime.mm": "69115d2146cbdf4c23b617305fc4744ee85b836741ae410a5fe4a4ca68c41eb1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f92f6ed0d9c91d46dabc7133b66cf39aec166bda9bac4f8a5d11afcc0ff5c1cc",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "c200aad360f5bacf118dde7ce7a1eb9d9f2b039b722a05ce1f026f5c29c5a9fa",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "419c9ea2dc5ea9a5549e4f6ba05d4db667428860ea0bb955ac0acf8d618e67c7"
+  },
+  "harness_sha256": "20cabe02830f1bc45bc649f378eb1b52246ea7e119226b8814f5ff94303b7523",
+  "conditions": {
+    "power_thermal_background_load": "uncontrolled",
+    "network": "not required"
+  },
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "dimensions": 384,
+  "max_length": 512,
+  "matrix": [
+    {
+      "batch_size": 1,
+      "tokens_per_text": 32,
+      "padded_tokens": 32,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.1527418339974247,
+        0.15207200002623722,
+        0.12852033297531307
+      ],
+      "p50_seconds": 0.15207200002623722,
+      "p95_seconds": 0.15267485060030594,
+      "texts_per_second": 6.923063604184011,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 396,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 0.41369608329841867,
+        "encode_seconds": 0.012926959025207907,
+        "submit_wait_seconds": 0.41675195802235976,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 337370432,
+        "peak_bytes": 337370564,
+        "cache_bytes": 2151936,
+        "process_rss_bytes": 618086400,
+        "process_peak_rss_bytes": 618102784
+      }
+    }
+  ],
+  "status": "passed",
+  "load_seconds": 0.8969059590017423,
+  "loaded_runtime": {
+    "shader_sha256": "7ca48e3192a2c3390c089f8780ec1a3139cd51776400303297a1b22b1fb362fc",
+    "native_library_sha256": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "allocations": 704,
+    "allocated_bytes": 335218496,
+    "completed_commands": 0,
+    "gpu_timed_commands": 0,
+    "gpu_seconds": 0.0,
+    "encode_seconds": 0.0,
+    "submit_wait_seconds": 0.0,
+    "dispatches": {},
+    "active_bytes": 335218496,
+    "cache_bytes": 0,
+    "peak_bytes": 335218496
+  },
+  "first_encode_seconds": 0.100335749972146,
+  "concurrency": {
+    "rounds": 10,
+    "canceled_tasks": 20,
+    "recovery_verified": true
+  },
+  "soak": {
+    "requested_seconds": 120,
+    "elapsed_seconds": 124.56378237495665,
+    "completed_calls": 23,
+    "bitwise_repeatability": true,
+    "live_buffers_stable": true,
+    "workspace_cache_bounded": true,
+    "rss_end_minus_start_bytes": -64045056,
+    "rss_sample_range_bytes": 65257472,
+    "checkpoints": [
+      {
+        "elapsed_seconds": 0.0,
+        "active_bytes": 401965376,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66746880,
+        "process_rss_bytes": 344129536,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 10.302812916983385,
+        "active_bytes": 401630528,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 279511040,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 20.871900958009064,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 278872064,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 41.47994366695639,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280395776,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 51.63758245797362,
+        "active_bytes": 401630528,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 280461312,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 62.20369704195764,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280494080,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 72.42297074996168,
+        "active_bytes": 401630528,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 280543232,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 82.94592624995857,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280559616,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 93.11937099997886,
+        "active_bytes": 401630528,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 280625152,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 103.66174449998653,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280625152,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 114.00152666697977,
+        "active_bytes": 401630528,
+        "peak_bytes": 410932288,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 279101440,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 124.54417758301133,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280018944,
+        "process_peak_rss_bytes": 619806720
+      },
+      {
+        "elapsed_seconds": 124.55632941698423,
+        "active_bytes": 400474432,
+        "peak_bytes": 410932288,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 280084480,
+        "process_peak_rss_bytes": 619806720
+      }
+    ]
+  },
+  "after_close": {
+    "active_bytes": 0,
+    "peak_bytes": 410932288,
+    "cache_bytes": 0,
+    "process_rss_bytes": 59523072,
+    "process_peak_rss_bytes": 619806720
+  },
+  "closed_rejected": true,
+  "reload_verified": true,
+  "workspace_sources_unchanged": true
+}

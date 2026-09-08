@@ -89,3 +89,12 @@ GPU timing follows Apple's
 [MTLCommandBuffer timestamp contract](https://developer.apple.com/documentation/metal/mtlcommandbuffer/gpustarttime).
 The developer benchmark compares products to NumPy float64 and retains the
 rejected long-K experiment as evidence instead of relaxing numerical tolerances.
+
+### 0.5 uint4 and standalone integrations
+
+The uint4 8x32 tile is original MSL code: 4 KiB of threadgroup weight storage,
+packed-word decoding with BF16 affine metadata, F32 SIMDgroup matrix operations
+and partial accumulation per 32 K elements. It uses Apple's documented Metal
+primitives ([SIMDgroup introduction](https://developer.apple.com/videos/play/tech-talks/10858/)).
+No MLX or GPL source was copied or linked. SQLite and HTTP support use Python's
+standard library; the example documents were written for this project.

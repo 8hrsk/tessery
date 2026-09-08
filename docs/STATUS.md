@@ -27,6 +27,12 @@ specification is preserved as historical input.
 * Eager float32 Metal tensors: addition, matrix multiplication, transpose, SiLU,
   explicit host readback and deterministic cleanup at tensor/runtime scope.
   Intermediate results stay on the device; operations preserve their inputs.
+* Tiled uint4 matmul with chunked F32 accumulation and bounded 64 MiB scratch
+  reuse; explicit cache accounting, trimming and disable option.
+* SQLite exact retrieval snapshots with embedding-contract checks, conservative
+  chunking, source offsets, a working RAG example and index/search CLI commands.
+* Loopback HTTP embeddings with bounded admission/connections, timeout cancellation,
+  optional bearer authentication, metadata routes and graceful shutdown.
 * Short-K tiled F32 matmul, bounded length buckets with output-order restoration,
   shared sync/async submission queue and recovery from partial command creation.
 * Cumulative CPU/GPU command diagnostics and reproducible latency/memory/soak tools;
@@ -57,7 +63,8 @@ verified real packs. Other packs within those bounded contracts can be described
 with manifests; this does not qualify their embedding quality automatically.
 New architectures, pooling modes, quantization formats or sharded weights still
 need implementation and validation. There is no autograd/training, general tensor graph,
-generation/KV cache, ANN database, HTTP/UDS daemon or production supervisor.
+generation/KV cache, ANN database, UDS daemon or production supervisor.
+The HTTP server is for trusted local applications; see [its limits](HTTP_API.md).
 This is not a complete MLX replacement or a claim of MLX performance parity.
 
 The wheel needs an installed Python and Apple frameworks. It is not a bundled

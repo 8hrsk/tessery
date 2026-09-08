@@ -13,3 +13,5 @@ recursive-include model-manifests *.json *.sha256
 # Black-box GPL environment tooling is deliberately excluded from distributions.
 prune benchmarks
 global-exclude *.dylib
+
+recursive-include examples *.py *.txt

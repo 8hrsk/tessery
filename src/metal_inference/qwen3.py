@@ -15,7 +15,13 @@ from .weights import SafeTensors, read_artifact, read_json
 class Qwen3Backend:
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir: str, profile: ModelProfile = QWEN3_PROFILE) -> None:
+    def __init__(
+        self,
+        model_dir: str,
+        profile: ModelProfile = QWEN3_PROFILE,
+        *,
+        workspace_limit_bytes: int = 64 * 1024 * 1024,
+    ) -> None:
         config = read_json(model_dir, "config.json", profile=profile)
         self.profile = profile
         self.hidden = config_int(config, "hidden_size", 64, 4096)
@@ -89,7 +95,7 @@ class Qwen3Backend:
         # Validate every tensor before creating any GPU allocation.
         for name, (shape, dtype) in specs.items():
             snapshots.view(name, shape=shape, dtype=dtype)
-        self.runtime = MetalRuntime()
+        self.runtime = MetalRuntime(workspace_limit_bytes=workspace_limit_bytes)
         self.weights: dict[str, Buffer] = {}
         self._closed = False
         try:
@@ -125,12 +131,6 @@ class Qwen3Backend:
         rt = self.runtime
         batch, seq = ids.shape
         tokens = batch * seq
-        allocated: list[Buffer] = []
-
-        def new(size: int, data: NDArray[Any] | None = None) -> Buffer:
-            buffer = rt.buffer(size, data)
-            allocated.append(buffer)
-            return buffer
 
         def norm(x: Buffer, y: Buffer, name: str, rows: int, cols: int) -> None:
             rt._dispatch(
@@ -143,11 +143,8 @@ class Qwen3Backend:
             )
 
         def linear(x: Buffer, y: Buffer, name: str, outputs: int, inputs: int) -> None:
-            rt._dispatch(
-                "linear4",
+            rt._linear4(
                 [x, *self._quant(name), y],
-                threads=((tokens + 3) // 4) * outputs * 32,
-                group_size=32,
                 rows=tokens,
                 cols=outputs,
                 k=inputs,
@@ -156,7 +153,7 @@ class Qwen3Backend:
         def residual(x: Buffer, y: Buffer) -> None:
             rt._dispatch("add", [x, y, x], threads=tokens * self.hidden, n=tokens * self.hidden)
 
-        try:
+        with rt._workspace() as new:
             with rt.command():
                 token_buffer = new(ids.nbytes, np.ascontiguousarray(ids))
                 length_buffer = new(lengths.nbytes, np.ascontiguousarray(lengths))
@@ -246,9 +243,6 @@ class Qwen3Backend:
             ):
                 raise InferenceError()
             return result
-        finally:
-            for buffer in allocated:
-                buffer.close()
 
     def close(self) -> None:
         if not self._closed:

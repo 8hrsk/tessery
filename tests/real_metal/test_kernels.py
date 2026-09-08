@@ -318,3 +318,80 @@ def test_tiled_matmul_and_unaligned_fallback(runtime, shape):
     name = "matmul_f32_tiled" if tiled else "matmul_f32"
     assert runtime.diagnostics()["dispatches"] == {name: 1}
     assert runtime.active_bytes == 0
+
+
+@pytest.mark.parametrize(
+    "m,n,k", [(1, 32, 64), (7, 33, 128), (8, 32, 64), (16, 64, 1024), (8, 32, 3072)]
+)
+def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
+    rng = np.random.default_rng(417)
+    codes = rng.integers(0, 16, size=(n, k), dtype=np.uint32)
+    packed = np.bitwise_or.reduce(
+        codes.reshape(n, k // 8, 8) << np.arange(0, 32, 4, dtype=np.uint32), axis=-1
+    )
+    scales = bf16(rng.uniform(0.01, 0.2, size=(n, k // 64)))
+    biases = bf16(rng.uniform(-1, 0.1, size=scales.shape))
+    decoded = codes.astype(np.float32) * (scales.astype(np.uint32) << 16).view(np.float32).repeat(
+        64, axis=1
+    )
+    decoded += (biases.astype(np.uint32) << 16).view(np.float32).repeat(64, axis=1)
+    x = rng.normal(size=(m, k)).astype(np.float32)
+    buffers = [runtime.buffer(a.nbytes, a) for a in (x, packed, scales, biases)]
+    buffers.append(runtime.buffer(m * n * 4))
+    try:
+        with runtime.command():
+            runtime._linear4(buffers, rows=m, cols=n, k=k)
+        expected = x.astype(np.float64) @ decoded.astype(np.float64).T
+        np.testing.assert_allclose(
+            runtime.read(buffers[-1], (m, n)), expected, atol=5e-5, rtol=5e-5
+        )
+        name = "linear4_tiled" if m % 8 == 0 and n % 32 == 0 else "linear4"
+        assert runtime.diagnostics()["dispatches"] == {name: 1}
+    finally:
+        for buffer in buffers:
+            buffer.close()
+
+
+def test_workspace_reuse_bound_abort_and_trim(runtime):
+    runtime.workspace_limit_bytes = 1024
+    with runtime._workspace() as allocate:
+        a, b = allocate(512), allocate(512)
+        assert a is not b
+        with runtime.command():
+            runtime._dispatch("add", [a, b, a], threads=128, n=128)
+    assert runtime.active_bytes == runtime.cache_bytes == 1024
+    allocations = runtime.diagnostics()["allocations"]
+    with pytest.raises(InferenceError), runtime._workspace() as allocate:
+        recovered = allocate(512)
+        with runtime.command():
+            runtime._dispatch("nonexistent_kernel", [recovered], threads=1)
+    assert runtime.diagnostics()["allocations"] == allocations
+    with pytest.raises(InferenceError):
+        allocate(512)  # No use after lease release.
+    with runtime._workspace() as allocate:
+        large = allocate(2048)
+        assert large.pointer
+    assert not large.pointer
+    assert runtime.cache_bytes <= 1024
+    with runtime._workspace() as allocate:
+        allocate(768)
+    assert runtime.cache_bytes == runtime.active_bytes == 768
+    np.testing.assert_array_equal(
+        runtime.add(np.ones(4, np.float32), np.ones(4, np.float32)), [2] * 4
+    )
+    runtime.trim_workspace()
+    assert runtime.active_bytes == runtime.cache_bytes == 0
+
+
+def test_workspace_uploads_are_not_retained_and_live_leases_are_exclusive(runtime):
+    x = np.ones(16, np.float32)
+    with runtime._workspace() as allocate:
+        upload = allocate(x.nbytes, x)
+        with pytest.raises(InferenceError), runtime._workspace():
+            pass
+        with pytest.raises(InferenceError):
+            runtime.close()
+        scratch = allocate(512)
+    assert not upload.pointer and scratch.pointer
+    runtime.close()
+    assert not scratch.pointer and runtime.active_bytes == runtime.cache_bytes == 0

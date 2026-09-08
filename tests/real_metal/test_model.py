@@ -73,10 +73,10 @@ def test_dimensions_batch_order_and_memory(model):
     )
     reversed_vectors = model.encode(list(reversed(texts)), dimensions=1024)
     np.testing.assert_array_equal(native, reversed_vectors[::-1])
-    assert model.memory_stats().active_bytes == 335218496
+    assert (model.memory_stats().active_bytes - model.memory_stats().cache_bytes) == 335218496
     for _ in range(3):
         model.encode(texts)
-    assert model.memory_stats().active_bytes == 335218496
+    assert (model.memory_stats().active_bytes - model.memory_stats().cache_bytes) == 335218496
 
 
 def test_boundaries_and_batch32(model):
@@ -86,3 +86,17 @@ def test_boundaries_and_batch32(model):
     vectors = model.encode(["text"] * 32)
     assert vectors.shape == (32, 384)
     np.testing.assert_allclose(vectors, np.repeat(vectors[:1], 32, axis=0), atol=1e-6)
+
+
+def test_workspace_reuses_scratch_but_refreshes_inputs(model):
+    texts = ["Alpha", "Beta"]
+    expected = model.encode(texts)
+    runtime = model._backend.runtime
+    before = runtime.diagnostics()["allocations"]
+    np.testing.assert_array_equal(model.encode(texts), expected)
+    assert runtime.diagnostics()["allocations"] - before == 2  # IDs and lengths only.
+    assert 0 < model.memory_stats().cache_bytes <= 64 * 1024 * 1024
+    model.trim_memory()
+    assert model.memory_stats().cache_bytes == 0
+    assert model.memory_stats().active_bytes == 335218496
+    np.testing.assert_array_equal(model.encode(texts), expected)

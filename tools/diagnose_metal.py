@@ -176,8 +176,14 @@ def soak(model, seconds, on_checkpoint=None):
     while time.perf_counter() - started < seconds:
         i = count % len(batches)
         np.testing.assert_array_equal(model.encode(batches[i]), references[i])
-        if model.memory_stats().active_bytes != baseline["active_bytes"]:
-            raise AssertionError("Owned Metal buffers grew between completed requests")
+        stats = model.memory_stats()
+        if (
+            stats.active_bytes - stats.cache_bytes
+            != baseline["active_bytes"] - baseline["cache_bytes"]
+        ):
+            raise AssertionError("Live Metal buffers grew between completed requests")
+        if stats.cache_bytes > model._backend.runtime.workspace_limit_bytes:
+            raise AssertionError("Workspace cache exceeded its budget")
         count += 1
         elapsed = time.perf_counter() - started
         if elapsed >= next_sample:
@@ -192,7 +198,8 @@ def soak(model, seconds, on_checkpoint=None):
         "elapsed_seconds": time.perf_counter() - started,
         "completed_calls": count,
         "bitwise_repeatability": True,
-        "owned_buffers_stable": True,
+        "live_buffers_stable": True,
+        "workspace_cache_bounded": True,
         "rss_end_minus_start_bytes": rss[-1] - rss[0],
         "rss_sample_range_bytes": max(rss) - min(rss),
         "checkpoints": points,

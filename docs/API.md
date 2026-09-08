@@ -1,4 +1,4 @@
-# Standalone API, 0.4 alpha
+# Standalone API, 0.5 alpha
 
 ```python
 from metal_inference import EmbeddingModel, MetalRuntime, cosine_search
@@ -54,7 +54,13 @@ encoded in the profile ID. Legacy Yuri embedding-space compatibility is not clai
 
 `health()`, `memory_stats()` and `warmup()` report readiness, owned GPU buffer
 bytes and perform an initial forward. `peak_bytes` is not process RSS or driver
-memory. `cache_bytes=0` describes tensor caches; compiled pipelines are retained.
+memory. `active_bytes` includes retained scratch and `cache_bytes` is that subset.
+`active_bytes - cache_bytes` reports live owned allocations. The default workspace
+cache budget is 64 MiB; set `load(..., workspace_limit_bytes=0)` to disable it
+(range 0..1 GiB). `trim_memory()` waits for the current forward and releases
+cached workspace. `close()` also releases it. Compiled pipelines are separate.
+The cache stores buffers, not texts, tokens or computed embeddings; each forward
+overwrites its working regions. General tensors keep explicit ownership.
 
 `cosine_search(query, documents, k=5)` returns `SearchHit(index, score)` records
 from an existing embedding matrix. Ties keep document order. This small helper
@@ -113,7 +119,7 @@ synchronized host arrays for callers that prefer a single-operation interface.
 * `benchmark --model-dir /absolute/model --batch-size 1 --tokens 32 --iterations 10
   --warmup 2`: synthetic direct-API diagnostic with raw timing samples.
 
-`inspect`, `embed` and `benchmark` accept either `--profile NAME` or
+Model commands accept either `--profile NAME` or
 `--profile-file FILE`. Defaults preserve the original Qwen3 behavior. `inspect`
 now returns a `profile` object with artifact filenames, sizes and hashes.
 See [model profiles](MODEL_PROFILES.md) for manifest trust and supported formats.
@@ -122,7 +128,9 @@ Invoke commands with `metal-inference` or `python -I -m metal_inference`.
 Exit codes: 0 success; 2 invalid arguments, model/input/I/O or inference error.
 Runtime failures contain stable safe codes. `embed` intentionally emits vectors
 to the caller-selected destination. The library does not log/persist prompts or
-vectors. HTTP/UDS, TLS and a Go supervisor are not part of this alpha.
+vectors unless explicitly requested through `DocumentIndex.save`.
+See [persisted indexes and RAG](RAG.md) and [local HTTP serving](HTTP_API.md).
+UDS, TLS and a Go supervisor are not part of this alpha.
 
 Runtime counters, bounded load tests and benchmark interpretation are documented
 in [performance diagnostics](PERFORMANCE.md).

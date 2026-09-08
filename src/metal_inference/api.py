@@ -110,6 +110,7 @@ class EmbeddingModel:
         dimensions: int | None = None,
         max_length: int | None = None,
         max_pending: int = 8,
+        workspace_limit_bytes: int = 64 * 1024 * 1024,
         profile: str | ModelProfile = "qwen3-embedding-0.6b-dwq",
     ) -> "EmbeddingModel":
         selected = get_profile(profile)
@@ -122,6 +123,8 @@ class EmbeddingModel:
             or not selected.min_length <= max_length <= selected.max_length
             or type(max_pending) is not int
             or not 1 <= max_pending <= 64
+            or type(workspace_limit_bytes) is not int
+            or not 0 <= workspace_limit_bytes <= 2**30
         ):
             raise ConfigurationError()
         tokenizer_data = read_json(str(model_dir), "tokenizer.json", profile=selected)
@@ -136,9 +139,9 @@ class EmbeddingModel:
         if tokenizer.vocab_size != config.get("vocab_size"):
             raise UnsupportedProfileError()
         backend: Backend = (
-            Qwen3Backend(str(model_dir), selected)
+            Qwen3Backend(str(model_dir), selected, workspace_limit_bytes=workspace_limit_bytes)
             if selected.architecture == "qwen3_uint4"
-            else BertBackend(str(model_dir), selected)
+            else BertBackend(str(model_dir), selected, workspace_limit_bytes=workspace_limit_bytes)
         )
         try:
             return cls(
@@ -278,8 +281,19 @@ class EmbeddingModel:
         return HealthStatus(loaded, loaded, self.descriptor.compatibility_id)
 
     def memory_stats(self) -> MemoryStats:
-        runtime = self._backend.runtime
-        return MemoryStats(runtime.active_bytes, runtime.peak_bytes)
+        # Keep active/cache counters from the same completed forward or trim.
+        with self._metal_lock:
+            runtime = self._backend.runtime
+            return MemoryStats(
+                runtime.active_bytes, runtime.peak_bytes, getattr(runtime, "cache_bytes", 0)
+            )
+
+    def trim_memory(self) -> None:
+        """Release cached workspace after any running forward finishes."""
+        with self._metal_lock:
+            if self._closed.is_set():
+                raise ClosedError()
+            self._backend.runtime.trim_workspace()
 
     def warmup(self) -> None:
         self.encode(["warmup"])

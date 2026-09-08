@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "label": "workspace-rag-http",
+  "scope": "single_host_diagnostic_not_release_gate",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python": "3.12.13",
+  "chip": "Apple M1",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "946fe5586d23939c371c881b43d631eb94449b97ede25a5cd23bceb353ffb308",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "src/metal_inference/api.py": "0dceb08de93b63757bf2fb51b58765c2f3dab9702d161f6ff3271861399e455c",
+    "src/metal_inference/backend.py": "9b492f9adbe8bea3e538b46cd7f50af193d6b81771b743b3ec20694f1912bd99",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cli.py": "3734b25263e88c2c1d3685685392065af703b864b9347bb04ad4d7d39abdaedc",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a37944cd104ed0efdfaa3ca70aad8c989958926b099ddfc16413cc24cf909e71",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "d0d5f700410c936a6eaa8a6f317d49d1c3d6d214f3950fed767f158731894984",
+    "src/metal_inference/native/kernels.metal": "7ca48e3192a2c3390c089f8780ec1a3139cd51776400303297a1b22b1fb362fc",
+    "src/metal_inference/native/runtime.mm": "69115d2146cbdf4c23b617305fc4744ee85b836741ae410a5fe4a4ca68c41eb1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "c200aad360f5bacf118dde7ce7a1eb9d9f2b039b722a05ce1f026f5c29c5a9fa",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "419c9ea2dc5ea9a5549e4f6ba05d4db667428860ea0bb955ac0acf8d618e67c7"
+  },
+  "harness_sha256": "20cabe02830f1bc45bc649f378eb1b52246ea7e119226b8814f5ff94303b7523",
+  "conditions": {
+    "power_thermal_background_load": "uncontrolled",
+    "network": "not required"
+  },
+  "model": "BAAI/bge-small-en-v1.5",
+  "compatibility_id": "tessery-bert_f32-v1:be9a26877207ec61e25a6874a01646ffee489b802353c3c43f3d82be4db1f3a8",
+  "dimensions": 384,
+  "max_length": 512,
+  "matrix": [
+    {
+      "batch_size": 1,
+      "tokens_per_text": 32,
+      "padded_tokens": 32,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.01240925001911819,
+        0.013440750015433878,
+        0.011826874979306012
+      ],
+      "p50_seconds": 0.01240925001911819,
+      "p95_seconds": 0.013337600015802309,
+      "texts_per_second": 79.62443803782979,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 396,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 0.030117208312731236,
+        "encode_seconds": 0.0037942909402772784,
+        "submit_wait_seconds": 0.03188862500246614,
+        "dispatches": {
+          "embedding_position": 3,
+          "layer_norm": 75,
+          "matmul_f32": 36,
+          "add_bias": 216,
+          "attention": 36,
+          "add": 72,
+          "gelu_f32": 36,
+          "pool_project": 3,
+          "matmul_f32_tiled": 180
+        }
+      },
+      "memory": {
+        "active_bytes": 133403136,
+        "peak_bytes": 133403268,
+        "cache_bytes": 554496,
+        "process_rss_bytes": 341966848,
+        "process_peak_rss_bytes": 341966848
+      }
+    }
+  ],
+  "status": "passed",
+  "load_seconds": 0.24820812500547618,
+  "loaded_runtime": {
+    "shader_sha256": "7ca48e3192a2c3390c089f8780ec1a3139cd51776400303297a1b22b1fb362fc",
+    "native_library_sha256": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "allocations": 197,
+    "allocated_bytes": 132848640,
+    "completed_commands": 0,
+    "gpu_timed_commands": 0,
+    "gpu_seconds": 0.0,
+    "encode_seconds": 0.0,
+    "submit_wait_seconds": 0.0,
+    "dispatches": {},
+    "active_bytes": 132848640,
+    "cache_bytes": 0,
+    "peak_bytes": 132848640
+  },
+  "first_encode_seconds": 0.013999708986375481,
+  "concurrency": {
+    "rounds": 10,
+    "canceled_tasks": 20,
+    "recovery_verified": true
+  },
+  "soak": {
+    "requested_seconds": 120,
+    "elapsed_seconds": 120.53653491602745,
+    "completed_calls": 491,
+    "bitwise_repeatability": true,
+    "live_buffers_stable": true,
+    "workspace_cache_bounded": true,
+    "rss_end_minus_start_bytes": -144506880,
+    "rss_sample_range_bytes": 145145856,
+    "checkpoints": [
+      {
+        "elapsed_seconds": 0.0,
+        "active_bytes": 142699008,
+        "peak_bytes": 142699648,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 342802432,
+        "process_peak_rss_bytes": 342802432
+      },
+      {
+        "elapsed_seconds": 10.372109499992803,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 343375872,
+        "process_peak_rss_bytes": 343392256
+      },
+      {
+        "elapsed_seconds": 20.770511500013527,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198230016,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 30.94329383299919,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198230016,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 41.06764387502335,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198262784,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 51.54895020800177,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198279168,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 61.9812770410208,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 72.0403522910201,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 82.08202295802766,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198311936,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 92.64918487501564,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 102.66320158302551,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 112.94041099998867,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      },
+      {
+        "elapsed_seconds": 120.52779800002463,
+        "active_bytes": 142699008,
+        "peak_bytes": 142701072,
+        "cache_bytes": 9850368,
+        "process_rss_bytes": 198295552,
+        "process_peak_rss_bytes": 343425024
+      }
+    ]
+  },
+  "after_close": {
+    "active_bytes": 0,
+    "peak_bytes": 142701072,
+    "cache_bytes": 0,
+    "process_rss_bytes": 65110016,
+    "process_peak_rss_bytes": 343425024
+  },
+  "closed_rejected": true,
+  "reload_verified": true,
+  "workspace_sources_unchanged": true
+}

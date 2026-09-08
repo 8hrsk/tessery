@@ -82,13 +82,17 @@ def test_semantics_limits_and_memory(model, reference):
     for dims in (32, 383, 385, True):
         with pytest.raises(InvalidInputError):
             model.encode(["hello"], dimensions=dims)
-    resident = model.memory_stats().active_bytes
+    resident = model.memory_stats().active_bytes - model.memory_stats().cache_bytes
     for _ in range(3):
         np.testing.assert_array_equal(model.encode(texts), output)
-        assert model.memory_stats().active_bytes == resident
+        assert (model.memory_stats().active_bytes - model.memory_stats().cache_bytes) == resident
     batch = model.encode(["hello"] * 32)
     np.testing.assert_allclose(batch, np.repeat(batch[:1], 32, axis=0), atol=1e-6)
-    assert model.memory_stats().active_bytes == resident == 132848640
+    assert (
+        (model.memory_stats().active_bytes - model.memory_stats().cache_bytes)
+        == resident
+        == 132848640
+    )
 
 
 def test_bert_truncation_keeps_sep_and_padding_mask(model):
@@ -98,4 +102,47 @@ def test_bert_truncation_keeps_sep_and_padding_mask(model):
     assert [int(ids[i, int(n) - 1]) for i, n in enumerate(lengths)] == [102] * 3
     out = model.encode(texts)
     np.testing.assert_allclose(out[1], out[2], atol=1e-6)
-    assert model.memory_stats().active_bytes == 132848640
+    assert (model.memory_stats().active_bytes - model.memory_stats().cache_bytes) == 132848640
+
+
+def test_persisted_retrieval_and_http_use_same_real_model(model, tmp_path):
+    import http.client
+    import threading
+
+    from metal_inference import DocumentIndex
+    from metal_inference.server import EmbeddingServer
+
+    documents = {
+        "france.txt": "Paris is the capital of France.",
+        "garden.txt": "Bananas grow in warm tropical climates.",
+    }
+    index = DocumentIndex.build(model, documents)
+    target = tmp_path / "retrieval.sqlite"
+    index.save(target)
+    loaded = DocumentIndex.load(target)
+    assert (
+        loaded.search(model, "What is the capital of France?", k=1)[0].chunk.source == "france.txt"
+    )
+    expected = model.encode(["Paris is the capital of France."])
+    with EmbeddingServer(model, port=0) as server:
+        worker = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.01})
+        worker.start()
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=10)
+            try:
+                connection.request(
+                    "POST",
+                    "/v1/embeddings",
+                    json.dumps({"input": documents["france.txt"]}),
+                    {"Content-Type": "application/json"},
+                )
+                response = connection.getresponse()
+                assert response.status == 200
+                actual = json.loads(response.read())["data"][0]["embedding"]
+                np.testing.assert_array_equal(np.asarray(actual, np.float32), expected[0])
+            finally:
+                connection.close()
+        finally:
+            server.shutdown()
+            worker.join(timeout=5)
+            assert not worker.is_alive()

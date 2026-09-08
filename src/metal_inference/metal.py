@@ -101,10 +101,56 @@ class Buffer:
         self.close()
 
 
+class WorkspaceLease:
+    """Internal forward-scoped allocator; a released lease cannot be reused."""
+
+    def __init__(self, runtime: "MetalRuntime") -> None:
+        self.runtime = runtime
+        self.buffers: list[tuple[Buffer, bool]] = []
+        self.closed = False
+
+    def __call__(self, size: int, data: NDArray[Any] | None = None) -> Buffer:
+        if self.closed:
+            raise InferenceError()
+        rt = self.runtime
+        buffer = None
+        if data is None:
+            for index, cached in enumerate(rt._scratch):
+                if cached.size == size:
+                    buffer = rt._scratch.pop(index)
+                    rt.cache_bytes -= size
+                    break
+        if buffer is None:
+            buffer = rt.buffer(size, data)
+        self.buffers.append((buffer, data is None))
+        return buffer
+
+    def release(self) -> None:
+        self.closed = True
+        rt = self.runtime
+        for buffer, reusable in self.buffers:
+            if reusable and buffer.pointer and buffer.size <= rt.workspace_limit_bytes:
+                while rt._scratch and rt.cache_bytes + buffer.size > rt.workspace_limit_bytes:
+                    old = rt._scratch.pop(0)
+                    rt.cache_bytes -= old.size
+                    old.close()
+                rt._scratch.append(buffer)
+                rt.cache_bytes += buffer.size
+            else:
+                buffer.close()
+        self.buffers.clear()
+
+
 class MetalRuntime:
     """Synchronous GPU command owner. Commands are serialized per instance."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, workspace_limit_bytes: int = 64 * 1024 * 1024) -> None:
+        if type(workspace_limit_bytes) is not int or not 0 <= workspace_limit_bytes <= 2**30:
+            raise InferenceError()
+        self.workspace_limit_bytes = workspace_limit_bytes
+        self.cache_bytes = 0
+        self._scratch: list[Buffer] = []
+        self._workspace_active = False
         self._lib = _library()
         source = (Path(__file__).parent / "native/kernels.metal").read_bytes()
         self._shader_sha256 = hashlib.sha256(source).hexdigest()
@@ -146,8 +192,34 @@ class MetalRuntime:
                 "submit_wait_seconds": self._submit_wait_seconds,
                 "dispatches": dict(self._dispatches),
                 "active_bytes": self.active_bytes,
+                "cache_bytes": self.cache_bytes,
                 "peak_bytes": self.peak_bytes,
             }
+
+    @contextmanager
+    def _workspace(self) -> Iterator[WorkspaceLease]:
+        # The lock spans encoding, GPU completion and host readback. Buffers are
+        # returned only after command() has finished or aborted unsubmitted work.
+        with self._lock:
+            if not self._pointer:
+                raise ClosedError()
+            if self._recording or self._workspace_active:
+                raise InferenceError()
+            self._workspace_active = True
+            lease = WorkspaceLease(self)
+            try:
+                yield lease
+            finally:
+                lease.release()
+                self._workspace_active = False
+
+    def trim_workspace(self) -> None:
+        """Release retained scratch buffers; waits for the current forward."""
+        with self._lock:
+            for buffer in self._scratch:
+                buffer.close()
+            self._scratch.clear()
+            self.cache_bytes = 0
 
     def tensor(self, data: NDArray[np.float32]) -> Tensor:
         """Upload a nonempty float32 array into an owned, contiguous Metal tensor."""
@@ -201,6 +273,18 @@ class MetalRuntime:
                 self._lib.mi_abort(self._pointer)
                 self._recording = False
                 self._inflight.clear()
+
+    def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
+        tiled = rows % 8 == 0 and cols % 32 == 0 and k % 64 == 0
+        self._dispatch(
+            "linear4_tiled" if tiled else "linear4",
+            buffers,
+            threads=(rows // 8) * (cols // 32) * 128 if tiled else ((rows + 3) // 4) * cols * 32,
+            group_size=128 if tiled else 32,
+            rows=rows,
+            cols=cols,
+            k=k,
+        )
 
     def _dispatch(
         self,
@@ -340,9 +424,10 @@ class MetalRuntime:
 
     def close(self) -> None:
         with self._lock:
-            if self._recording:
+            if self._recording or self._workspace_active:
                 raise InferenceError()
             if self._pointer:
+                self.trim_workspace()
                 for buffer in list(self._buffers):
                     buffer.close()
                 self._lib.mi_destroy(self._pointer)

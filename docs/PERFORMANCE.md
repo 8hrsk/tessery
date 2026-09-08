@@ -113,3 +113,18 @@ Future work includes long-K accuracy-preserving tiling, quantized tiled GEMM,
 tiled attention, controlled per-kernel profiling and a longer soak on another Mac.
 Local research/review reports are deliberately kept outside Git under
 `artifacts/research/`.
+
+## 0.5 workspace and uint4 changes
+
+`active_bytes` now includes cached scratch; `cache_bytes` is its retained subset.
+Soak checks live bytes (`active_bytes - cache_bytes`) and the cache budget after
+every request, allowing bounded cache contents to change with shapes. Disable
+the cache with `EmbeddingModel.load(..., workspace_limit_bytes=0)` or trim via
+`model.trim_memory()`. Buffer reuse happens after GPU completion/readback.
+
+`tools/benchmark_quantized.py --model-dir /absolute/qwen --output NEW.json`
+compares the original and tiled uint4 kernels against float64, then runs paired
+full-model comparisons on the same loaded Qwen weights. It excludes two warmups
+and records 20 kernel samples or five full-model samples per route. Both routes
+use the same batching and workspace configuration. No weights are downloaded.
+See the [0.5 delivery report](IMPLEMENTATION_05.md) for measured bounds.

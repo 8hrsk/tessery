@@ -1,7 +1,5 @@
 """Float32 BERT encoder adapter using the shared native Metal runtime."""
 
-from typing import Any
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -15,7 +13,13 @@ from .weights import SafeTensors, read_artifact, read_json
 class BertBackend:
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir: str, profile: ModelProfile) -> None:
+    def __init__(
+        self,
+        model_dir: str,
+        profile: ModelProfile,
+        *,
+        workspace_limit_bytes: int = 64 * 1024 * 1024,
+    ) -> None:
         self.profile = profile
         config = read_json(model_dir, "config.json", profile=profile)
         self.hidden = config_int(config, "hidden_size", 32, 4096)
@@ -84,7 +88,7 @@ class BertBackend:
                 raise ManifestError()
             if dtype == "I64" and not np.array_equal(data.view(np.int64), np.arange(positions)):
                 raise ManifestError()
-        self.runtime = MetalRuntime()
+        self.runtime = MetalRuntime(workspace_limit_bytes=workspace_limit_bytes)
         self.weights: dict[str, Buffer] = {}
         self._closed = False
         try:
@@ -118,12 +122,6 @@ class BertBackend:
         rt = self.runtime
         batch, seq = ids.shape
         tokens = batch * seq
-        allocated: list[Buffer] = []
-
-        def new(size: int, data: NDArray[Any] | None = None) -> Buffer:
-            buffer = rt.buffer(size, data)
-            allocated.append(buffer)
-            return buffer
 
         def norm(x: Buffer, y: Buffer, name: str) -> None:
             rt._dispatch(
@@ -153,7 +151,7 @@ class BertBackend:
         def add(x: Buffer, y: Buffer) -> None:
             rt._dispatch("add", [x, y, x], threads=tokens * self.hidden, n=tokens * self.hidden)
 
-        try:
+        with rt._workspace() as new:
             with rt.command():
                 token_buffer = new(ids.nbytes, np.ascontiguousarray(ids))
                 length_buffer = new(lengths.nbytes, np.ascontiguousarray(lengths))
@@ -236,9 +234,6 @@ class BertBackend:
             ):
                 raise InferenceError()
             return result
-        finally:
-            for buffer in allocated:
-                buffer.close()
 
     def close(self) -> None:
         if not self._closed:

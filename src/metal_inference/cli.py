@@ -3,6 +3,7 @@
 import argparse
 import json
 import platform
+import signal
 import sys
 import time
 from collections.abc import Sequence
@@ -12,9 +13,11 @@ from pathlib import Path
 import numpy as np
 
 from .api import EmbeddingModel
-from .errors import EmbeddingError, InvalidInputError
+from .errors import ConfigurationError, EmbeddingError, InvalidInputError
+from .index import DocumentIndex, read_documents
 from .json_codec import dumps, loads
 from .profiles import ModelProfile, get_profile, list_profiles
+from .server import EmbeddingServer
 from .weights import read_artifact
 
 
@@ -22,7 +25,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="metal-inference")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("profiles", help="List built-in model profiles")
-    for name in ("inspect", "embed", "benchmark"):
+    for name in ("inspect", "embed", "benchmark", "index", "search", "serve"):
         command = sub.add_parser(name)
         command.add_argument("--model-dir", required=True)
         profile_args = command.add_mutually_exclusive_group()
@@ -33,6 +36,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         if name != "inspect":
             command.add_argument("--dimensions", type=int)
             command.add_argument("--max-length", type=int)
+            command.add_argument("--max-pending", type=int, default=8)
+            command.add_argument("--workspace-limit-mib", type=int, default=64)
+        if name == "serve":
+            command.add_argument("--port", type=int, default=8765)
+            command.add_argument("--max-connections", type=int, default=16)
+            command.add_argument("--request-timeout", type=float, default=30)
+            command.add_argument("--token-file", help="Optional file containing a bearer token")
+        if name == "index":
+            command.add_argument(
+                "--documents", required=True, help="Directory of UTF-8 .txt/.md files"
+            )
+            command.add_argument("--index", required=True, help="New SQLite snapshot path")
+            command.add_argument("--chunk-chars", type=int, default=600)
+            command.add_argument("--overlap-chars", type=int, default=80)
+            command.add_argument("--document-prefix", default="")
+            command.add_argument("--query-prefix", default="")
+        if name == "search":
+            command.add_argument("--index", required=True)
+            command.add_argument("--query", required=True)
+            command.add_argument("--top-k", type=int, default=5)
         if name == "embed":
             command.add_argument("--input", default="-", help="JSON array file; - reads stdin")
             command.add_argument("--output", default="-", help="JSON result file; - writes stdout")
@@ -98,9 +121,69 @@ def main(argv: Sequence[str] | None = None) -> int:
                 dimensions=args.dimensions,
                 max_length=args.max_length,
                 profile=profile,
+                max_pending=args.max_pending,
+                workspace_limit_bytes=args.workspace_limit_mib * 1024 * 1024,
             ) as model:
                 load_seconds = time.perf_counter() - started
-                if args.command == "embed":
+                if args.command == "serve":
+                    token = None
+                    if args.token_file:
+                        with Path(args.token_file).open("rb") as stream:
+                            raw_token = stream.read(4097)
+                        try:
+                            token = raw_token.decode("ascii").strip()
+                        except UnicodeError:
+                            raise ConfigurationError() from None
+                        if len(raw_token) > 4096:
+                            raise ConfigurationError()
+                    with EmbeddingServer(
+                        model,
+                        port=args.port,
+                        max_connections=args.max_connections,
+                        request_timeout=args.request_timeout,
+                        token=token,
+                    ) as server:
+                        print(
+                            json.dumps({"listening": f"http://127.0.0.1:{server.server_port}"}),
+                            file=sys.stderr,
+                            flush=True,
+                        )
+                        previous = signal.getsignal(signal.SIGTERM)
+
+                        def stop(signum: int, frame: object) -> None:
+                            raise KeyboardInterrupt
+
+                        signal.signal(signal.SIGTERM, stop)
+                        try:
+                            server.serve_forever(poll_interval=0.1)
+                        except KeyboardInterrupt:
+                            pass
+                        finally:
+                            signal.signal(signal.SIGTERM, previous)
+                    return 0
+                elif args.command == "index":
+                    index = DocumentIndex.build(
+                        model,
+                        read_documents(args.documents),
+                        chunk_chars=args.chunk_chars,
+                        overlap_chars=args.overlap_chars,
+                        document_prefix=args.document_prefix,
+                        query_prefix=args.query_prefix,
+                    )
+                    index.save(args.index)
+                    payload = {
+                        "chunks": len(index.chunks),
+                        "index": args.index,
+                        "compatibility_id": model.descriptor.compatibility_id,
+                    }
+                elif args.command == "search":
+                    index = DocumentIndex.load(args.index)
+                    payload = {
+                        "hits": [
+                            asdict(hit) for hit in index.search(model, args.query, k=args.top_k)
+                        ]
+                    }
+                elif args.command == "embed":
                     vectors = model.encode(texts)
                     payload = {
                         "model": model.descriptor.model_id,
