@@ -1,0 +1,37 @@
+{
+  "scope": "single_host_diagnostic_not_release_gate",
+  "backend": "native_metal",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python": "3.12.13",
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "model_load_seconds": 0.6088993339799345,
+  "first_encode_seconds": 0.3340320829884149,
+  "warmup_count": 2,
+  "batch_size": 1,
+  "tokens_per_text": 32,
+  "latency_seconds": [
+    0.5923996249912307,
+    0.5628256659838371,
+    0.5742697090026923,
+    0.6089105409919284,
+    0.5818546670489013
+  ],
+  "p50_seconds": 0.5818546670489013,
+  "p95_seconds": 0.6056083577917889,
+  "p99_seconds": 0.6082501043519005,
+  "texts_per_second": 1.7121761911047384,
+  "memory": {
+    "active_bytes": 335218496,
+    "peak_bytes": 337186244,
+    "cache_bytes": 0
+  },
+  "kernels_sha256": "30686823cf916bd9ab6d56cd89e6e31dc303d46c345a8733067572b7f2b6d3d1",
+  "runtime_source_sha256": "1b26dae8c36d5639d4f8624da95667245234f64c9d6a3d730d974d65ac93beda",
+  "tested_wheel_sha256": "343bb2a28ae518d75152e9e2d5d916f9ef64c5f7a8d62310642554a6fe3862ec",
+  "conditions": {
+    "concurrent_gpu_tests": false,
+    "power_and_thermal_controls": "not controlled",
+    "samples": "5 warm; diagnostic only"
+  }
+}

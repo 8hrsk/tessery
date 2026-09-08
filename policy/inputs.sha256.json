@@ -1,0 +1,10 @@
+{
+  "benchmarks/corpus.seed-v2.json": "35255104070be2c1fca922a042e9ef50124f887eb260026f0c5d0237a52d5980",
+  "benchmarks/corpus.seed.json": "cfcbd4343bdb33fa9d6c2e975a0ac22a7fe4aa20e5f2748e66182ed1df3f33f4",
+  "benchmarks/observations/local-20260905/environment.json": "3dc25535f55512e2d46e17a2c42e8cf45fe441496da1fa883e0bb9b1323135ad",
+  "benchmarks/observations/local-20260905/preprocessing-profile.json": "82eb307e715ff9373f93748ae60712b64c4f1f625bfa1f8b324351b585325a94",
+  "benchmarks/observations/local-20260905/vectors.json": "e002e8852f55e271f7813df12fcf9c3287d73396ed2cd965cc3b32b70f0138c3",
+  "docs/specification.ru.md": "ebc049f3280bc3fe4624540f1f6dd6669aaad19119804e3037454edefddab153",
+  "model-manifests/qwen3-0.6b-dwq.json": "c228bbf6c209a43831bf684a61bedffa650c2a704305fc0b47597d3b7bf45411",
+  "tests/contract/fixtures/draft-success.json": "54e52b7d3a592d40a99fa85998e11421c0e898c2364ec85f9b91f9a3d1007136"
+}

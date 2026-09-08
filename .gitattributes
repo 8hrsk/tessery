@@ -1,0 +1,4 @@
+* text=auto
+# Preserve verbatim upstream notices and the frozen input specification.
+third_party/** -whitespace
+docs/specification.ru.md -whitespace

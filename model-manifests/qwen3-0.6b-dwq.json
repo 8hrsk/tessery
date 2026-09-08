@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "model_revision": "6c3ae70858513f1a78e9cdca3cae330d9075cd2a",
+  "tokenizer_revision": "6c3ae70858513f1a78e9cdca3cae330d9075cd2a",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": "config.json",
+      "sha256": "e7dfa5b73fb2a03cbc8fb40c394e95b99f03348e237f7f28e7a1daf56a2169bb",
+      "size": 937,
+      "mode": 384
+    },
+    {
+      "path": "model.safetensors",
+      "sha256": "3d773d5ee582eda445daeee23f7a2b76124011796df244ddb45e22638fdb7cde",
+      "size": 335296756,
+      "mode": 384
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "sha256": "90d82744cdb6b7d093f0b812fc21a49b6ffa9d0084a45428f0cfd01eb4adbe12",
+      "size": 49770,
+      "mode": 384
+    },
+    {
+      "path": "tokenizer.json",
+      "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a",
+      "size": 11423705,
+      "mode": 384
+    },
+    {
+      "path": "tokenizer_config.json",
+      "sha256": "443bfa629eb16387a12edbf92a76f6a6f10b2af3b53d87ba1550adfcf45f7fa0",
+      "size": 5404,
+      "mode": 384
+    }
+  ]
+}

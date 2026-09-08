@@ -1,0 +1,25 @@
+Metal Inference 0.2.0a1 runtime dependencies:
+
+NumPy 2.5.2: BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0.
+regex 2025.9.18: Apache-2.0 AND CNRI-Python.
+Exact notices from the installed macOS distributions are retained in third_party/.
+The dependency wheels retain their own upstream notices and license files.
+The installed macOS NumPy binaries link to Apple Accelerate. NumPy's complete
+upstream notice also describes GCC/OpenBLAS variants; the referenced bundled
+GCC/quadmath libraries are absent from the inspected macOS wheel. Preserve the
+notice and recheck actual target binaries rather than inferring contents from
+that generic notice alone. Other platform wheels are not runtime release targets.
+Apple Foundation/Metal are system frameworks, not redistributed libraries.
+No MLX, PyTorch, MPS, transformers or Hugging Face runtime is a dependency.
+
+The Apache License text in LICENSE is published by the Apache Software Foundation.
+
+Model artifacts (not distributed):
+Qwen/Qwen3-Embedding-0.6B — Apache-2.0, Qwen authors.
+mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ — Apache-2.0 model card.
+Revision: 6c3ae70858513f1a78e9cdca3cae330d9075cd2a.
+Artifacts require separate provenance and license review before redistribution.
+
+The optional baseline environment is external to the package and is not a
+production or development dependency. Its GPL package is never bundled.
+Future runtime releases must aggregate CPython, MLX, all wheels and model notices.

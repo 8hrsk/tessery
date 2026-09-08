@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metal-inference"
+version = "0.2.0a1"
+description = "Independent Metal compute and local embedding inference on Apple Silicon"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.txt"]
+dependencies = ["numpy==2.5.2", "regex==2025.9.18"]
+classifiers = ["Development Status :: 2 - Pre-Alpha", "Typing :: Typed"]
+
+[project.scripts]
+metal-inference = "metal_inference.cli:main"
+yuri-mlx-embeddings = "yuri_mlx_embeddings.cli:main"
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "pytest-cov==6.2.1", "ruff==0.12.12", "mypy==1.15.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
+markers = ["real_mlx: historical marker", "metal: requires a native Metal device",
+           "real_model: requires the pinned local model artifacts"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+mypy_path = "stubs"
+
+[tool.coverage.run]
+branch = true
+source = ["yuri_mlx_embeddings", "metal_inference"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90

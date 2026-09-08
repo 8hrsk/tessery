@@ -1,0 +1,6 @@
+Metal Inference
+Copyright 2026 Metal Inference contributors
+
+This independent project is not a fork of or affiliated with MLX or mlx-embeddings.
+It implements its own numerical kernels using Apple's Metal platform interfaces.
+Model weights are not distributed with this Python package.

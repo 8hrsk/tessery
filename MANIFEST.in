@@ -1,0 +1,15 @@
+include LICENSE NOTICE THIRD_PARTY_NOTICES.txt PROVENANCE.md
+include uv.lock
+include .python-version
+recursive-include docs *.md *.json
+recursive-include tests *.py *.json
+recursive-include policy *.json
+recursive-include policy *.txt
+recursive-include tools *.py
+recursive-include stubs *.pyi
+recursive-include third_party *
+recursive-include src/metal_inference/native *.mm *.metal
+recursive-include model-manifests *.json *.sha256
+# Black-box GPL environment tooling is deliberately excluded from distributions.
+prune benchmarks
+global-exclude *.dylib

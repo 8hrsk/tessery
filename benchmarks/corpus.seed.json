@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "version": "seed-1",
+  "status": "proposed_requires_independent_review",
+  "cases": [
+    {
+      "id": "ru-query",
+      "text": "Какая столица Франции?"
+    },
+    {
+      "id": "en-query",
+      "text": "What is the capital of France?"
+    },
+    {
+      "id": "paris",
+      "text": "Париж — столица Франции."
+    },
+    {
+      "id": "weather",
+      "text": "Сегодня в Москве идёт снег."
+    },
+    {
+      "id": "code",
+      "text": "def square(x: int) -> int:\n    return x * x"
+    },
+    {
+      "id": "mixed",
+      "text": "Поиск embeddings работает offline на Mac."
+    },
+    {
+      "id": "emoji",
+      "text": "Привет 👋🏽 🌍 👨‍👩‍👧‍👦"
+    },
+    {
+      "id": "combining",
+      "text": "café café ё ё"
+    },
+    {
+      "id": "special-literal",
+      "text": "<|endoftext|> hello <|im_start|>"
+    },
+    {
+      "id": "short",
+      "text": "a"
+    },
+    {
+      "id": "boundary-32",
+      "text": " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+      "expected_untruncated_tokens": 32
+    },
+    {
+      "id": "boundary-128",
+      "text": " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+      "expected_untruncated_tokens": 128
+    },
+    {
+      "id": "boundary-511",
+      "text": " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+      "expected_untruncated_tokens": 511
+    },
+    {
+      "id": "boundary-512",
+      "text": " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+      "expected_untruncated_tokens": 512
+    },
+    {
+      "id": "boundary-513",
+      "text": " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+      "expected_untruncated_tokens": 513
+    }
+  ],
+  "relevance": [
+    {
+      "query_id": "ru-query",
+      "grades": {
+        "paris": 3,
+        "weather": 0
+      }
+    },
+    {
+      "query_id": "en-query",
+      "grades": {
+        "paris": 3,
+        "weather": 0
+      }
+    }
+  ],
+  "evaluation_proposal": {
+    "k": [
+      1,
+      5,
+      8,
+      12
+    ],
+    "tie_epsilon": 1e-08,
+    "tie_break": "stable document id; review required",
+    "aggregation": "macro over queries with relevant documents",
+    "allowed_failures": 0,
+    "cosine_min": 0.99999,
+    "overlap_min": 0.999,
+    "metrics": "Recall@k=binary relevant retrieved / all relevant; MRR@k=1/rank of first relevant; nDCG@k uses (2**grade-1)/log2(rank+1)"
+  },
+  "batches": [
+    [
+      "ru-query"
+    ],
+    [
+      "en-query"
+    ],
+    [
+      "paris"
+    ],
+    [
+      "weather"
+    ],
+    [
+      "code"
+    ],
+    [
+      "mixed"
+    ],
+    [
+      "emoji"
+    ],
+    [
+      "combining"
+    ],
+    [
+      "special-literal"
+    ],
+    [
+      "short"
+    ],
+    [
+      "boundary-32"
+    ],
+    [
+      "boundary-128"
+    ],
+    [
+      "boundary-511"
+    ],
+    [
+      "boundary-512"
+    ],
+    [
+      "boundary-513"
+    ],
+    [
+      "ru-query",
+      "en-query",
+      "paris",
+      "weather",
+      "code",
+      "mixed",
+      "emoji",
+      "combining",
+      "special-literal",
+      "short",
+      "boundary-32",
+      "boundary-128",
+      "boundary-511",
+      "boundary-512",
+      "boundary-513"
+    ],
+    [
+      "short",
+      "boundary-513",
+      "emoji",
+      "boundary-511"
+    ],
+    [
+      "ru-query",
+      "en-query",
+      "paris",
+      "weather",
+      "code",
+      "mixed",
+      "emoji",
+      "combining",
+      "special-literal",
+      "short",
+      "boundary-32",
+      "boundary-128",
+      "boundary-511",
+      "boundary-512",
+      "boundary-513",
+      "ru-query",
+      "en-query",
+      "paris",
+      "weather",
+      "code",
+      "mixed",
+      "emoji",
+      "combining",
+      "special-literal",
+      "short",
+      "boundary-32",
+      "boundary-128",
+      "boundary-511",
+      "boundary-512",
+      "boundary-513",
+      "ru-query",
+      "en-query"
+    ]
+  ]
+}

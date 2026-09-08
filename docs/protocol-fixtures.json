@@ -1,0 +1,9 @@
+{
+  "protocol": "yuri-embedding-protocol-v1",
+  "canonical_repository": "yuri-embedding-go",
+  "tag": null,
+  "artifact_sha256": null,
+  "status": "blocked_canonical_artifact_not_available",
+  "local_fixture": "tests/contract/fixtures/draft-success.json",
+  "local_fixture_status": "synthetic_draft_not_canonical"
+}
