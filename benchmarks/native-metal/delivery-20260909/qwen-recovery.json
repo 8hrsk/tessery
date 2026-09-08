@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "label": "tessery-0.6-bounded-native",
+  "scope": "single_host_diagnostic_not_release_gate",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python": "3.12.13",
+  "chip": "Apple M1",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "src/metal_inference/api.py": "8727bffce0aeb09105cbac73aea42c2f995a49061d42929a98af92fb4f09d16b",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "2e38b6f543808bfaf926feeb89a0648366244b1d4cb7fbfe5d3054111afdf9aa",
+    "src/metal_inference/native/kernels.metal": "ffa6ab872819372ebc8d3d8bb3977d3aceaab706189940cd476da3fa3aa8a030",
+    "src/metal_inference/native/runtime.mm": "69115d2146cbdf4c23b617305fc4744ee85b836741ae410a5fe4a4ca68c41eb1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "20cabe02830f1bc45bc649f378eb1b52246ea7e119226b8814f5ff94303b7523",
+  "conditions": {
+    "power_thermal_background_load": "uncontrolled",
+    "network": "not required"
+  },
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "dimensions": 384,
+  "max_length": 512,
+  "matrix": [
+    {
+      "batch_size": 1,
+      "tokens_per_text": 7,
+      "padded_tokens": 7,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.07840158301405609,
+        0.07424625003477558,
+        0.07348295801784843
+      ],
+      "p50_seconds": 0.07424625003477558,
+      "p95_seconds": 0.07798604971612803,
+      "texts_per_second": 13.266658582180336,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 96,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 0.20960945828119293,
+        "encode_seconds": 0.01187649997882545,
+        "submit_wait_seconds": 0.21168170898454264,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tail": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 335834432,
+        "peak_bytes": 335834464,
+        "cache_bytes": 615936,
+        "process_rss_bytes": 818921472,
+        "process_peak_rss_bytes": 836796416
+      }
+    },
+    {
+      "batch_size": 1,
+      "tokens_per_text": 31,
+      "padded_tokens": 31,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.1891583749675192,
+        0.19011737499386072,
+        0.1729793749982491
+      ],
+      "p50_seconds": 0.1891583749675192,
+      "p95_seconds": 0.19002147499122657,
+      "texts_per_second": 5.432271905524292,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 384,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 0.5246984167024493,
+        "encode_seconds": 0.020680418063420802,
+        "submit_wait_seconds": 0.5277212079963647,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tail": 588,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 337739072,
+        "peak_bytes": 337739200,
+        "cache_bytes": 2520576,
+        "process_rss_bytes": 819052544,
+        "process_peak_rss_bytes": 836796416
+      }
+    },
+    {
+      "batch_size": 1,
+      "tokens_per_text": 128,
+      "padded_tokens": 128,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.6842672909842804,
+        0.600049750006292,
+        0.5938969170092605
+      ],
+      "p50_seconds": 0.600049750006292,
+      "p95_seconds": 0.6758455368864815,
+      "texts_per_second": 1.5972621155444884,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 1548,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 1.8532727916026488,
+        "encode_seconds": 0.012860207993071526,
+        "submit_wait_seconds": 1.8554688750300556,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 345603392,
+        "peak_bytes": 345603908,
+        "cache_bytes": 10384896,
+        "process_rss_bytes": 761364480,
+        "process_peak_rss_bytes": 836796416
+      }
+    },
+    {
+      "batch_size": 4,
+      "tokens_per_text": 7,
+      "padded_tokens": 28,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.14454925002064556,
+        0.189033875009045,
+        0.14334679197054356
+      ],
+      "p50_seconds": 0.14454925002064556,
+      "p95_seconds": 0.18458541251020505,
+      "texts_per_second": 25.16092946208302,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 384,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 0.4432052916381508,
+        "encode_seconds": 0.024390290956944227,
+        "submit_wait_seconds": 0.4461155839962885,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tail": 588,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 347329856,
+        "peak_bytes": 347329984,
+        "cache_bytes": 12111360,
+        "process_rss_bytes": 761446400,
+        "process_peak_rss_bytes": 836796416
+      }
+    },
+    {
+      "batch_size": 4,
+      "tokens_per_text": 31,
+      "padded_tokens": 124,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        0.6690812080050819,
+        0.5639363749651238,
+        0.6283275409950875
+      ],
+      "p50_seconds": 0.6283275409950875,
+      "p95_seconds": 0.6650058413040825,
+      "texts_per_second": 6.446950565747824,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 1536,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 1.8238814999349415,
+        "encode_seconds": 0.020974540966562927,
+        "submit_wait_seconds": 1.8287788760499097,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tail": 588,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 354948416,
+        "peak_bytes": 354948928,
+        "cache_bytes": 19729920,
+        "process_rss_bytes": 761479168,
+        "process_peak_rss_bytes": 836796416
+      }
+    },
+    {
+      "batch_size": 4,
+      "tokens_per_text": 128,
+      "padded_tokens": 512,
+      "iterations": 3,
+      "warmup": 1,
+      "latency_seconds": [
+        2.346232542011421,
+        2.28454545798013,
+        2.3607299579889514
+      ],
+      "p50_seconds": 2.346232542011421,
+      "p95_seconds": 2.3592802163911983,
+      "texts_per_second": 1.7163679240760246,
+      "runtime": {
+        "allocations": 6,
+        "allocated_bytes": 6192,
+        "completed_commands": 3,
+        "gpu_timed_commands": 3,
+        "gpu_seconds": 6.939586875087116,
+        "encode_seconds": 0.014988667040597647,
+        "submit_wait_seconds": 6.942324207979254,
+        "dispatches": {
+          "embedding4": 3,
+          "rms_norm": 339,
+          "rope": 168,
+          "attention": 84,
+          "add": 168,
+          "silu_gate": 84,
+          "pool_project": 3,
+          "linear4_tiled": 588
+        }
+      },
+      "memory": {
+        "active_bytes": 386405696,
+        "peak_bytes": 386407760,
+        "cache_bytes": 51187200,
+        "process_rss_bytes": 761446400,
+        "process_peak_rss_bytes": 836796416
+      }
+    }
+  ],
+  "status": "passed",
+  "load_seconds": 1.4822893330128863,
+  "loaded_runtime": {
+    "shader_sha256": "ffa6ab872819372ebc8d3d8bb3977d3aceaab706189940cd476da3fa3aa8a030",
+    "native_library_sha256": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "allocations": 704,
+    "allocated_bytes": 335218496,
+    "completed_commands": 0,
+    "gpu_timed_commands": 0,
+    "gpu_seconds": 0.0,
+    "encode_seconds": 0.0,
+    "submit_wait_seconds": 0.0,
+    "dispatches": {},
+    "active_bytes": 335218496,
+    "cache_bytes": 0,
+    "peak_bytes": 335218496
+  },
+  "first_encode_seconds": 0.07843091600807384,
+  "concurrency": {
+    "rounds": 3,
+    "canceled_tasks": 6,
+    "recovery_verified": true
+  },
+  "soak": {
+    "requested_seconds": 30,
+    "elapsed_seconds": 31.569774875009898,
+    "completed_calls": 18,
+    "bitwise_repeatability": true,
+    "live_buffers_stable": true,
+    "workspace_cache_bounded": true,
+    "rss_end_minus_start_bytes": 65536,
+    "rss_sample_range_bytes": 65536,
+    "checkpoints": [
+      {
+        "elapsed_seconds": 0.0,
+        "active_bytes": 401965376,
+        "peak_bytes": 433457472,
+        "cache_bytes": 66746880,
+        "process_rss_bytes": 426868736,
+        "process_peak_rss_bytes": 836796416
+      },
+      {
+        "elapsed_seconds": 10.205641874985304,
+        "active_bytes": 401630528,
+        "peak_bytes": 433457472,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 426934272,
+        "process_peak_rss_bytes": 836796416
+      },
+      {
+        "elapsed_seconds": 21.625010750023648,
+        "active_bytes": 400474432,
+        "peak_bytes": 433457472,
+        "cache_bytes": 65255936,
+        "process_rss_bytes": 426934272,
+        "process_peak_rss_bytes": 836796416
+      },
+      {
+        "elapsed_seconds": 31.56158887501806,
+        "active_bytes": 401630528,
+        "peak_bytes": 433457472,
+        "cache_bytes": 66412032,
+        "process_rss_bytes": 426934272,
+        "process_peak_rss_bytes": 836796416
+      }
+    ]
+  },
+  "after_close": {
+    "active_bytes": 0,
+    "peak_bytes": 433457472,
+    "cache_bytes": 0,
+    "process_rss_bytes": 91750400,
+    "process_peak_rss_bytes": 836796416
+  },
+  "closed_rejected": true,
+  "reload_verified": true,
+  "workspace_sources_unchanged": true
+}

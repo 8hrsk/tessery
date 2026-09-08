@@ -20,7 +20,7 @@ def kernel_samples():
     rng = np.random.default_rng(914)
     results = []
     with MetalRuntime() as rt:
-        for m, n, k in [(8, 1024, 1024), (32, 2048, 1024), (128, 3072, 1024), (32, 1024, 3072)]:
+        for m, n, k in [(m, 1024, k) for m in (1, 7, 8, 9, 31, 32) for k in (1024, 3072)]:
             x = rng.normal(size=(m, k)).astype(np.float32)
             w = rng.integers(0, 2**32, size=(n, k // 8), dtype=np.uint32)
             s = bf16(rng.uniform(0.01, 0.2, size=(n, k // 64)))
@@ -31,17 +31,19 @@ def kernel_samples():
             weights = codes.astype(np.float32) * scales + biases
             reference = x.astype(np.float64) @ weights.astype(np.float64).T
             bufs = [rt.buffer(a.nbytes, a) for a in (x, w, s, b)] + [rt.buffer(m * n * 4)]
-            samples = {name: [] for name in ("linear4", "linear4_tiled")}
+            samples = {
+                name: [] for name in ("linear4", "linear4_tiled" if m % 8 == 0 else "linear4_tail")
+            }
             errors = {}
             for iteration in range(22):
                 for name in rng.permutation(list(samples)):
-                    tiled = name.endswith("tiled")
+                    tiled = name != "linear4"
                     before = rt.diagnostics()
                     with rt.command():
                         rt._dispatch(
                             str(name),
                             bufs,
-                            threads=(m // 8) * (n // 32) * 128
+                            threads=((m + 7) // 8) * (n // 32) * 128
                             if tiled
                             else ((m + 3) // 4) * n * 32,
                             group_size=128 if tiled else 32,
@@ -84,7 +86,7 @@ def model_samples(model_dir):
                 k=k,
             )
 
-        for batch, tokens in [(1, 8), (1, 32), (4, 32), (1, 128)]:
+        for batch, tokens in [(1, 2), (1, 7), (1, 8), (1, 9), (1, 31), (1, 32), (4, 33)]:
             texts = [" token" * (tokens - 1)] * batch
             ids, _ = model._tokenizer.batch(texts, max_length=model.max_length)
             assert ids.shape == (batch, tokens)

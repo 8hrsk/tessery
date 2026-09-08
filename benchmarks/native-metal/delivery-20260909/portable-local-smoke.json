@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "scope": "portable_cpu_synthetic_backend",
+  "metal_qualified": false,
+  "model_inference_qualified": false,
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "python": "3.12.13",
+  "numpy": "2.5.2",
+  "source_sha256": "f8681dba2549b53eb8a27a34f06539d2e4a984705aaa465ac988b783fa630a74",
+  "requested_seconds": 35,
+  "iterations": 812,
+  "checkpoints": [
+    {
+      "seconds": 30.012080000014976,
+      "rss_bytes": 53526528,
+      "python_growth_bytes": 993634
+    }
+  ],
+  "rss_kind": "peak",
+  "python_growth_budget_bytes": 33554432,
+  "elapsed_seconds": 35.190571790968534,
+  "python_growth_bytes": 995040,
+  "rss_bytes": 53559296,
+  "workload_seconds": 35.02358758304035
+}

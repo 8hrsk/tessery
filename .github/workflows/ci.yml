@@ -26,6 +26,7 @@ jobs:
       - run: uv run --frozen ruff check .
       - run: uv run --frozen mypy
       - run: uv run --frozen pytest -m 'not metal'
+      - run: uv run --frozen python tools/soak_portable.py --seconds 2 --output artifacts/portable-ci.json
       - run: uv run --frozen python tools/check_dependencies.py
       - run: uv run --frozen python tools/check_inputs.py
       - run: uv build --sdist

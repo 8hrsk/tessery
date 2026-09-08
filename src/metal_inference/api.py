@@ -96,7 +96,8 @@ class EmbeddingModel:
     """One loaded model, one tokenizer, one Metal forward at a time.
 
     Admission is bounded across synchronous and asynchronous callers. Cancellation
-    prevents queued work; an already submitted GPU command completes and its
+    prevents queued work and cooperatively stops CPU tokenization; a submitted GPU
+    command completes and its
     result is discarded. No prompt cache or implicit download is performed.
     """
 
@@ -208,7 +209,9 @@ class EmbeddingModel:
                     raise ClosedError()
                 if canceled.is_set():
                     raise CanceledError()
-                ids, lengths = self._tokenizer.batch(texts, max_length=self.max_length)
+                ids, lengths = self._tokenizer.batch(
+                    texts, max_length=self.max_length, canceled=canceled.is_set
+                )
                 result = np.empty((len(texts), dimensions), dtype=np.float32)
                 # Limit temporary GPU memory independently of caller batch size.
                 for rows, width in length_batches(lengths, self._backend.max_padded_tokens):

@@ -275,16 +275,40 @@ class MetalRuntime:
                 self._inflight.clear()
 
     def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
-        tiled = rows % 8 == 0 and cols % 32 == 0 and k % 64 == 0
-        self._dispatch(
-            "linear4_tiled" if tiled else "linear4",
-            buffers,
-            threads=(rows // 8) * (cols // 32) * 128 if tiled else ((rows + 3) // 4) * cols * 32,
-            group_size=128 if tiled else 32,
-            rows=rows,
-            cols=cols,
-            k=k,
-        )
+        if rows >= 5 and cols % 32 == 0 and k % 64 == 0:
+            complete = rows // 8
+            if complete:
+                self._dispatch(
+                    "linear4_tiled",
+                    buffers,
+                    threads=complete * (cols // 32) * 128,
+                    group_size=128,
+                    rows=rows,
+                    cols=cols,
+                    k=k,
+                )
+            if rows % 8:
+                # n is the starting row for the single partial row tile.
+                self._dispatch(
+                    "linear4_tail",
+                    buffers,
+                    threads=(cols // 32) * 128,
+                    group_size=128,
+                    n=complete * 8,
+                    rows=rows,
+                    cols=cols,
+                    k=k,
+                )
+        else:
+            self._dispatch(
+                "linear4",
+                buffers,
+                threads=((rows + 3) // 4) * cols * 32,
+                group_size=32,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
 
     def _dispatch(
         self,
@@ -366,7 +390,9 @@ class MetalRuntime:
         self._dispatch(
             "matmul_f32_tiled" if tiled else "matmul_f32",
             buffers,
-            threads=(rows // 8) * (cols // 32) * 128 if tiled else ((rows + 3) // 4) * cols * 32,
+            threads=((rows + 7) // 8) * (cols // 32) * 128
+            if tiled
+            else ((rows + 3) // 4) * cols * 32,
             group_size=128 if tiled else 32,
             rows=rows,
             cols=cols,

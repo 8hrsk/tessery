@@ -1,0 +1,46 @@
+{
+  "tests_passed": 371,
+  "coverage_percent": 94.69,
+  "metal_shader_validation_cases": 28,
+  "wheel_smoke_models": [
+    "qwen3_uint4",
+    "bert_f32"
+  ],
+  "kaggle_execution": "not_started",
+  "multi_hour_native_execution": "not_started",
+  "checks": [
+    "ruff check",
+    "ruff format --check",
+    "mypy",
+    "dependency policy installed",
+    "frozen inputs",
+    "wheel layout",
+    "notebook code compilation",
+    "workflow YAML parse"
+  ],
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/api.py": "ec06433b06192b9a72b09b60c4908c913a72b2de5814190df8ed2f048da60481",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "2e38b6f543808bfaf926feeb89a0648366244b1d4cb7fbfe5d3054111afdf9aa",
+    "src/metal_inference/native/kernels.metal": "ffa6ab872819372ebc8d3d8bb3977d3aceaab706189940cd476da3fa3aa8a030",
+    "src/metal_inference/native/runtime.mm": "69115d2146cbdf4c23b617305fc4744ee85b836741ae410a5fe4a4ca68c41eb1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  }
+}

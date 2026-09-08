@@ -321,7 +321,9 @@ def test_tiled_matmul_and_unaligned_fallback(runtime, shape):
 
 
 @pytest.mark.parametrize(
-    "m,n,k", [(1, 32, 64), (7, 33, 128), (8, 32, 64), (16, 64, 1024), (8, 32, 3072)]
+    "m,n,k",
+    [(m, 64, k) for m in (1, 2, 7, 8, 9, 15, 16, 17, 31) for k in (64, 1024, 3072)]
+    + [(7, 33, 128)],
 )
 def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
     rng = np.random.default_rng(417)
@@ -345,8 +347,15 @@ def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
         np.testing.assert_allclose(
             runtime.read(buffers[-1], (m, n)), expected, atol=5e-5, rtol=5e-5
         )
-        name = "linear4_tiled" if m % 8 == 0 and n % 32 == 0 else "linear4"
-        assert runtime.diagnostics()["dispatches"] == {name: 1}
+        expected_dispatches = {"linear4": 1}
+        if m >= 5 and n % 32 == 0:
+            expected_dispatches = {}
+            if m >= 8:
+                expected_dispatches["linear4_tiled"] = 1
+            if m % 8:
+                expected_dispatches["linear4_tail"] = 1
+        assert runtime.diagnostics()["dispatches"] == expected_dispatches
+
     finally:
         for buffer in buffers:
             buffer.close()

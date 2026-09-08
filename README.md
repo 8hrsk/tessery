@@ -5,7 +5,7 @@ Objective-C++ Metal runtime, GPU kernels, SafeTensors reader, BPE and WordPiece 
 It does **not** use MLX, PyTorch, MPS, transformers or a hosted model service.
 Yuri is not required.
 
-**Status: working 0.5 alpha.** Qwen3 uint4 and BERT float32 adapters share the
+**Status: 0.6 alpha candidate in this checkout; PyPI currently has 0.5.1a1.** Qwen3 uint4 and BERT float32 adapters share the
 same Metal runtime. Verified profiles cover Qwen3-Embedding-0.6B and
 BGE-small-en-v1.5. Float32 tensors support GPU addition, matrix
 multiplication, transpose and SiLU. This is an inference-focused foundation;
@@ -126,6 +126,9 @@ its own compatibility report; Go fixtures do not block this standalone engine.
 
 Performance work: [measurement tools and runtime counters](docs/PERFORMANCE.md),
 [observed speed and stability results](docs/PERFORMANCE_REPORT.md).
+
+New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
+[Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 
 New in 0.5: [uint4 and workspace results](docs/IMPLEMENTATION_05.md),
 [persisted RAG example](docs/RAG.md), and [local HTTP API](docs/HTTP_API.md).

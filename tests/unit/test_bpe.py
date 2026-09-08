@@ -59,3 +59,21 @@ def test_unknown_tokenizer_profile():
     config["added_tokens"][0]["lstrip"] = True
     with pytest.raises(UnsupportedProfileError):
         QwenTokenizer(config)
+
+
+@pytest.mark.parametrize("stop", [3, 20, 80, 90])
+def test_cancel_inside_bpe_and_recover(stop):
+    from metal_inference.errors import CanceledError
+
+    tokenizer = QwenTokenizer(tiny_config())
+    checks = 0
+
+    def canceled():
+        nonlocal checks
+        checks += 1
+        return checks == stop
+
+    with pytest.raises(CanceledError):
+        tokenizer.batch(["ab" * 10000], max_length=512, canceled=canceled)
+    assert checks == stop
+    assert tokenizer.encode("aba") == [257, 258]

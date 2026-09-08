@@ -12,6 +12,7 @@ import numpy as np
 import regex
 from numpy.typing import NDArray
 
+from .cancellation import CancelCheck, checkpoint
 from .errors import InvalidInputError, UnsupportedProfileError
 
 QWEN_SPLIT = (
@@ -137,7 +138,8 @@ class QwenTokenizer:
         except (KeyError, TypeError, ValueError, IndexError):
             raise UnsupportedProfileError() from None
 
-    def _bpe(self, piece: str) -> list[int]:
+    def _bpe(self, piece: str, canceled: CancelCheck = None) -> list[int]:
+        checkpoint(canceled)
         raw = piece.encode("utf-8")
         if len(raw) > 65536:
             raise InvalidInputError()
@@ -159,8 +161,14 @@ class QwenTokenizer:
                     heapq.heappush(pending, (rank, left, right, version[left], version[right]))
 
         for left in range(size - 1):
+            if left % 256 == 0:
+                checkpoint(canceled)
             enqueue(left)
+        operations = 0
         while pending:
+            if operations % 256 == 0:
+                checkpoint(canceled)
+            operations += 1
             _, left, right, lv, rv = heapq.heappop(pending)
             if (
                 not alive[left]
@@ -181,19 +189,23 @@ class QwenTokenizer:
             enqueue(left)
         return [self.vocab[symbols[i]] for i in range(size) if alive[i]]
 
-    def encode(self, text: str, *, max_length: int = 512) -> list[int]:
+    def encode(
+        self, text: str, *, max_length: int = 512, canceled: CancelCheck = None
+    ) -> list[int]:
+        checkpoint(canceled)
         if not isinstance(text, str) or not text.strip() or not 1 <= max_length <= 512:
             raise InvalidInputError()
         output: list[int] = []
         try:
             # Preserve the special-token template even at the truncation boundary.
             for chunk in self._special.split(text):
+                checkpoint(canceled)
                 if chunk in self.added:
                     output.append(self.added[chunk])
                 else:
                     normalized = unicodedata.normalize("NFC", chunk)
                     for match in self._split.finditer(normalized):
-                        output.extend(self._bpe(match.group()))
+                        output.extend(self._bpe(match.group(), canceled))
                         if len(output) >= max_length - 1:
                             break
                 if len(output) >= max_length - 1:
@@ -203,9 +215,9 @@ class QwenTokenizer:
         return output[: max_length - 1] + [self.suffix_id]
 
     def batch(
-        self, texts: list[str], *, max_length: int
+        self, texts: list[str], *, max_length: int, canceled: CancelCheck = None
     ) -> tuple[NDArray[np.uint32], NDArray[np.uint32]]:
-        encoded = [self.encode(text, max_length=max_length) for text in texts]
+        encoded = [self.encode(text, max_length=max_length, canceled=canceled) for text in texts]
         lengths = np.array([len(ids) for ids in encoded], dtype=np.uint32)
         ids = np.full((len(encoded), int(lengths.max())), self.pad_id, dtype=np.uint32)
         for row, tokens in enumerate(encoded):

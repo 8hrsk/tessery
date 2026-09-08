@@ -125,3 +125,26 @@ def test_unsupported_profiles(path, value):
 def test_invalid_config():
     with pytest.raises(UnsupportedProfileError):
         WordPieceTokenizer({})
+
+
+@pytest.mark.parametrize("operation", ["normalize", "pieces", "batch"])
+def test_cancel_inside_wordpiece_and_recover(operation):
+    from metal_inference.errors import CanceledError
+
+    tokenizer = WordPieceTokenizer(tiny_config())
+    checks = 0
+
+    def canceled():
+        nonlocal checks
+        checks += 1
+        return checks == 3
+
+    with pytest.raises(CanceledError):
+        if operation == "normalize":
+            tokenizer._normalize("Café " * 10000, canceled)
+        elif operation == "pieces":
+            tokenizer._pieces("a" + "b" * 90, canceled)
+        else:
+            tokenizer.batch(["hello " * 10000], max_length=512, canceled=canceled)
+    assert checks == 3
+    assert tokenizer.encode("hello") == [2, 5, 3]

@@ -7,6 +7,7 @@ import numpy as np
 import regex
 from numpy.typing import NDArray
 
+from .cancellation import CancelCheck, checkpoint
 from .errors import InvalidInputError, UnsupportedProfileError
 
 
@@ -95,9 +96,11 @@ class WordPieceTokenizer:
         except (KeyError, TypeError, ValueError, IndexError, AttributeError):
             raise UnsupportedProfileError() from None
 
-    def _normalize(self, text: str) -> str:
+    def _normalize(self, text: str, canceled: CancelCheck = None) -> str:
         parts = []
-        for char in text:
+        for index, char in enumerate(text):
+            if index % 256 == 0:
+                checkpoint(canceled)
             if self.clean:
                 if char in ("\x00", "\ufffd") or (
                     ud.category(char) in {"Cc", "Cf", "Cs", "Co"} and char not in "\t\n\r"
@@ -113,14 +116,18 @@ class WordPieceTokenizer:
             text = "".join(c.lower() for c in text)
         return text
 
-    def _pieces(self, word: str) -> list[int]:
+    def _pieces(self, word: str, canceled: CancelCheck = None) -> list[int]:
+        checkpoint(canceled)
         if len(word) > self.word_limit:
             return [self.unk_id]
         result = []
         start = 0
         while start < len(word):
+            checkpoint(canceled)
             end = len(word)
             while end > start:
+                if end % 256 == 0:
+                    checkpoint(canceled)
                 piece = ("##" if start else "") + word[start:end]
                 if piece in self.vocab:
                     break
@@ -131,7 +138,10 @@ class WordPieceTokenizer:
             start = end
         return result
 
-    def encode(self, text: str, *, max_length: int = 512) -> list[int]:
+    def encode(
+        self, text: str, *, max_length: int = 512, canceled: CancelCheck = None
+    ) -> list[int]:
+        checkpoint(canceled)
         if (
             not isinstance(text, str)
             or not text.strip()
@@ -146,13 +156,16 @@ class WordPieceTokenizer:
             raise InvalidInputError() from None
         output: list[int] = []
         for chunk in self._special.split(text):
+            checkpoint(canceled)
             if len(output) >= max_length - 2:
                 break
             if chunk in self.added:
                 output.append(self.added[chunk])
                 continue
             word: list[str] = []
-            for char in self._normalize(chunk) + " ":
+            for index, char in enumerate(self._normalize(chunk, canceled) + " "):
+                if index % 256 == 0:
+                    checkpoint(canceled)
                 code = ord(char)
                 punctuation = (
                     ud.category(char).startswith("P")
@@ -162,10 +175,10 @@ class WordPieceTokenizer:
                     or 123 <= code <= 126
                 )
                 if char.isspace() or punctuation:
-                    output.extend(self._pieces("".join(word)))
+                    output.extend(self._pieces("".join(word), canceled))
                     word.clear()
                     if punctuation:
-                        output.extend(self._pieces(char))
+                        output.extend(self._pieces(char, canceled))
                     if len(output) >= max_length - 2:
                         break
                 else:
@@ -173,9 +186,9 @@ class WordPieceTokenizer:
         return [self.cls_id] + output[: max_length - 2] + [self.sep_id]
 
     def batch(
-        self, texts: list[str], *, max_length: int
+        self, texts: list[str], *, max_length: int, canceled: CancelCheck = None
     ) -> tuple[NDArray[np.uint32], NDArray[np.uint32]]:
-        encoded = [self.encode(text, max_length=max_length) for text in texts]
+        encoded = [self.encode(text, max_length=max_length, canceled=canceled) for text in texts]
         lengths = np.array([len(row) for row in encoded], np.uint32)
         ids = np.full((len(texts), int(lengths.max())), self.pad_id, np.uint32)
         for i, row in enumerate(encoded):

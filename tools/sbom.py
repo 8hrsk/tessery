@@ -36,14 +36,14 @@ def main():
         "name": args.artifact.name,
         "documentNamespace": f"https://spdx.org/spdxdocs/tessery-{digest}",
         "creationInfo": {
-            "creators": ["Tool: tessery-sbom-0.5.1a1"],
+            "creators": ["Tool: tessery-sbom-0.6.0a1"],
             "created": datetime.fromtimestamp(args.epoch, UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         },
         "packages": [
             {
                 "SPDXID": "SPDXRef-Foundation",
                 "name": "tessery",
-                "versionInfo": "0.5.1a1",
+                "versionInfo": "0.6.0a1",
                 "downloadLocation": "NOASSERTION",
                 "filesAnalyzed": False,
                 "licenseConcluded": "Apache-2.0",

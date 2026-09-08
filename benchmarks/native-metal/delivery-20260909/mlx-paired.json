@@ -1,0 +1,184 @@
+{
+  "status": "passed",
+  "scope": "same_host_full_qwen_public_api",
+  "baseline": "independent F32 Qwen graph using public MLX ops; not mlx-embeddings",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "mlx_version": "0.32.2",
+  "harness_sha256": "fd7e2aa3d5d63d02d5d03c4bdede2788acd1b2a6b7ce697fea2541f6bbb4bc98",
+  "profile_sha256": "2b5938f003b6d6721d40c63d8e6a547979fa1ecf49930332045f5ad683f9cad9",
+  "conditions": "random paired order; 2 warmups; both models resident; uncontrolled thermals",
+  "memory_note": "allocator-owned bytes only; MLX BF16 values expanded to F32; excludes process RSS",
+  "results": [
+    {
+      "texts": [
+        " token token token token token token"
+      ],
+      "lengths": [
+        7
+      ],
+      "seconds": {
+        "tessery": [
+          0.04517987498547882,
+          0.04706379194976762,
+          0.06033204199047759,
+          0.08007129101315513,
+          0.07908583298558369
+        ],
+        "mlx": [
+          0.025713459006510675,
+          0.031134416989516467,
+          0.043102791998535395,
+          0.04719037498580292,
+          0.06851083302171901
+        ]
+      },
+      "max_abs_vector_difference": 3.781169652938843e-07,
+      "tessery_over_mlx_latency": 1.3997246858748185
+    },
+    {
+      "texts": [
+        " token token token token token token token"
+      ],
+      "lengths": [
+        8
+      ],
+      "seconds": {
+        "tessery": [
+          0.04232212499482557,
+          0.04437179199885577,
+          0.03267229098128155,
+          0.039673499995842576,
+          0.050741540966555476
+        ],
+        "mlx": [
+          0.07867254101438448,
+          0.05784958298318088,
+          0.06915408401982859,
+          0.06495179102057591,
+          0.08140416600508615
+        ]
+      },
+      "max_abs_vector_difference": 2.7939677238464355e-07,
+      "tessery_over_mlx_latency": 0.6119974777294501
+    },
+    {
+      "texts": [
+        " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token"
+      ],
+      "lengths": [
+        31
+      ],
+      "seconds": {
+        "tessery": [
+          0.2253532080212608,
+          0.17468970798654482,
+          0.21639091602992266,
+          0.2193764160037972,
+          0.17196399997919798
+        ],
+        "mlx": [
+          0.09822774998610839,
+          0.09009162499569356,
+          0.07830658397870138,
+          0.08277191699016839,
+          0.08013704203767702
+        ]
+      },
+      "max_abs_vector_difference": 2.60770320892334e-07,
+      "tessery_over_mlx_latency": 2.6143035451942653
+    },
+    {
+      "texts": [
+        " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+        " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+        " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token",
+        " token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token token"
+      ],
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ],
+      "seconds": {
+        "tessery": [
+          0.6205906249815598,
+          0.6085383750032634,
+          0.5945442919619381,
+          0.6040184170124121,
+          0.6007602080353536
+        ],
+        "mlx": [
+          0.3487674169591628,
+          0.33140845800517127,
+          0.32830895902588964,
+          0.33753183303633705,
+          0.35249637498054653
+        ]
+      },
+      "max_abs_vector_difference": 4.209578037261963e-07,
+      "tessery_over_mlx_latency": 1.7895154112690355
+    },
+    {
+      "texts": [
+        "Hello world",
+        "\u041a\u043e\u0448\u043a\u0438 \u0438 \u0441\u043e\u0431\u0430\u043a\u0438",
+        "A much longer passage about Paris in France."
+      ],
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "seconds": {
+        "tessery": [
+          0.2150437079835683,
+          0.21384591603418812,
+          0.21735308301867917,
+          0.2400131250033155,
+          0.21777141699567437
+        ],
+        "mlx": [
+          0.09518816700438038,
+          0.10357233398826793,
+          0.1408007920254022,
+          0.10111812496325001,
+          0.09491629200056195
+        ]
+      },
+      "max_abs_vector_difference": 2.3283064365386963e-07,
+      "tessery_over_mlx_latency": 2.1494967702147676
+    }
+  ],
+  "tessery_runtime": {
+    "shader_sha256": "ffa6ab872819372ebc8d3d8bb3977d3aceaab706189940cd476da3fa3aa8a030",
+    "native_library_sha256": "9bce0428f42b0ce42a48421291538f29ad64a8d4cfd8f6a0aaa2383ff4b7faa1",
+    "allocations": 845,
+    "allocated_bytes": 347584596,
+    "completed_commands": 42,
+    "gpu_timed_commands": 42,
+    "gpu_seconds": 7.833822541870177,
+    "encode_seconds": 0.2856825842172839,
+    "submit_wait_seconds": 7.927508210705128,
+    "dispatches": {
+      "embedding4": 42,
+      "rms_norm": 4746,
+      "linear4_tail": 5488,
+      "rope": 2352,
+      "attention": 1176,
+      "add": 2352,
+      "silu_gate": 1176,
+      "pool_project": 42,
+      "linear4_tiled": 5488,
+      "linear4": 1372
+    },
+    "active_bytes": 347578688,
+    "cache_bytes": 12360192,
+    "peak_bytes": 347578776
+  },
+  "mlx_allocator": {
+    "active_bytes": 372604928,
+    "cache_bytes": 806583312,
+    "peak_bytes": 708400284
+  }
+}

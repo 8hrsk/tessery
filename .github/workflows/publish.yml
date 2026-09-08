@@ -1,0 +1,75 @@
+name: Publish verified Tessery release
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing version tag, for example v0.6.0a1'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: pypi-${{ inputs.release_tag }}
+  cancel-in-progress: false
+jobs:
+  native:
+    runs-on: [self-hosted, macOS, ARM64, metal-inference]
+    timeout-minutes: 30
+    env:
+      METAL_INFERENCE_TEST: '1'
+      METAL_INFERENCE_PORTABLE_TESTS: '0'
+      SOURCE_DATE_EPOCH: '1788566400'
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Validate tag syntax before checkout
+        run: |
+          python3 -c 'import os,re; assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+(?:a[0-9]+|b[0-9]+|rc[0-9]+)?", os.environ["RELEASE_TAG"])'
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: refs/tags/${{ inputs.release_tag }}
+          persist-credentials: false
+      - name: Verify tagged version
+        run: |
+          python3 -c 'import os,tomllib; assert "v"+tomllib.load(open("pyproject.toml","rb"))["project"]["version"] == os.environ["RELEASE_TAG"]'
+      # Dedicated runner must have Python 3.12.13, uv 0.10.9, Xcode and both pinned model packs.
+      - run: uv sync --locked --group dev
+      - run: uv run --frozen ruff format --check .
+      - run: uv run --frozen ruff check .
+      - run: uv run --frozen mypy
+      - run: uv run --frozen pytest --cov --cov-report=term-missing
+      - run: uv run --frozen python tools/check_dependencies.py --installed
+      - run: uv run --frozen python tools/check_inputs.py
+      - name: Build immutable release payload
+        id: build
+        run: |
+          RELEASE_DIR=$(mktemp -d "$RUNNER_TEMP/tessery-release.XXXXXX")
+          uv build --no-sources --out-dir "$RELEASE_DIR"
+          uv run --frozen python tools/verify_release.py "$RELEASE_DIR"
+          uv venv "$RELEASE_DIR/smoke" --python 3.12.13
+          uv pip install --python "$RELEASE_DIR/smoke/bin/python" "$RELEASE_DIR"/*.whl
+          "$RELEASE_DIR/smoke/bin/python" -I tools/smoke_release.py
+          echo "directory=$RELEASE_DIR" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pypi-distributions
+          path: |
+            ${{ steps.build.outputs.directory }}/*.whl
+            ${{ steps.build.outputs.directory }}/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+  publish:
+    needs: native
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/tessery/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: pypi-distributions
+          path: dist/
+      - name: Publish with PyPI OIDC identity and attestations
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33

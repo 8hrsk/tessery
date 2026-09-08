@@ -6,6 +6,7 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import NDArray
 
+from .cancellation import CancelCheck
 from .errors import UnsupportedProfileError
 from .metal import MetalRuntime
 
@@ -14,7 +15,7 @@ class Tokenizer(Protocol):
     vocab_size: int
 
     def batch(
-        self, texts: list[str], *, max_length: int
+        self, texts: list[str], *, max_length: int, canceled: CancelCheck = None
     ) -> tuple[NDArray[np.uint32], NDArray[np.uint32]]: ...
 
 

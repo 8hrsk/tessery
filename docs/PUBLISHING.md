@@ -87,19 +87,34 @@ For a code change, choose a new version and update `pyproject.toml`, the engine'
 and the SPDX tool's version; regenerate `uv.lock` and rebuild. Do not delete and
 re-upload the same filename. See [PyPI file reuse rules](https://pypi.org/help/#file-name-reuse).
 
-## Later: publish from GitHub Actions without a permanent token
+## GitHub Actions with Trusted Publishing
 
-[Trusted Publishing](https://docs.pypi.org/trusted-publishers/) lets PyPI trust a
-specific workflow and issue short-lived credentials through OIDC. Register the
-owner `8hrsk`, repository `tessery`, the actual publishing workflow filename,
-and optionally a GitHub environment such as `pypi`. A first upload can use a
-[pending publisher](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/).
+The repository now contains [publish.yml](../.github/workflows/publish.yml).
+It is triggered manually with an existing tag such as `v0.6.0a1`; ordinary pushes
+and pull requests cannot publish. The checked-out package version must match the
+tag. Native checks, both pinned models, artifact layout validation and isolated
+wheel inference must pass before the Ubuntu publishing job receives the artifacts.
+That job uses the pinned PyPA action with OIDC and attestations, without a stored
+API token. See [PyPI's publisher documentation](https://docs.pypi.org/trusted-publishers/using-a-publisher/).
 
-The future workflow should build and validate native artifacts on macOS arm64,
-then publish precisely those artifacts in a job with `id-token: write`. Configure
-an explicit release trigger and environment protections. The existing `ci.yml`
-checks changes and builds a source archive; it does not publish. No publishing
-workflow, account, token or pending publisher was created by this change.
+One-time configuration still required:
+
+1. In the existing PyPI `tessery` project's **Publishing** settings, add a GitHub
+   publisher: owner `8hrsk`, repository `tessery`, workflow `publish.yml`,
+   environment `pypi`.
+2. Configure the GitHub `pypi` environment with the desired reviewer and release-tag
+   protections. No environment protection was configured automatically.
+3. Provision the dedicated runner with labels `self-hosted`, `macOS`, `ARM64`,
+   `metal-inference`, Python 3.12.13, uv 0.10.9, Xcode CLT and both verified local
+   Qwen/BGE packs. Model paths can be configured with the existing
+   `METAL_INFERENCE_MODEL_DIR`, `METAL_INFERENCE_BGE_MODEL_DIR` and
+   `METAL_INFERENCE_BGE_PROFILE_FILE` runner environment variables.
+
+After qualification, create/push a version tag and dispatch **Publish verified
+Tessery release** with that tag. Only `.whl` and `.tar.gz` from that run are
+uploaded. PyPI rejects reuse of an existing release filename; this workflow does
+not silently skip duplicates. It cannot publish until the PyPI identity is registered.
+The 0.6 candidate has been built and checked locally, but not published or tagged.
 
 ## Migration from the local `metal-inference` distribution
 

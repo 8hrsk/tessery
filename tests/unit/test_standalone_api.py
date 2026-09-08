@@ -17,7 +17,7 @@ from metal_inference.retrieval import cosine_search
 
 
 class Tokenizer:
-    def batch(self, texts, *, max_length):
+    def batch(self, texts, *, max_length, canceled=None):
         return np.array([[int(t)] for t in texts], dtype=np.uint32), np.ones(len(texts), np.uint32)
 
 
@@ -179,7 +179,7 @@ def test_cosine_lookup():
 
 def test_length_buckets_restore_original_output_order(model):
     class VariableTokenizer:
-        def batch(self, texts, *, max_length):
+        def batch(self, texts, *, max_length, canceled=None):
             lengths = np.array([3, 8, 2, 8, 2], np.uint32)
             ids = np.zeros((5, 8), np.uint32)
             ids[:, 0] = [int(t) for t in texts]
@@ -278,3 +278,36 @@ def test_close_cancels_queued_sync_as_closed(monkeypatch):
         finally:
             backend.release.set()
             model.close()
+
+
+def test_async_cancellation_during_tokenization_releases_worker(model):
+    from metal_inference.cancellation import checkpoint
+
+    entered, release = threading.Event(), threading.Event()
+    original = model._tokenizer.batch
+
+    def batch(texts, *, max_length, canceled=None):
+        if texts == ["1"]:
+            entered.set()
+            assert release.wait(5)
+            checkpoint(canceled)
+            pytest.fail("Canceled tokenization reached encoding")
+        return original(texts, max_length=max_length, canceled=canceled)
+
+    model._tokenizer.batch = batch
+
+    async def exercise():
+        job = asyncio.create_task(model.encode_async(["1"]))
+        assert await asyncio.to_thread(entered.wait, 5)
+        job.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await job
+        release.set()
+        result = await model.encode_async(["2"])
+        assert result.argmax(axis=1).tolist() == [2]
+        assert model._backend.calls == [[2]]
+
+    try:
+        asyncio.run(exercise())
+    finally:
+        release.set()
