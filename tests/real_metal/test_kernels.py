@@ -1,3 +1,4 @@
+import math
 import os
 
 import numpy as np
@@ -197,3 +198,107 @@ def test_rope_and_silu(runtime):
     finally:
         a.close()
         b.close()
+
+
+def test_layer_norm_and_absolute_embedding(runtime):
+    rng = np.random.default_rng(37)
+    x = rng.normal(size=(3, 67)).astype(np.float32)
+    scale = rng.normal(size=67).astype(np.float32)
+    bias = rng.normal(size=67).astype(np.float32)
+    out = run(
+        runtime,
+        "layer_norm",
+        [x, scale, bias],
+        x.shape,
+        threads=3 * 32,
+        group_size=32,
+        cols=67,
+        eps=1e-12,
+    )
+    expected = (x - x.mean(axis=-1, keepdims=True)) / np.sqrt(
+        x.var(axis=-1, keepdims=True) + 1e-12
+    ) * scale + bias
+    np.testing.assert_allclose(out, expected, atol=1e-6, rtol=1e-5)
+    words = rng.normal(size=(17, 67)).astype(np.float32)
+    positions = rng.normal(size=(4, 67)).astype(np.float32)
+    types = rng.normal(size=(2, 67)).astype(np.float32)
+    ids = np.array([[1, 3, 0, 0], [5, 6, 7, 8]], np.uint32)
+    out = run(
+        runtime,
+        "embedding_position",
+        [ids, words, positions, types],
+        (2, 4, 67),
+        threads=8 * 67,
+        n=8 * 67,
+        cols=67,
+        seq=4,
+    )
+    np.testing.assert_allclose(out, words[ids] + types[0] + positions, atol=1e-6)
+
+
+def test_gelu_erf_form_and_bias(runtime):
+    x = np.linspace(-12, 12, 10001, dtype=np.float32)
+    buffer = runtime.buffer(x.nbytes, x)
+    try:
+        with runtime.command():
+            runtime._dispatch("gelu_f32", [buffer], threads=x.size, n=x.size)
+        expected = np.array(
+            [0.5 * float(v) * (1 + math.erf(float(v) / math.sqrt(2))) for v in x], np.float32
+        )
+        np.testing.assert_allclose(runtime.read(buffer, x.shape), expected, atol=2e-6, rtol=1e-6)
+    finally:
+        buffer.close()
+    x = np.arange(12, dtype=np.float32).reshape(3, 4)
+    bias = np.array([-2, -1, 1, 2], np.float32)
+    a, b = runtime.buffer(x.nbytes, x), runtime.buffer(bias.nbytes, bias)
+    try:
+        with runtime.command():
+            runtime._dispatch("add_bias", [a, b], threads=x.size, n=x.size, cols=4)
+        np.testing.assert_array_equal(runtime.read(a, x.shape), x + bias)
+    finally:
+        a.close()
+        b.close()
+
+
+def test_bidirectional_attention_and_cls_pool(runtime):
+    rng = np.random.default_rng(83)
+    batch, seq, heads, dim = 2, 5, 3, 8
+    q, k, v = [rng.normal(size=(batch, seq, heads, dim)).astype(np.float32) for _ in range(3)]
+    lengths = np.array([5, 2], np.uint32)
+    out = run(
+        runtime,
+        "attention",
+        [q, k, v, lengths],
+        q.shape,
+        threads=batch * seq * heads * 32,
+        group_size=32,
+        seq=seq,
+        heads=heads,
+        kv_heads=heads,
+        dim=dim,
+        scale=dim**-0.5,
+        bidirectional=True,
+    )
+    expected = np.empty_like(q)
+    for b in range(batch):
+        for h in range(heads):
+            scores = q[b, :, h] @ k[b, : lengths[b], h].T / np.sqrt(dim)
+            probabilities = np.exp(scores - scores.max(axis=-1, keepdims=True))
+            probabilities /= probabilities.sum(axis=-1, keepdims=True)
+            expected[b, :, h] = probabilities @ v[b, : lengths[b], h]
+    np.testing.assert_allclose(out, expected, atol=2e-6, rtol=2e-5)
+    x = q.reshape(batch, seq, heads * dim)
+    pooled = run(
+        runtime,
+        "pool_project",
+        [x, lengths],
+        (batch, heads * dim),
+        threads=batch * 32,
+        group_size=32,
+        seq=seq,
+        cols=heads * dim,
+        dim=heads * dim,
+        first_token=True,
+    )
+    expected = x[:, 0] / np.linalg.norm(x[:, 0], axis=-1, keepdims=True)
+    np.testing.assert_allclose(pooled, expected, atol=1e-6)

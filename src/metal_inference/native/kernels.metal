@@ -73,7 +73,7 @@ kernel void rope(device float *x [[buffer(0)]], constant Params &p [[buffer(8)]]
     x[row*p.dim+c+halfdim] = a*sin(angle) + b*cos(angle);
 }
 
-// Causal grouped-query attention using an online stable softmax. No SxS scores
+// Causal or bidirectional grouped-query attention with online softmax. No SxS scores
 // allocation. Each SIMD group owns one query/head and up to 256 output channels.
 kernel void attention(device const float *q [[buffer(0)]],
                       device const float *k [[buffer(1)]],
@@ -86,7 +86,7 @@ kernel void attention(device const float *q [[buffer(0)]],
     uint batch = token / p.seq, position = token % p.seq;
     uint kvhead = head / (p.heads / p.kv_heads);
     float accum[8] = {0.0f}, maximum = -INFINITY, denominator = 0.0f;
-    uint end = min(position + 1, lengths[batch]);
+    uint end = p.u0 ? lengths[batch] : min(position + 1, lengths[batch]);
     for (uint key = 0; key < end; ++key) {
         uint kvrow = (batch*p.seq + key)*p.kv_heads + kvhead;
         float dot = 0.0f;
@@ -146,9 +146,51 @@ kernel void pool_project(device const float *x [[buffer(0)]],
                          device float *out [[buffer(2)]], constant Params &p [[buffer(8)]],
                          uint batch [[threadgroup_position_in_grid]],
                          uint lane [[thread_index_in_threadgroup]]) {
-    uint start = (batch*p.seq + lengths[batch]-1)*p.cols;
+    uint start = (batch*p.seq + (p.u1 ? 0 : lengths[batch]-1))*p.cols;
     float squares = 0.0f;
     for (uint c = lane; c < p.dim; c += 32) { float v = x[start+c]; squares += v*v; }
     float inv = rsqrt(simd_sum(squares));
     for (uint c = lane; c < p.dim; c += 32) out[batch*p.dim+c] = x[start+c]*inv;
+}
+
+kernel void embedding_position(device const uint *ids [[buffer(0)]],
+                               device const float *words [[buffer(1)]],
+                               device const float *positions [[buffer(2)]],
+                               device const float *types [[buffer(3)]],
+                               device float *out [[buffer(4)]],
+                               constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
+    if (i >= p.n) return;
+    uint token = i/p.cols, c = i%p.cols;
+    out[i] = (words[ids[token]*p.cols+c] + types[c]) + positions[(token%p.seq)*p.cols+c];
+}
+
+kernel void layer_norm(device const float *x [[buffer(0)]], device const float *w [[buffer(1)]],
+                       device const float *bias [[buffer(2)]], device float *out [[buffer(3)]],
+                       constant Params &p [[buffer(8)]],
+                       uint row [[threadgroup_position_in_grid]],
+                       uint lane [[thread_index_in_threadgroup]]) {
+    float total = 0.0f;
+    for (uint c = lane; c < p.cols; c += 32) total += x[row*p.cols+c];
+    float mean = simd_sum(total)/float(p.cols), squares = 0.0f;
+    for (uint c = lane; c < p.cols; c += 32) { float d = x[row*p.cols+c]-mean; squares += d*d; }
+    float inv = rsqrt(simd_sum(squares)/float(p.cols)+p.eps);
+    for (uint c = lane; c < p.cols; c += 32)
+        out[row*p.cols+c] = (x[row*p.cols+c]-mean)*inv*w[c]+bias[c];
+}
+
+kernel void add_bias(device float *x [[buffer(0)]], device const float *bias [[buffer(1)]],
+                     constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
+    if (i < p.n) x[i] += bias[i%p.cols];
+}
+
+kernel void gelu_f32(device float *x [[buffer(0)]], constant Params &p [[buffer(8)]],
+                     uint i [[thread_position_in_grid]]) {
+    if (i >= p.n) return;
+    // erf-form GELU, using the A&S 7.1.26 approximation because Metal has no erf.
+    // Coefficients are mathematical constants; numerical error is checked against math.erf.
+    float value = x[i], z = fabs(value)*M_SQRT1_2_F;
+    float t = 1.0f/(1.0f+0.3275911f*z);
+    float poly = ((((1.061405429f*t-1.453152027f)*t+1.421413741f)*t-0.284496736f)*t+0.254829592f)*t;
+    float tail = poly*exp(-z*z);
+    x[i] = 0.5f*value*(value < 0.0f ? tail : 2.0f-tail);
 }

@@ -14,18 +14,25 @@ import numpy as np
 from .api import EmbeddingModel
 from .errors import EmbeddingError, InvalidInputError
 from .json_codec import dumps, loads
-from .weights import ARTIFACTS, MODEL_ID, REVISION, read_artifact
+from .profiles import ModelProfile, get_profile, list_profiles
+from .weights import read_artifact
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="metal-inference")
     sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("profiles", help="List built-in model profiles")
     for name in ("inspect", "embed", "benchmark"):
         command = sub.add_parser(name)
         command.add_argument("--model-dir", required=True)
+        profile_args = command.add_mutually_exclusive_group()
+        profile_args.add_argument(
+            "--profile", default="qwen3-embedding-0.6b-dwq", choices=list_profiles()
+        )
+        profile_args.add_argument("--profile-file", help="Caller-trusted data-only model manifest")
         if name != "inspect":
-            command.add_argument("--dimensions", type=int, default=384)
-            command.add_argument("--max-length", type=int, default=512)
+            command.add_argument("--dimensions", type=int)
+            command.add_argument("--max-length", type=int)
         if name == "embed":
             command.add_argument("--input", default="-", help="JSON array file; - reads stdin")
             command.add_argument("--output", default="-", help="JSON result file; - writes stdout")
@@ -36,17 +43,40 @@ def main(argv: Sequence[str] | None = None) -> int:
             command.add_argument("--warmup", type=int, default=2)
     args = parser.parse_args(argv)
     try:
+        if args.command == "profiles":
+            print(
+                dumps(
+                    {
+                        "profiles": [
+                            {"name": name, **get_profile(name).to_dict()}
+                            for name in list_profiles()
+                        ]
+                    },
+                    limit=65536,
+                ).decode()
+            )
+            return 0
+        profile = (
+            ModelProfile.from_file(args.profile_file)
+            if args.profile_file
+            else get_profile(args.profile)
+        )
         if args.command == "inspect":
-            for name in ARTIFACTS:
-                read_artifact(args.model_dir, name)
+            for artifact in profile.artifacts:
+                read_artifact(args.model_dir, artifact.name, profile=profile)
             payload: object = {
-                "model": MODEL_ID,
-                "revision": REVISION,
+                "model": profile.model_id,
+                "revision": profile.revision,
                 "verified": True,
                 "backend": "native_metal",
-                "artifacts": ARTIFACTS,
+                "profile": profile.to_dict(),
+                "compatibility_id": profile.compatibility_id,
             }
         else:
+            args.dimensions = (
+                profile.default_dimensions if args.dimensions is None else args.dimensions
+            )
+            args.max_length = profile.max_length if args.max_length is None else args.max_length
             if args.command == "benchmark" and not (
                 1 <= args.iterations <= 1000
                 and 1 <= args.warmup <= 20
@@ -64,19 +94,22 @@ def main(argv: Sequence[str] | None = None) -> int:
                     raise InvalidInputError()
             started = time.perf_counter()
             with EmbeddingModel.load(
-                args.model_dir, dimensions=args.dimensions, max_length=args.max_length
+                args.model_dir,
+                dimensions=args.dimensions,
+                max_length=args.max_length,
+                profile=profile,
             ) as model:
                 load_seconds = time.perf_counter() - started
                 if args.command == "embed":
                     vectors = model.encode(texts)
                     payload = {
-                        "model": MODEL_ID,
+                        "model": model.descriptor.model_id,
                         "compatibility_id": model.descriptor.compatibility_id,
                         "dimensions": args.dimensions,
                         "embeddings": vectors.tolist(),
                     }
                 else:
-                    batch = [" token" * (args.tokens - 1)] * args.batch_size
+                    batch = [" token" * (args.tokens - profile.min_length)] * args.batch_size
                     started = time.perf_counter()
                     model.encode(batch)
                     first = time.perf_counter() - started
@@ -93,7 +126,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         "backend": "native_metal",
                         "platform": platform.platform(),
                         "python": platform.python_version(),
-                        "model": MODEL_ID,
+                        "model": model.descriptor.model_id,
                         "compatibility_id": model.descriptor.compatibility_id,
                         "model_load_seconds": load_seconds,
                         "first_encode_seconds": first,

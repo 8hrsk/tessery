@@ -1,12 +1,13 @@
-# Metal Inference
+# Tessery — Metal Inference
 
 An independent **Apache-2.0** inference engine for Apple Silicon, with its own
-Objective-C++ Metal runtime, GPU kernels, SafeTensors reader and Qwen BPE tokenizer.
+Objective-C++ Metal runtime, GPU kernels, SafeTensors reader, BPE and WordPiece tokenizers.
 It does **not** use MLX, PyTorch, MPS, transformers or a hosted model service.
 Yuri is not required.
 
-**Status: working 0.2 alpha.** The first supported model is the pinned local
-Qwen3-Embedding-0.6B 4-bit pack. Float32 tensors support GPU addition, matrix
+**Status: working 0.3 alpha.** Qwen3 uint4 and BERT float32 adapters share the
+same Metal runtime. Verified profiles cover Qwen3-Embedding-0.6B and
+BGE-small-en-v1.5. Float32 tensors support GPU addition, matrix
 multiplication, transpose and SiLU. This is an inference-focused foundation;
 autograd, training, a general lazy tensor graph, generation and HTTP serving
 are not implemented.
@@ -31,10 +32,27 @@ with EmbeddingModel.load("/absolute/path/to/Qwen3-Embedding-0.6B-4bit-DWQ") as m
     print(model.memory_stats())
 ```
 
-Output dimensions: 32..1024. Sequence limit: 1..512. Batch: up to 32 texts.
+Qwen3 output dimensions: 32..1024. Sequence limit: 1..512. Batch: up to 32 texts.
 Large padded batches are split to bound temporary memory. Weights and tokenizer
 load once. GPU forwards are serialized with bounded admission.
 `encode_async` supports asyncio cancellation and `asyncio.timeout` deadlines.
+
+## Model profiles
+
+```python
+from metal_inference import EmbeddingModel, list_profiles
+
+print(list_profiles())
+with EmbeddingModel.load("/absolute/path/to/bge-small-en-v1.5", profile="bge-small-en-v1.5") as model:
+    vectors = model.encode(["A question", "A relevant passage"])
+    print(vectors.shape)  # (2, 384), normalized CLS embeddings
+```
+
+BGE is an English BERT encoder; its native 384 dimensions are preserved, with a
+2..512 token sequence limit including CLS/SEP. An explicit JSON profile can pin
+another compatible set of weights/configuration/tokenizer without changing the
+engine. Unknown architecture/tokenizer/pooling combinations are rejected.
+See [profile format and existing cache reuse](docs/MODEL_PROFILES.md).
 
 ## General compute
 
@@ -67,19 +85,23 @@ uv build
 ```
 
 `inspect` verifies all three consumed artifacts. Additional model-directory files
-are ignored and never imported. Registered pack hashes are built in; other
-models fail closed. The wheel contains our native bridge and kernels, not model
+are ignored and never imported. Built-in profiles and caller-selected manifests
+pin all consumed bytes. The wheel contains our native bridge and kernels, not model
 weights or an embedded Python interpreter.
 
 ```sh
 uv run ruff check .
 uv run mypy
 uv run pytest -m 'not metal'
-METAL_INFERENCE_TEST=1 METAL_INFERENCE_MODEL_DIR=/absolute/model uv run pytest --cov
+METAL_INFERENCE_TEST=1 uv run pytest --cov
 ```
 
+Native tests require both local models; paths and profile overrides are described
+in [model profiles](docs/MODEL_PROFILES.md). Tests never download weights.
+
 See [API](docs/API.md), [architecture/status](docs/STATUS.md),
-[measured results](docs/NATIVE_METAL_REPORT.md), and [provenance](PROVENANCE.md).
+[BGE validation](docs/BGE_VALIDATION.md), [earlier measurements](docs/NATIVE_METAL_REPORT.md),
+and [provenance](PROVENANCE.md).
 The old `yuri_mlx_embeddings` namespace contains the earlier protocol codec only.
 It is not a dependency of `metal_inference`. Legacy Yuri vector reuse requires
 its own compatibility report; Go fixtures do not block this standalone engine.

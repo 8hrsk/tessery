@@ -11,7 +11,7 @@ from metal_inference.errors import MetalUnavailableError
 
 
 class FakeModel:
-    descriptor = SimpleNamespace(compatibility_id="test-engine")
+    descriptor = SimpleNamespace(compatibility_id="test-engine", model_id="test-model")
 
     def __enter__(self):
         return self
@@ -55,10 +55,28 @@ def test_safe_bad_wire(data, monkeypatch, capsys):
 
 def test_inspect(monkeypatch, capsys):
     calls = []
-    monkeypatch.setattr(cli, "read_artifact", lambda *args: calls.append(args))
+    monkeypatch.setattr(cli, "read_artifact", lambda *args, **kwargs: calls.append(args))
     assert cli.main(["inspect", "--model-dir", "/model"]) == 0
     assert len(calls) == 3
     assert json.loads(capsys.readouterr().out)["verified"]
+
+
+def test_profile_listing_and_file_selection(tmp_path, monkeypatch, capsys):
+    from metal_inference import get_profile
+
+    assert cli.main(["profiles"]) == 0
+    rows = json.loads(capsys.readouterr().out)["profiles"]
+    assert [row["name"] for row in rows] == ["qwen3-embedding-0.6b-dwq", "bge-small-en-v1.5"]
+    file = tmp_path / "profile.json"
+    profile = get_profile("bge-small-en-v1.5")
+    file.write_text(json.dumps(profile.to_dict()))
+    calls = []
+    monkeypatch.setattr(
+        cli, "read_artifact", lambda *args, **kwargs: calls.append(kwargs["profile"])
+    )
+    assert cli.main(["inspect", "--model-dir", "/model", "--profile-file", str(file)]) == 0
+    assert calls == [profile] * 3
+    assert json.loads(capsys.readouterr().out)["model"] == "BAAI/bge-small-en-v1.5"
 
 
 def test_benchmark_and_limits(capsys):

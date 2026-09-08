@@ -5,23 +5,36 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from .backend import config_float, config_int
 from .errors import ClosedError, InferenceError, ManifestError, UnsupportedProfileError
 from .metal import Buffer, MetalRuntime
+from .profiles import QWEN3_PROFILE, ModelProfile
 from .weights import SafeTensors, read_artifact, read_json
 
 
 class Qwen3Backend:
-    hidden = 1024
-    intermediate = 3072
-    layers = 28
-    heads = 16
-    kv_heads = 8
-    head_dim = 128
-    vocab_size = 151669
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir: str) -> None:
-        config = read_json(model_dir, "config.json")
+    def __init__(self, model_dir: str, profile: ModelProfile = QWEN3_PROFILE) -> None:
+        config = read_json(model_dir, "config.json", profile=profile)
+        self.profile = profile
+        self.hidden = config_int(config, "hidden_size", 64, 4096)
+        self.intermediate = config_int(config, "intermediate_size", 64, 16384)
+        self.layers = config_int(config, "num_hidden_layers", 1, 64)
+        self.heads = config_int(config, "num_attention_heads", 1, 64)
+        self.kv_heads = config_int(config, "num_key_value_heads", 1, self.heads)
+        self.head_dim = config_int(config, "head_dim", 2, 256)
+        self.vocab_size = config_int(config, "vocab_size", 256, 200000)
+        if (
+            profile.architecture != "qwen3_uint4"
+            or self.hidden != profile.native_dimensions
+            or self.heads % self.kv_heads
+            or self.head_dim % 2
+            or any(n % 64 for n in (self.hidden, self.intermediate, self.heads * self.head_dim))
+            or config.get("is_decoder", False)
+            or config.get("add_cross_attention", False)
+        ):
+            raise UnsupportedProfileError()
         expected: dict[str, Any] = {
             "model_type": "qwen3",
             "architectures": ["Qwen3ForCausalLM"],
@@ -40,9 +53,9 @@ class Qwen3Backend:
         }
         if any(config.get(key) != value for key, value in expected.items()):
             raise UnsupportedProfileError()
-        self.eps = float(config["rms_norm_eps"])
-        self.theta = float(config["rope_theta"])
-        snapshots = SafeTensors(read_artifact(model_dir, "model.safetensors"))
+        self.eps = config_float(config, "rms_norm_eps", 1e-12, 1)
+        self.theta = config_float(config, "rope_theta", 1, 1e12)
+        snapshots = SafeTensors(read_artifact(model_dir, "model.safetensors", profile=profile))
         specs: dict[str, tuple[tuple[int, ...], str]] = {}
 
         def norm(prefix: str, dims: int) -> None:
@@ -100,12 +113,13 @@ class Qwen3Backend:
             or lengths.dtype != np.uint32
             or ids.ndim != 2
             or not 1 <= ids.shape[0] <= 32
-            or not 1 <= ids.shape[1] <= 512
+            or not 1 <= ids.shape[1] <= self.profile.max_length
             or ids.size > self.max_padded_tokens
             or lengths.shape != (ids.shape[0],)
             or not np.all((lengths > 0) & (lengths <= ids.shape[1]))
             or np.any(ids >= self.vocab_size)
-            or not 32 <= dimensions <= self.hidden
+            or type(dimensions) is not int
+            or not self.profile.min_dimensions <= dimensions <= self.hidden
         ):
             raise InferenceError()
         rt = self.runtime

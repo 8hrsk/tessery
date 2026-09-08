@@ -6,5 +6,7 @@
   "benchmarks/observations/local-20260905/vectors.json": "e002e8852f55e271f7813df12fcf9c3287d73396ed2cd965cc3b32b70f0138c3",
   "docs/specification.ru.md": "ebc049f3280bc3fe4624540f1f6dd6669aaad19119804e3037454edefddab153",
   "model-manifests/qwen3-0.6b-dwq.json": "c228bbf6c209a43831bf684a61bedffa650c2a704305fc0b47597d3b7bf45411",
-  "tests/contract/fixtures/draft-success.json": "54e52b7d3a592d40a99fa85998e11421c0e898c2364ec85f9b91f9a3d1007136"
+  "tests/contract/fixtures/draft-success.json": "54e52b7d3a592d40a99fa85998e11421c0e898c2364ec85f9b91f9a3d1007136",
+  "benchmarks/observations/bge-small-en-v1.5/reference.json": "99c00bde0e343fa6eb29724fe4459a97936db4eebb625ebf857c9cfa88d42c57",
+  "model-manifests/bge-small-en-v1.5-hf-cache.json": "dabf77faf868caab034fe100af1d672aa99b9f26c062495fc5792e716ee51db3"
 }

@@ -36,14 +36,14 @@ def main():
         "name": args.artifact.name,
         "documentNamespace": f"https://spdx.org/spdxdocs/metal-inference-{digest}",
         "creationInfo": {
-            "creators": ["Tool: metal-inference-sbom-0.2.0a1"],
+            "creators": ["Tool: metal-inference-sbom-0.3.0a1"],
             "created": datetime.fromtimestamp(args.epoch, UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         },
         "packages": [
             {
                 "SPDXID": "SPDXRef-Foundation",
                 "name": "metal-inference",
-                "versionInfo": "0.2.0a1",
+                "versionInfo": "0.3.0a1",
                 "downloadLocation": "NOASSERTION",
                 "filesAnalyzed": False,
                 "licenseConcluded": "Apache-2.0",

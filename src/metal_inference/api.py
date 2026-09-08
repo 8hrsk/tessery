@@ -12,6 +12,8 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
+from .backend import Backend, Tokenizer
+from .bert import BertBackend
 from .errors import (
     CanceledError,
     ClosedError,
@@ -20,10 +22,13 @@ from .errors import (
     InferenceError,
     InvalidInputError,
     OverloadError,
+    UnsupportedProfileError,
 )
+from .profiles import QWEN3_PROFILE, ModelProfile, get_profile
 from .qwen3 import Qwen3Backend
-from .tokenizer import QwenTokenizer
+from .tokenizer import QwenTokenizer, validate_qwen_profile
 from .weights import ARTIFACTS, MODEL_ID, REVISION, read_json
+from .wordpiece import WordPieceTokenizer
 
 ENGINE_ID = "metal-inference-qwen3-f32-v1"
 
@@ -45,6 +50,30 @@ class ModelDescriptor:
     manifest_sha256: str = hashlib.sha256(
         json.dumps(ARTIFACTS, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+    architecture: str = "qwen3_uint4"
+    tokenizer: str = "qwen_bpe"
+
+    @classmethod
+    def from_profile(cls, profile: ModelProfile) -> "ModelDescriptor":
+        return cls(
+            model_id=profile.model_id,
+            revision=profile.revision,
+            tokenizer_revision=profile.revision,
+            native_dimensions=profile.native_dimensions,
+            min_dimensions=profile.min_dimensions,
+            max_dimensions=profile.native_dimensions,
+            max_length=profile.max_length,
+            pooling=profile.pooling,
+            quantization="none"
+            if profile.architecture == "bert_f32"
+            else "affine_uint4_group64_bf16_scales",
+            compatibility_id=profile.compatibility_id,
+            manifest_sha256=cls().manifest_sha256
+            if profile.identity_sha256 == QWEN3_PROFILE.identity_sha256
+            else profile.identity_sha256,
+            architecture=profile.architecture,
+            tokenizer=profile.tokenizer,
+        )
 
 
 @dataclass(frozen=True)
@@ -76,33 +105,64 @@ class EmbeddingModel:
         cls,
         model_dir: str | Path,
         *,
-        dimensions: int = 384,
-        max_length: int = 512,
+        dimensions: int | None = None,
+        max_length: int | None = None,
         max_pending: int = 8,
+        profile: str | ModelProfile = "qwen3-embedding-0.6b-dwq",
     ) -> "EmbeddingModel":
+        selected = get_profile(profile)
+        dimensions = selected.default_dimensions if dimensions is None else dimensions
+        max_length = selected.max_length if max_length is None else max_length
         if (
             type(dimensions) is not int
-            or not 32 <= dimensions <= 1024
+            or not selected.min_dimensions <= dimensions <= selected.native_dimensions
             or type(max_length) is not int
-            or not 1 <= max_length <= 512
+            or not selected.min_length <= max_length <= selected.max_length
             or type(max_pending) is not int
             or not 1 <= max_pending <= 64
         ):
             raise ConfigurationError()
-        tokenizer = QwenTokenizer(read_json(str(model_dir), "tokenizer.json"))
-        backend = Qwen3Backend(str(model_dir))
-        return cls(backend, tokenizer, dimensions, max_length, max_pending)
+        tokenizer_data = read_json(str(model_dir), "tokenizer.json", profile=selected)
+        if selected.tokenizer == "qwen_bpe":
+            validate_qwen_profile(tokenizer_data)
+        tokenizer: Tokenizer = (
+            QwenTokenizer(tokenizer_data)
+            if selected.tokenizer == "qwen_bpe"
+            else WordPieceTokenizer(tokenizer_data)
+        )
+        config = read_json(str(model_dir), "config.json", profile=selected)
+        if tokenizer.vocab_size != config.get("vocab_size"):
+            raise UnsupportedProfileError()
+        backend: Backend = (
+            Qwen3Backend(str(model_dir), selected)
+            if selected.architecture == "qwen3_uint4"
+            else BertBackend(str(model_dir), selected)
+        )
+        try:
+            return cls(
+                backend,
+                tokenizer,
+                dimensions,
+                max_length,
+                max_pending,
+                ModelDescriptor.from_profile(selected),
+            )
+        except BaseException:
+            backend.close()
+            raise
 
     def __init__(
         self,
-        backend: Qwen3Backend,
-        tokenizer: QwenTokenizer,
+        backend: Backend,
+        tokenizer: Tokenizer,
         dimensions: int,
         max_length: int,
         max_pending: int,
+        descriptor: ModelDescriptor | None = None,
     ) -> None:
         self._backend = backend
         self._tokenizer = tokenizer
+        self.descriptor = ModelDescriptor() if descriptor is None else descriptor
         self.dimensions = dimensions
         self.max_length = max_length
         self._admission = threading.BoundedSemaphore(max_pending)
@@ -114,7 +174,10 @@ class EmbeddingModel:
         if self._closed.is_set():
             raise ClosedError()
         dims = self.dimensions if dimensions is None else dimensions
-        if type(dims) is not int or not 32 <= dims <= 1024:
+        if (
+            type(dims) is not int
+            or not self.descriptor.min_dimensions <= dims <= self.descriptor.max_dimensions
+        ):
             raise InvalidInputError()
         if isinstance(texts, str | bytes) or not isinstance(texts, Sequence) or len(texts) > 32:
             raise InvalidInputError()
@@ -203,7 +266,7 @@ class EmbeddingModel:
 
     def health(self) -> HealthStatus:
         loaded = not self._closed.is_set()
-        return HealthStatus(loaded, loaded, ENGINE_ID)
+        return HealthStatus(loaded, loaded, self.descriptor.compatibility_id)
 
     def memory_stats(self) -> MemoryStats:
         runtime = self._backend.runtime

@@ -14,6 +14,66 @@ from numpy.typing import NDArray
 
 from .errors import InvalidInputError, UnsupportedProfileError
 
+QWEN_SPLIT = (
+    r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}|"
+    r" ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"
+)
+
+
+def validate_qwen_profile(config: dict[str, Any]) -> None:
+    """Reject tokenizer behavior the adapter does not implement, before constructing it."""
+    byte_level = {
+        "type": "ByteLevel",
+        "add_prefix_space": False,
+        "trim_offsets": False,
+        "use_regex": False,
+    }
+    try:
+        if config["pre_tokenizer"] != {
+            "type": "Sequence",
+            "pretokenizers": [
+                {
+                    "type": "Split",
+                    "pattern": {"Regex": QWEN_SPLIT},
+                    "behavior": "Isolated",
+                    "invert": False,
+                },
+                byte_level,
+            ],
+        }:
+            raise UnsupportedProfileError()
+        model = config["model"]
+        for name, expected in {
+            "dropout": None,
+            "unk_token": None,
+            "continuing_subword_prefix": "",
+            "end_of_word_suffix": "",
+            "fuse_unk": False,
+            "byte_fallback": False,
+            "ignore_merges": False,
+        }.items():
+            if model.get(name, expected) != expected:
+                raise UnsupportedProfileError()
+        post = config["post_processor"]
+        if (
+            post["type"] != "Sequence"
+            or len(post["processors"]) != 2
+            or post["processors"][0] != byte_level
+        ):
+            raise UnsupportedProfileError()
+        template = post["processors"][1]
+        if template["type"] != "TemplateProcessing" or template["single"] != [
+            {"Sequence": {"id": "A", "type_id": 0}},
+            {"SpecialToken": {"id": "<|endoftext|>", "type_id": 0}},
+        ]:
+            raise UnsupportedProfileError()
+        suffix = template["special_tokens"]["<|endoftext|>"]["ids"]
+        added = {row["content"]: row["id"] for row in config["added_tokens"]}
+        if suffix != [added["<|endoftext|>"]]:
+            raise UnsupportedProfileError()
+    except (KeyError, TypeError, ValueError, IndexError):
+        raise UnsupportedProfileError() from None
+
 
 def byte_alphabet() -> tuple[str, ...]:
     visible = set(range(33, 127)) | set(range(161, 173)) | set(range(174, 256))
@@ -34,11 +94,25 @@ class QwenTokenizer:
             if config["normalizer"] != {"type": "NFC"} or config["model"]["type"] != "BPE":
                 raise UnsupportedProfileError()
             self.vocab: dict[str, int] = config["model"]["vocab"]
+            if (
+                not isinstance(self.vocab, dict)
+                or not 256 <= len(self.vocab) <= 200000
+                or any(
+                    not isinstance(k, str) or not k or type(v) is not int or not 0 <= v < 200000
+                    for k, v in self.vocab.items()
+                )
+            ):
+                raise UnsupportedProfileError()
             self.ranks = {tuple(pair): i for i, pair in enumerate(config["model"]["merges"])}
             self._split = regex.compile(
                 config["pre_tokenizer"]["pretokenizers"][0]["pattern"]["Regex"]
             )
             self.added = {row["content"]: row["id"] for row in config["added_tokens"]}
+            if not self.added or any(
+                not isinstance(k, str) or not k or type(v) is not int or not 0 <= v < 200000
+                for k, v in self.added.items()
+            ):
+                raise UnsupportedProfileError()
             # Added tokens are matched before normalization. All flags in this
             # registered pack are false; they are not approximated for other packs.
             if any(
@@ -56,6 +130,9 @@ class QwenTokenizer:
                 "<|endoftext|>"
             ]["ids"][0]
             self.pad_id = self.suffix_id
+            self.vocab_size = max((*self.vocab.values(), *self.added.values())) + 1
+            if set(self.vocab.values()) | set(self.added.values()) != set(range(self.vocab_size)):
+                raise UnsupportedProfileError()
             self._alphabet = byte_alphabet()
         except (KeyError, TypeError, ValueError, IndexError):
             raise UnsupportedProfileError() from None

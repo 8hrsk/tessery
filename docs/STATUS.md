@@ -16,6 +16,12 @@ specification is preserved as historical input.
   Quantized weights remain on GPU. Attention does not allocate S-by-S scores.
 * Original NFC/Unicode-split/byte-level BPE tokenizer. Tokens and masks match
   all 18 saved baseline batches exactly.
+* Data-only immutable model profiles with checked artifacts, explicit architecture,
+  tokenizer, pooling, dimensions and model identity. Compatible packs can be added
+  through manifests without editing core code; architecture features remain bounded.
+* BERT float32 encoder, WordPiece, absolute position embeddings, LayerNorm,
+  bidirectional attention, erf-form GELU and normalized CLS pooling. The existing
+  BGE-small-en-v1.5 pack is validated against offline CPU reference outputs.
 * Bounded sync/async embedding API, cancellation, lifecycle/memory reporting,
   CLI, in-memory cosine lookup and general compute primitives.
 * Eager float32 Metal tensors: addition, matrix multiplication, transpose, SiLU,
@@ -26,21 +32,27 @@ specification is preserved as historical input.
 
 ## Architecture
 
-`api` coordinates admission/tokenization/batches. `qwen3` is a registered model
-adapter calling kernels through `metal`. Its C ABI lives in `native/runtime.mm`,
+`api` coordinates admission/tokenization/batches. `profiles` binds artifact hashes
+to supported adapter contracts. `qwen3` and `bert` call shared kernels through `metal`.
+Its C ABI lives in `native/runtime.mm`,
 which uses Apple Metal directly. `native/kernels.metal` contains the numerical
 operations. `weights` validates bytes/offsets/shapes; `tokenizer` implements BPE.
 `tensor` provides the reusable device-resident compute interface through `metal`.
 These modules do not import the `yuri_mlx_embeddings` compatibility package.
 
-The existing 335 MB pack is reused in place; no new weights were downloaded.
+The existing 335 MB Qwen3 and 133 MB BGE packs are reused in place; no new weights
+were downloaded or copied. The BGE cache manifest addresses regular blob files
+directly rather than following snapshot symlinks.
 All three consumed artifacts are hashed. Verified snapshots, not subsequently
 reopened paths, supply GPU weights and tokenizer/configuration data.
 
 ## Limits and next development
 
-This alpha supports one exact embedding pack. More models need explicit adapters
-and verified weight formats. There is no autograd/training, general tensor graph,
+This alpha supports two architecture/tokenizer/pooling combinations and two
+verified real packs. Other packs within those bounded contracts can be described
+with manifests; this does not qualify their embedding quality automatically.
+New architectures, pooling modes, quantization formats or sharded weights still
+need implementation and validation. There is no autograd/training, general tensor graph,
 generation/KV cache, ANN database, HTTP/UDS daemon or production supervisor.
 This is not a complete MLX replacement or a claim of MLX performance parity.
 

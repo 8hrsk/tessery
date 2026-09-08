@@ -164,6 +164,8 @@ class MetalRuntime:
         eps: float = 1e-6,
         theta: float = 1e6,
         scale: float = 1.0,
+        bidirectional: int = 0,
+        first_token: int = 0,
     ) -> None:
         if not self._recording or any(not b.pointer or b.runtime is not self for b in buffers):
             raise InferenceError()
@@ -179,8 +181,8 @@ class MetalRuntime:
             batch,
             dim,
             group,
-            0,
-            0,
+            int(bidirectional),
+            int(first_token),
             eps,
             theta,
             scale,

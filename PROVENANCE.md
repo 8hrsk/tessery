@@ -50,6 +50,19 @@ Additional public sources consulted:
   BPE merge scheduling and numerical kernels were written for this project.
 
 No mlx-embeddings GPL implementation source was consulted for this implementation.
+
+The 0.3 work also consulted the [BGE-small-en-v1.5 model card](https://huggingface.co/BAAI/bge-small-en-v1.5)
+(MIT model), its existing local configuration/tokenizer/weight metadata, and the
+Apache-2.0 public [BERT reference architecture](https://github.com/huggingface/transformers/blob/main/src/transformers/models/bert/modeling_bert.py)
+and [BERT normalizer contract](https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/normalizers/bert.rs).
+The WordPiece and Metal BERT implementation was written for this project.
+GELU uses the published A&S 7.1.26 error-function approximation, checked against
+Python `math.erf`; Metal does not provide an `erf` intrinsic.
+`benchmarks/reference/capture_bert.py` uses only public torch/transformers APIs in
+an already installed, separate offline environment. Its synthetic observations
+record exact versions and model digests. This collector and its dependencies are
+not packaged or imported by the engine. See `docs/BGE_VALIDATION.md`.
+
 NumPy and regex license notices are preserved in `third_party/` from the exact
 installed distributions. This license inventory is not a legal approval.
 

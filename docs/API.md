@@ -1,4 +1,4 @@
-# Standalone API, 0.2 alpha
+# Standalone API, 0.3 alpha
 
 ```python
 from metal_inference import EmbeddingModel, MetalRuntime, cosine_search
@@ -9,7 +9,9 @@ vectors = model.encode(["текст", "text"], dimensions=1024)
 model.close()
 ```
 
-`load` verifies consumed bytes against registered immutable hashes and uploads
+`load(..., profile="qwen3-embedding-0.6b-dwq")` accepts a built-in profile name or
+an immutable `ModelProfile`. Omitted dimensions and max length use profile defaults.
+It verifies consumed bytes against the profile's hashes and uploads
 that validated snapshot into owned Metal buffers. Model code is never imported.
 No pickle/torch loader, downloader, plugin registry, remote code hook, tokenization
 cache or network library is involved.
@@ -18,8 +20,10 @@ cache or network library is involved.
 Empty batches return `(0, dimensions)` without GPU work. Whitespace-only strings,
 invalid Unicode, more than 32 texts or 1 MiB total UTF-8 input are rejected.
 A single pretokenizer segment is bounded to 64 KiB to constrain BPE resource use.
-Dimensions must be integers 32..1024, excluding booleans. Configured max length
-is an integer 1..512, including the special suffix. MRL truncation precedes L2.
+For the built-in Qwen3 profile, dimensions must be integers 32..1024, excluding
+booleans, and max length is 1..512 including its special suffix. MRL truncation
+precedes L2. BGE uses exactly 384 dimensions and 2..512 tokens, including CLS/SEP;
+it pools the first encoder token and applies L2. No prompt prefix is added implicitly.
 
 `encode_async` uses a private executor and bounded admission shared with sync
 calls. Overload raises `OverloadError`. Canceling an await prevents queued work;
@@ -39,8 +43,12 @@ A context manager provides deterministic ownership.
 
 `descriptor` exposes model/tokenizer revisions, dimension range, pooling,
 quantization/storage/compute types, manifest digest and compatibility ID.
-Compute is float32, with the new space identifier `metal-inference-qwen3-f32-v1`.
-Legacy Yuri embedding-space compatibility is not claimed.
+Compute is float32. The original Qwen3 profile retains `metal-inference-qwen3-f32-v1`.
+Other profiles derive identifiers from their architecture, model metadata,
+tokenizer/pooling contract and artifact digests. Changing physical filenames does
+not change this identifier. Store the chosen output dimension, max length and
+application query-prefix policy alongside vectors; those call options are not
+encoded in the profile ID. Legacy Yuri embedding-space compatibility is not claimed.
 
 `health()`, `memory_stats()` and `warmup()` report readiness, owned GPU buffer
 bytes and perform an initial forward. `peak_bytes` is not process RSS or driver
@@ -95,12 +103,18 @@ synchronized host arrays for callers that prefer a single-operation interface.
 
 ## CLI
 
+* `profiles`: list built-in profile names and their data-only manifests.
 * `inspect --model-dir /absolute/model`: SHA-256/size validation.
 * `embed --model-dir /absolute/model --dimensions 384`: read a JSON string array
   from stdin, write JSON embeddings to stdout. Optional `--input FILE` and
   `--output FILE`; existing output files are refused.
 * `benchmark --model-dir /absolute/model --batch-size 1 --tokens 32 --iterations 10
   --warmup 2`: synthetic direct-API diagnostic with raw timing samples.
+
+`inspect`, `embed` and `benchmark` accept either `--profile NAME` or
+`--profile-file FILE`. Defaults preserve the original Qwen3 behavior. `inspect`
+now returns a `profile` object with artifact filenames, sizes and hashes.
+See [model profiles](MODEL_PROFILES.md) for manifest trust and supported formats.
 
 Invoke commands with `metal-inference` or `python -I -m metal_inference`.
 Exit codes: 0 success; 2 invalid arguments, model/input/I/O or inference error.
