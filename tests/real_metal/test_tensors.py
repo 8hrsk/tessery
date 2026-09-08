@@ -20,7 +20,7 @@ def runtime():
         yield engine
 
 
-@pytest.mark.parametrize("shape", [(1, 1, 1), (7, 65, 9), (4, 128, 16)])
+@pytest.mark.parametrize("shape", [(1, 1, 1), (7, 65, 9), (4, 128, 16), (16, 64, 32)])
 def test_composed_operations_keep_intermediates_on_metal(runtime, monkeypatch, shape):
     m, k, n = shape
     rng = np.random.default_rng(24)
@@ -158,3 +158,39 @@ def test_parallel_tensor_calls_are_serialized_and_release_memory(runtime):
             np.testing.assert_array_equal(result, (data * 2).T)
         assert runtime.active_bytes == data.nbytes
     assert runtime.active_bytes == 0
+
+
+def test_partial_begin_failure_recovers(runtime, monkeypatch):
+    begin = runtime._lib.mi_begin
+
+    def partial_failure(pointer):
+        assert begin(pointer) == 0
+        return 1
+
+    with monkeypatch.context() as patch:
+        patch.setattr(runtime._lib, "mi_begin", partial_failure)
+        with pytest.raises(InferenceError), runtime.command():
+            pytest.fail("failed begin must not yield")
+    a = np.ones(9, np.float32)
+    np.testing.assert_array_equal(runtime.add(a, a), a + a)
+    assert runtime.active_bytes == 0
+
+
+def test_diagnostics_count_completed_work_and_abort(runtime):
+    a = np.ones(9, np.float32)
+    runtime.add(a, a)
+    stats = runtime.diagnostics()
+    assert stats["completed_commands"] == 1
+    assert stats["dispatches"] == {"add": 1}
+    assert stats["allocations"] == 3
+    assert stats["allocated_bytes"] == a.nbytes * 3
+    assert stats["active_bytes"] == 0
+    assert stats["encode_seconds"] >= 0
+    assert stats["submit_wait_seconds"] > 0
+    assert 0 <= stats["gpu_timed_commands"] <= 1
+    assert stats["gpu_seconds"] >= 0
+    with pytest.raises(ValueError), runtime.command():
+        raise ValueError("abort")
+    assert runtime.diagnostics()["completed_commands"] == 1
+    stats["dispatches"]["add"] = 100
+    assert runtime.diagnostics()["dispatches"] == {"add": 1}

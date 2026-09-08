@@ -194,3 +194,23 @@ kernel void gelu_f32(device float *x [[buffer(0)]], constant Params &p [[buffer(
     float tail = poly*exp(-z*z);
     x[i] = 0.5f*value*(value < 0.0f ? tail : 2.0f-tail);
 }
+
+// Original 8x32 output tile: four SIMDgroups each own one 8x8 fragment.
+// F32 inputs and accumulators; weights remain [N,K]. Only aligned shapes are
+// routed here, so all collective loads/stores are complete and in bounds.
+kernel void matmul_f32_tiled(device const float *a [[buffer(0)]],
+                             device const float *bt [[buffer(1)]],
+                             device float *out [[buffer(2)]],
+                             constant Params &p [[buffer(8)]],
+                             uint tile [[threadgroup_position_in_grid]],
+                             uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*8;
+    uint col = (tile % (p.cols/32))*32 + sg*8;
+    simdgroup_float8x8 accum(0.0f), left, right;
+    for (uint k = 0; k < p.k; k += 8) {
+        simdgroup_load(left, a + row*p.k + k, p.k);
+        simdgroup_load(right, bt + col*p.k + k, p.k, ulong2(0), true);
+        simdgroup_multiply_accumulate(accum, left, right, accum);
+    }
+    simdgroup_store(accum, out + row*p.cols + col, p.cols);
+}

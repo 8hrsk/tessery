@@ -175,3 +175,106 @@ def test_cosine_lookup():
     ]:
         with pytest.raises(InvalidInputError):
             cosine_search(query, documents, k=k)
+
+
+def test_length_buckets_restore_original_output_order(model):
+    class VariableTokenizer:
+        def batch(self, texts, *, max_length):
+            lengths = np.array([3, 8, 2, 8, 2], np.uint32)
+            ids = np.zeros((5, 8), np.uint32)
+            ids[:, 0] = [int(t) for t in texts]
+            return ids, lengths
+
+    model._tokenizer = VariableTokenizer()
+    model._backend.max_padded_tokens = 16
+    shapes = []
+    forward = model._backend.forward
+
+    def record(ids, lengths, **kw):
+        shapes.append(ids.shape)
+        assert ids.flags.c_contiguous
+        return forward(ids, lengths, **kw)
+
+    model._backend.forward = record
+    output = model.encode(["3", "1", "2", "4", "5"])
+    assert output.argmax(axis=1).tolist() == [3, 1, 2, 4, 5]
+    assert shapes == [(3, 3), (2, 8)]
+
+
+def test_sync_does_not_bypass_admitted_async(monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+
+    backend = Backend()
+    backend.release = threading.Event()
+    model = EmbeddingModel(backend, Tokenizer(), 384, 512, 4)
+    sync_submitted = threading.Event()
+    submit = model._executor.submit
+
+    def observed_submit(function, snapshot, *args):
+        result = submit(function, snapshot, *args)
+        if snapshot == ["2"]:
+            sync_submitted.set()
+        return result
+
+    monkeypatch.setattr(model._executor, "submit", observed_submit)
+
+    async def run():
+        with ThreadPoolExecutor(max_workers=1) as callers:
+            first = asyncio.create_task(model.encode_async(["0"]))
+            assert await asyncio.to_thread(backend.entered.wait, 2)
+            queued = asyncio.create_task(model.encode_async(["1"]))
+            await asyncio.sleep(0)
+            sync = callers.submit(model.encode, ["2"])
+            assert await asyncio.to_thread(sync_submitted.wait, 2)
+            backend.release.set()
+            await asyncio.gather(first, queued)
+            assert (await asyncio.wrap_future(sync)).argmax() == 2
+            assert backend.calls == [[0], [1], [2]]
+
+    try:
+        asyncio.run(run())
+    finally:
+        backend.release.set()
+        model.close()
+
+
+def test_close_cancels_queued_sync_as_closed(monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+
+    backend = Backend()
+    backend.release = threading.Event()
+    model = EmbeddingModel(backend, Tokenizer(), 384, 512, 4)
+    admitted = threading.Event()
+    shutdown = threading.Event()
+    submit = model._executor.submit
+    native_shutdown = model._executor.shutdown
+
+    def observed_submit(function, snapshot, *args):
+        result = submit(function, snapshot, *args)
+        if snapshot == ["1"]:
+            admitted.set()
+        return result
+
+    def observed_shutdown(**kw):
+        shutdown.set()
+        native_shutdown(**kw)
+
+    monkeypatch.setattr(model._executor, "submit", observed_submit)
+    monkeypatch.setattr(model._executor, "shutdown", observed_shutdown)
+    with ThreadPoolExecutor(max_workers=3) as callers:
+        try:
+            first = callers.submit(model.encode, ["0"])
+            assert backend.entered.wait(2)
+            queued = callers.submit(model.encode, ["1"])
+            assert admitted.wait(2)
+            closing = callers.submit(model.close)
+            assert shutdown.wait(2)
+            with pytest.raises(ClosedError):
+                queued.result(timeout=2)
+            backend.release.set()
+            first.result(timeout=2)
+            closing.result(timeout=2)
+            assert backend.calls == [[0]]
+        finally:
+            backend.release.set()
+            model.close()

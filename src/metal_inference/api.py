@@ -5,6 +5,7 @@ import hashlib
 import json
 import threading
 from collections.abc import Sequence
+from concurrent.futures import CancelledError as FutureCancelledError
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .backend import Backend, Tokenizer
+from .batching import length_batches
 from .bert import BertBackend
 from .errors import (
     CanceledError,
@@ -206,14 +208,12 @@ class EmbeddingModel:
                 ids, lengths = self._tokenizer.batch(texts, max_length=self.max_length)
                 result = np.empty((len(texts), dimensions), dtype=np.float32)
                 # Limit temporary GPU memory independently of caller batch size.
-                step = max(1, self._backend.max_padded_tokens // ids.shape[1])
-                for start in range(0, len(texts), step):
+                for rows, width in length_batches(lengths, self._backend.max_padded_tokens):
                     if canceled.is_set():
                         raise CanceledError()
-                    end = min(start + step, len(texts))
-                    result[start:end] = self._backend.forward(
-                        ids[start:end],
-                        lengths[start:end],
+                    result[rows] = self._backend.forward(
+                        np.ascontiguousarray(ids[rows, :width]),
+                        lengths[rows],
                         dimensions=dimensions,
                     )
                 if canceled.is_set():
@@ -230,22 +230,18 @@ class EmbeddingModel:
         snapshot, dims = self._prepare(texts, dimensions)
         if not snapshot:
             return np.empty((0, dims), dtype=np.float32)
-        if not self._admission.acquire(blocking=False):
-            raise OverloadError()
-        return self._run(snapshot, dims, threading.Event())
+        try:
+            return self._submit(snapshot, dims, threading.Event()).result()
+        except FutureCancelledError:
+            raise ClosedError() from None
 
-    async def encode_async(
-        self,
-        texts: Sequence[str],
-        *,
-        dimensions: int | None = None,
-    ) -> NDArray[np.float32]:
-        snapshot, dims = self._prepare(texts, dimensions)
-        if not snapshot:
-            return np.empty((0, dims), dtype=np.float32)
+    def _submit(
+        self, snapshot: list[str], dims: int, canceled: threading.Event
+    ) -> Future[NDArray[np.float32]]:
+        # Both APIs submit to the same single worker so synchronous callers do
+        # not bypass already queued asynchronous work by racing for a lock.
         if not self._admission.acquire(blocking=False):
             raise OverloadError()
-        canceled = threading.Event()
         try:
             future = self._executor.submit(self._run, snapshot, dims, canceled)
         except RuntimeError:
@@ -258,6 +254,19 @@ class EmbeddingModel:
                 self._admission.release()
 
         future.add_done_callback(on_done)
+        return future
+
+    async def encode_async(
+        self,
+        texts: Sequence[str],
+        *,
+        dimensions: int | None = None,
+    ) -> NDArray[np.float32]:
+        snapshot, dims = self._prepare(texts, dimensions)
+        if not snapshot:
+            return np.empty((0, dims), dtype=np.float32)
+        canceled = threading.Event()
+        future = self._submit(snapshot, dims, canceled)
         try:
             return await asyncio.wrap_future(future)
         except asyncio.CancelledError:

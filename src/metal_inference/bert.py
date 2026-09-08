@@ -136,11 +136,8 @@ class BertBackend:
             )
 
         def linear(x: Buffer, y: Buffer, name: str, outputs: int, inputs: int) -> None:
-            rt._dispatch(
-                "matmul_f32",
+            rt._matmul_f32(
                 [x, self.weights[name + ".weight"], y],
-                threads=((tokens + 3) // 4) * outputs * 32,
-                group_size=32,
                 rows=tokens,
                 cols=outputs,
                 k=inputs,

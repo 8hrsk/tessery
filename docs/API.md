@@ -1,4 +1,4 @@
-# Standalone API, 0.3 alpha
+# Standalone API, 0.4 alpha
 
 ```python
 from metal_inference import EmbeddingModel, MetalRuntime, cosine_search
@@ -25,8 +25,9 @@ booleans, and max length is 1..512 including its special suffix. MRL truncation
 precedes L2. BGE uses exactly 384 dimensions and 2..512 tokens, including CLS/SEP;
 it pools the first encoder token and applies L2. No prompt prefix is added implicitly.
 
-`encode_async` uses a private executor and bounded admission shared with sync
-calls. Overload raises `OverloadError`. Canceling an await prevents queued work;
+`encode` and `encode_async` submit to the same private single-worker executor
+and share bounded admission. Length buckets limit padding and restore original
+output order. Overload raises `OverloadError`. Canceling an await prevents queued work;
 already submitted GPU work finishes, its result is discarded, and its slot is
 released. Impose a deadline with:
 
@@ -36,10 +37,11 @@ async with asyncio.timeout(5):
     vectors = await model.encode_async(["text"])
 ```
 
-`close()` is idempotent, rejects subsequent calls, cancels queued async jobs and
+`close()` is idempotent, rejects subsequent calls, cancels queued jobs and
 waits for current GPU work before freeing model buffers. It cannot instantly
 interrupt Metal. For asynchronous cleanup use `await asyncio.to_thread(model.close)`.
-A context manager provides deterministic ownership.
+Canceled queued sync calls raise `ClosedError`. CPU tokenization is not instantly
+interrupted by cancellation. A context manager provides deterministic ownership.
 
 `descriptor` exposes model/tokenizer revisions, dimension range, pooling,
 quantization/storage/compute types, manifest digest and compatibility ID.
@@ -121,3 +123,6 @@ Exit codes: 0 success; 2 invalid arguments, model/input/I/O or inference error.
 Runtime failures contain stable safe codes. `embed` intentionally emits vectors
 to the caller-selected destination. The library does not log/persist prompts or
 vectors. HTTP/UDS, TLS and a Go supervisor are not part of this alpha.
+
+Runtime counters, bounded load tests and benchmark interpretation are documented
+in [performance diagnostics](PERFORMANCE.md).

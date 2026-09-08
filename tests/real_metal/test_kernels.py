@@ -302,3 +302,19 @@ def test_bidirectional_attention_and_cls_pool(runtime):
     )
     expected = x[:, 0] / np.linalg.norm(x[:, 0], axis=-1, keepdims=True)
     np.testing.assert_allclose(pooled, expected, atol=1e-6)
+
+
+@pytest.mark.parametrize(
+    "shape", [(8, 8, 32), (16, 384, 384), (32, 512, 384), (32, 1536, 384), (8, 65, 32), (9, 64, 32)]
+)
+def test_tiled_matmul_and_unaligned_fallback(runtime, shape):
+    m, k, n = shape
+    rng = np.random.default_rng(33)
+    a = rng.normal(size=(m, k)).astype(np.float32)
+    b = rng.normal(size=(k, n)).astype(np.float32)
+    expected = a.astype(np.float64) @ b.astype(np.float64)
+    np.testing.assert_allclose(runtime.matmul(a, b), expected, atol=5e-5, rtol=5e-5)
+    tiled = m % 8 == 0 and k % 8 == 0 and k <= 512
+    name = "matmul_f32_tiled" if tiled else "matmul_f32"
+    assert runtime.diagnostics()["dispatches"] == {name: 1}
+    assert runtime.active_bytes == 0

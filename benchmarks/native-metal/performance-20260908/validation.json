@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-08",
+  "version": "0.4.0a1",
+  "full_suite_passed": 301,
+  "python_coverage_percent": 95.29,
+  "full_suite_seconds": 43.58,
+  "ruff": "passed",
+  "mypy_source_files": 28,
+  "dependency_policy": "passed",
+  "frozen_inputs": "passed",
+  "wheel_sha256": "56f6e55f85219ad823d0888c47afacedb061cffde4d230a25017ca75fd146c7e",
+  "installed_wheel_offline_smoke": {
+    "isolated_import": true,
+    "both_models": true,
+    "tiled_tensor": true,
+    "network_calls_blocked": true,
+    "unwanted_framework_imports_absent": true
+  }
+}

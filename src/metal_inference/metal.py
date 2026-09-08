@@ -5,9 +5,12 @@ BF16 is a weight storage format, decoded by our kernels into float32 registers.
 """
 
 import ctypes as ct
+import hashlib
 import platform
 import struct
 import threading
+import time
+from collections import Counter
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
@@ -29,7 +32,11 @@ def _library() -> Any:
     if len(candidates) != 1:
         raise NativeBuildError()
     try:
-        lib = ct.CDLL(str(candidates[0]))
+        native_bytes = candidates[0].read_bytes()
+        lib: Any = ct.CDLL(str(candidates[0]))
+        if candidates[0].read_bytes() != native_bytes:
+            raise NativeBuildError()
+        lib._tessery_sha256 = hashlib.sha256(native_bytes).hexdigest()
     except OSError:
         raise NativeBuildError() from None
     signatures = {
@@ -40,6 +47,7 @@ def _library() -> Any:
         "mi_read": ([ct.c_void_p, ct.c_void_p, ct.c_uint64], ct.c_int),
         "mi_begin": ([ct.c_void_p], ct.c_int),
         "mi_finish": ([ct.c_void_p], ct.c_int),
+        "mi_gpu_seconds": ([ct.c_void_p], ct.c_double),
         "mi_abort": ([ct.c_void_p], None),
         "mi_dispatch": (
             [
@@ -55,9 +63,13 @@ def _library() -> Any:
             ct.c_int,
         ),
     }
-    for name, (args, result) in signatures.items():
-        function = getattr(lib, name)
-        function.argtypes, function.restype = args, result
+    try:
+        for name, (args, result) in signatures.items():
+            function = getattr(lib, name)
+            function.argtypes, function.restype = args, result
+    except AttributeError:
+        # Source checkouts need an explicit rebuild when the native ABI changes.
+        raise NativeBuildError() from None
     return lib
 
 
@@ -73,6 +85,8 @@ class Buffer:
         if not self.pointer:
             raise InferenceError()
         runtime.active_bytes += size
+        runtime._allocations += 1
+        runtime._allocated_bytes += size
         runtime.peak_bytes = max(runtime.peak_bytes, runtime.active_bytes)
         runtime._buffers.add(self)
 
@@ -93,6 +107,7 @@ class MetalRuntime:
     def __init__(self) -> None:
         self._lib = _library()
         source = (Path(__file__).parent / "native/kernels.metal").read_bytes()
+        self._shader_sha256 = hashlib.sha256(source).hexdigest()
         self._pointer: int | None = self._lib.mi_create(source)
         if not self._pointer:
             raise MetalUnavailableError()
@@ -102,6 +117,37 @@ class MetalRuntime:
         self._buffers: WeakSet[Buffer] = WeakSet()
         self.active_bytes = 0
         self.peak_bytes = 0
+        self._allocations = 0
+        self._allocated_bytes = 0
+        self._commands = 0
+        self._gpu_samples = 0
+        self._gpu_seconds = 0.0
+        self._encode_seconds = 0.0
+        self._submit_wait_seconds = 0.0
+        self._dispatches: Counter[str] = Counter()
+
+    def diagnostics(self) -> dict[str, Any]:
+        """Cumulative counters; GPU time covers completed commands, not individual kernels.
+
+        Encoding includes Python/driver work and allocations inside command().
+        Submit/wait includes GPU execution and must not be added to GPU time.
+        Dispatch counts include encoded work discarded by command aborts.
+        """
+        with self._lock:
+            return {
+                "shader_sha256": self._shader_sha256,
+                "native_library_sha256": self._lib._tessery_sha256,
+                "allocations": self._allocations,
+                "allocated_bytes": self._allocated_bytes,
+                "completed_commands": self._commands,
+                "gpu_timed_commands": self._gpu_samples,
+                "gpu_seconds": self._gpu_seconds,
+                "encode_seconds": self._encode_seconds,
+                "submit_wait_seconds": self._submit_wait_seconds,
+                "dispatches": dict(self._dispatches),
+                "active_bytes": self.active_bytes,
+                "peak_bytes": self.peak_bytes,
+            }
 
     def tensor(self, data: NDArray[np.float32]) -> Tensor:
         """Upload a nonempty float32 array into an owned, contiguous Metal tensor."""
@@ -132,13 +178,25 @@ class MetalRuntime:
         with self._lock:
             if not self._pointer:
                 raise ClosedError()
-            if self._recording or self._lib.mi_begin(self._pointer):
+            if self._recording:
+                raise InferenceError()
+            if self._lib.mi_begin(self._pointer):
+                self._lib.mi_abort(self._pointer)
                 raise InferenceError()
             self._recording = True
+            started = time.perf_counter()
             try:
                 yield
+                submitted = time.perf_counter()
                 if self._lib.mi_finish(self._pointer):
                     raise InferenceError()
+                self._encode_seconds += submitted - started
+                self._submit_wait_seconds += time.perf_counter() - submitted
+                self._commands += 1
+                gpu_seconds = self._lib.mi_gpu_seconds(self._pointer)
+                if gpu_seconds >= 0:
+                    self._gpu_seconds += gpu_seconds
+                    self._gpu_samples += 1
             finally:
                 self._lib.mi_abort(self._pointer)
                 self._recording = False
@@ -201,6 +259,7 @@ class MetalRuntime:
             group_size,
         ):
             raise InferenceError()
+        self._dispatches[name] += 1
 
     def read(self, buffer: Buffer, shape: tuple[int, ...]) -> NDArray[np.float32]:
         with self._lock:
@@ -215,6 +274,20 @@ class MetalRuntime:
             if self._lib.mi_read(buffer.pointer, result.ctypes.data, result.nbytes):
                 raise InferenceError()
             return result
+
+    def _matmul_f32(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
+        # Longer sequential MMA accumulations need a separate error policy;
+        # retain the original reduction beyond the qualified short-K range.
+        tiled = rows >= 8 and rows % 8 == 0 and cols % 32 == 0 and k % 8 == 0 and k <= 512
+        self._dispatch(
+            "matmul_f32_tiled" if tiled else "matmul_f32",
+            buffers,
+            threads=(rows // 8) * (cols // 32) * 128 if tiled else ((rows + 3) // 4) * cols * 32,
+            group_size=128 if tiled else 32,
+            rows=rows,
+            cols=cols,
+            k=k,
+        )
 
     def add(self, a: NDArray[np.float32], b: NDArray[np.float32]) -> NDArray[np.float32]:
         """Reusable elementwise GPU addition, independent of any model."""
@@ -254,11 +327,8 @@ class MetalRuntime:
                     buffers.append(self.buffer(data.nbytes, np.ascontiguousarray(data)))
                 buffers.append(self.buffer(m * n * 4))
                 with self.command():
-                    self._dispatch(
-                        "matmul_f32",
+                    self._matmul_f32(
                         buffers,
-                        threads=((m + 3) // 4) * n * 32,
-                        group_size=32,
                         rows=m,
                         cols=n,
                         k=k,

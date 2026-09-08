@@ -77,3 +77,15 @@ installed distributions. This license inventory is not a legal approval.
 These declarations are review evidence, not automatic legal approval. Dependency
 allowlisting is not a substitute for a release similarity scan, complete
 third-party notices, model redistribution review or signed compatibility report.
+
+### Short-K SIMDgroup matmul and runtime timing (0.4)
+
+The 8x32 F32 output-tile kernel is an original implementation using Apple's
+public SIMDgroup matrix interface, described in
+[Discover Metal enhancements for A14 Bionic](https://developer.apple.com/videos/play/tech-talks/10858/).
+It does not copy MLX or another framework's kernel source. Inputs and accumulators
+remain F32; the original reduction handles long-K and unaligned shapes. Command
+GPU timing follows Apple's
+[MTLCommandBuffer timestamp contract](https://developer.apple.com/documentation/metal/mtlcommandbuffer/gpustarttime).
+The developer benchmark compares products to NumPy float64 and retains the
+rejected long-K experiment as evidence instead of relaxing numerical tolerances.

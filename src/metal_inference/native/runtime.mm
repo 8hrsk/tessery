@@ -13,6 +13,7 @@ struct Runtime {
     NSMutableDictionary<NSString *, id<MTLComputePipelineState>> *pipelines;
     id<MTLCommandBuffer> command;
     id<MTLComputeCommandEncoder> encoder;
+    double lastGPUSeconds;
 };
 struct Buffer { id<MTLBuffer> metal; };
 
@@ -68,7 +69,11 @@ int mi_begin(void *runtime) {
         if (r->command) return 1;
         r->command = [r->queue commandBuffer];
         r->encoder = [r->command computeCommandEncoder];
-        return r->encoder ? 0 : 1;
+        if (!r->encoder) {
+            r->command = nil;
+            return 1;
+        }
+        return 0;
     }
 }
 
@@ -108,10 +113,16 @@ int mi_finish(void *runtime) {
         [r->command commit];
         [r->command waitUntilCompleted];
         int failed = r->command.status == MTLCommandBufferStatusCompleted ? 0 : 1;
+        double start = r->command.GPUStartTime, end = r->command.GPUEndTime;
+        r->lastGPUSeconds = !failed && start > 0 && end >= start ? end - start : -1;
         r->encoder = nil;
         r->command = nil;
         return failed;
     }
+}
+
+double mi_gpu_seconds(void *runtime) {
+    return static_cast<Runtime *>(runtime)->lastGPUSeconds;
 }
 
 void mi_abort(void *runtime) {

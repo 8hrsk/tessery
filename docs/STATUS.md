@@ -27,6 +27,10 @@ specification is preserved as historical input.
 * Eager float32 Metal tensors: addition, matrix multiplication, transpose, SiLU,
   explicit host readback and deterministic cleanup at tensor/runtime scope.
   Intermediate results stay on the device; operations preserve their inputs.
+* Short-K tiled F32 matmul, bounded length buckets with output-order restoration,
+  shared sync/async submission queue and recovery from partial command creation.
+* Cumulative CPU/GPU command diagnostics and reproducible latency/memory/soak tools;
+  see [performance diagnostics](PERFORMANCE.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 
@@ -58,7 +62,7 @@ This is not a complete MLX replacement or a claim of MLX performance parity.
 
 The wheel needs an installed Python and Apple frameworks. It is not a bundled
 CPython archive, signed/notarized application or a two-host production release.
-Long soak, comprehensive GPU instrumentation, kernel fault recovery and more
+Multi-hour soak, per-kernel GPU counter instrumentation, kernel fault recovery and more
 advanced tiling/fusion remain future work. Python coverage does not measure
 Metal/C++ branch coverage. Hosted CI cannot assume local model availability.
 

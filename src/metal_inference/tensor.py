@@ -129,11 +129,8 @@ class Tensor:
                         rows=k,
                         cols=n,
                     )
-                    runtime._dispatch(
-                        "matmul_f32",
+                    runtime._matmul_f32(
                         [self._buffer, transposed, output],
-                        threads=((m + 3) // 4) * n * 32,
-                        group_size=32,
                         rows=m,
                         cols=n,
                         k=k,
