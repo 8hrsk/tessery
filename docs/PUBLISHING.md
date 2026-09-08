@@ -2,13 +2,12 @@
 
 `pip` installs packages; PyPI is the public registry. `uv publish` or `twine upload`
 performs the upload, much like `npm publish`. Tessery's distribution name and public
-Python import are both `tessery`, starting with 0.5.1a1. Nothing has been uploaded
-by this change.
+Python import are both `tessery`, starting with 0.5.1a1.
+The first release is now [published on PyPI](https://pypi.org/project/tessery/0.5.1a1/);
+see [the release verification](PYPI_RELEASE.md).
 
-The PyPI JSON endpoint for `tessery` returned HTTP 404 on 2026-09-08. That means no
-published project was found at that time, not a reservation or guarantee that the
-name can be registered. Import names and distribution names are independent: if
-PyPI requires another distribution name, the Python import can stay `tessery`.
+The project is registered as `tessery`. Import names and distribution names are
+independent, but this project uses the same public name for both.
 See the [PyPA packaging guide](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
 
 ## One-time setup

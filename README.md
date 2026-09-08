@@ -20,7 +20,13 @@ from tessery import EmbeddingModel, list_profiles
 print(list_profiles())
 ```
 
-Build/install locally today; after publication, install with `pip install --pre tessery`.
+Install the published alpha from [PyPI](https://pypi.org/project/tessery/):
+
+```sh
+python -m pip install --pre tessery
+```
+
+The native wheel supports Apple Silicon/macOS 14+ and Python 3.12+.
 See [PyPI publishing and migration](docs/PUBLISHING.md). The previous
 `metal_inference` imports and `metal-inference` CLI remain compatible.
 
