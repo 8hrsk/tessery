@@ -49,9 +49,49 @@ memory. `cache_bytes=0` describes tensor caches; compiled pipelines are retained
 `cosine_search(query, documents, k=5)` returns `SearchHit(index, score)` records
 from an existing embedding matrix. Ties keep document order. This small helper
 uses NumPy and owns no persistent index or database.
-`MetalRuntime.add` and `MetalRuntime.matmul` provide general float32 GPU operations
-and return synchronized host arrays. Low-level buffers/dispatch are internal,
-not a stable general tensor API.
+
+## Metal tensors
+
+`MetalRuntime.tensor(array)` uploads a nonempty NumPy float32 array, including
+noncontiguous arrays and scalars, into an owned contiguous allocation. The
+input is copied, with no implicit dtype conversion. `Tensor.shape`, `dtype`
+and `nbytes` describe the allocation. Create tensors through the runtime;
+the `Tensor` constructor and raw buffers/dispatch are internal interfaces.
+
+* `a + b`: elementwise addition with identical shapes, without broadcasting.
+* `a @ b`: matrix multiplication of `[M,K]` and `[K,N]` tensors.
+* `a.transpose()`: matrix transpose into a new contiguous allocation.
+* `a.silu()`: elementwise `x * sigmoid(x)` for any supported shape.
+* `a.numpy()`: an independent, writable NumPy float32 copy.
+
+All operands must belong to the same runtime. Operations preserve inputs and
+return new tensors; no intermediate result is copied to the host. Matrix
+multiplication transposes its right operand on Metal and releases that temporary
+after execution. Commands execute eagerly and synchronize before returning;
+this is not a lazy graph, asynchronous GPU queue or kernel fusion API.
+
+```python
+import numpy as np
+from metal_inference import MetalRuntime
+
+with MetalRuntime() as gpu:
+    with gpu.tensor(np.ones((3, 4), np.float32)) as x:
+        with x.transpose() as weights:
+            with (x @ weights).silu() as result:
+                host = result.numpy()
+```
+
+Tensor `close()` is idempotent, and tensor context managers free their allocation.
+Closing a runtime frees all its remaining buffers and invalidates its tensors.
+Subsequent computation/read raises `ClosedError`; mismatched shapes, dtypes or
+runtimes raise `InferenceError`. Calls on one runtime are serialized, including
+resource release. Garbage collection also releases unreferenced tensors; use
+explicit cleanup when deterministic lifetime matters. Allocation size is bounded
+to 2 GiB per buffer and by available Metal memory. Empty tensors, broadcasting,
+views, arbitrary strides, mixed precision and autodiff are not implemented.
+
+`MetalRuntime.add` and `MetalRuntime.matmul` still accept NumPy inputs and return
+synchronized host arrays for callers that prefer a single-operation interface.
 
 ## CLI
 

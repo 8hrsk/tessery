@@ -18,6 +18,9 @@ specification is preserved as historical input.
   all 18 saved baseline batches exactly.
 * Bounded sync/async embedding API, cancellation, lifecycle/memory reporting,
   CLI, in-memory cosine lookup and general compute primitives.
+* Eager float32 Metal tensors: addition, matrix multiplication, transpose, SiLU,
+  explicit host readback and deterministic cleanup at tensor/runtime scope.
+  Intermediate results stay on the device; operations preserve their inputs.
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 
@@ -27,6 +30,7 @@ specification is preserved as historical input.
 adapter calling kernels through `metal`. Its C ABI lives in `native/runtime.mm`,
 which uses Apple Metal directly. `native/kernels.metal` contains the numerical
 operations. `weights` validates bytes/offsets/shapes; `tokenizer` implements BPE.
+`tensor` provides the reusable device-resident compute interface through `metal`.
 These modules do not import the `yuri_mlx_embeddings` compatibility package.
 
 The existing 335 MB pack is reused in place; no new weights were downloaded.

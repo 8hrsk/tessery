@@ -6,8 +6,8 @@ It does **not** use MLX, PyTorch, MPS, transformers or a hosted model service.
 Yuri is not required.
 
 **Status: working 0.2 alpha.** The first supported model is the pinned local
-Qwen3-Embedding-0.6B 4-bit pack. General float32 GPU addition and matrix
-multiplication are also available. This is an inference-focused foundation;
+Qwen3-Embedding-0.6B 4-bit pack. Float32 tensors support GPU addition, matrix
+multiplication, transpose and SiLU. This is an inference-focused foundation;
 autograd, training, a general lazy tensor graph, generation and HTTP serving
 are not implemented.
 
@@ -43,10 +43,18 @@ import numpy as np
 from metal_inference import MetalRuntime
 
 with MetalRuntime() as gpu:
-    a = np.ones((2, 64), dtype=np.float32)
-    b = np.ones((64, 3), dtype=np.float32)
-    print(gpu.matmul(a, b))  # our Metal kernel
+    a = gpu.tensor(np.ones((2, 64), dtype=np.float32))
+    b = gpu.tensor(np.ones((64, 3), dtype=np.float32))
+    bias = gpu.tensor(np.ones((2, 3), dtype=np.float32))
+    result = ((a @ b) + bias).silu()
+    print(result.numpy())  # one explicit copy back to the host
 ```
+
+Each operation completes synchronously; intermediate tensors stay in Metal
+memory. Inputs are preserved, and results own separate allocations. Use tensor
+context managers or `close()` to free allocations early; closing the runtime
+frees every remaining owned buffer. NumPy-in/NumPy-out `gpu.add` and `gpu.matmul`
+remain available. See the [tensor API](docs/API.md#metal-tensors) for limits.
 
 ## Build and run
 

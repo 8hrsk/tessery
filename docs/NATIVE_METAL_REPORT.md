@@ -6,6 +6,17 @@ downloaded. The installed wheel imports no MLX, torch, transformers or Yuri code
 
 ## Validation
 
+Follow-up tensor API validation (same local device): **204 tests passed** with
+**95.52%** combined Python statement/branch coverage. Added checks cover chained
+device-resident operations with host reads disabled until the final result,
+scalar/multidimensional addition and SiLU, matrix transpose, noncontiguous
+uploads, copy isolation, cross-runtime rejection, closed resources, parallel
+call serialization and cleanup after injected command failures. The full pinned
+Qwen3 suite also passed after the buffer lifetime changes. The timings and wheel
+hash below describe the earlier 192-test snapshot, not a new performance run.
+
+Initial alpha snapshot:
+
 * 192 tests passed, including actual Metal numerical tests and model inference.
 * Python statement/branch combined coverage: 94.95%. Native C++/Metal code is
   checked numerically, not included in that coverage percentage.

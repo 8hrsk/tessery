@@ -126,6 +126,16 @@ kernel void matmul_f32(device const float *a [[buffer(0)]],
     }
 }
 
+kernel void transpose_f32(device const float *x [[buffer(0)]], device float *out [[buffer(1)]],
+                          constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
+    if (i < p.rows*p.cols) out[(i%p.cols)*p.rows+i/p.cols] = x[i];
+}
+
+kernel void silu_f32(device const float *x [[buffer(0)]], device float *out [[buffer(1)]],
+                     constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
+    if (i < p.n) out[i] = x[i] / (1.0f+exp(-x[i]));
+}
+
 kernel void silu_gate(device float *gate [[buffer(0)]], device const float *up [[buffer(1)]],
                       constant Params &p [[buffer(8)]], uint i [[thread_position_in_grid]]) {
     if (i < p.n) { float g = gate[i]; gate[i] = (g / (1.0f+exp(-g))) * up[i]; }

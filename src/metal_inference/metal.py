@@ -12,11 +12,13 @@ from collections.abc import Iterator, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+from weakref import WeakSet
 
 import numpy as np
 from numpy.typing import NDArray
 
 from .errors import ClosedError, InferenceError, MetalUnavailableError, NativeBuildError
+from .tensor import Tensor
 
 
 def _library() -> Any:
@@ -72,12 +74,14 @@ class Buffer:
             raise InferenceError()
         runtime.active_bytes += size
         runtime.peak_bytes = max(runtime.peak_bytes, runtime.active_bytes)
+        runtime._buffers.add(self)
 
     def close(self) -> None:
-        if self.pointer:
-            self.runtime._lib.mi_free(self.pointer)
-            self.pointer = None
-            self.runtime.active_bytes -= self.size
+        with self.runtime._lock:
+            if getattr(self, "pointer", None):
+                self.runtime._lib.mi_free(self.pointer)
+                self.pointer = None
+                self.runtime.active_bytes -= self.size
 
     def __del__(self) -> None:
         self.close()
@@ -95,8 +99,23 @@ class MetalRuntime:
         self._lock = threading.RLock()
         self._recording = False
         self._inflight: list[Buffer] = []
+        self._buffers: WeakSet[Buffer] = WeakSet()
         self.active_bytes = 0
         self.peak_bytes = 0
+
+    def tensor(self, data: NDArray[np.float32]) -> Tensor:
+        """Upload a nonempty float32 array into an owned, contiguous Metal tensor."""
+        with self._lock:
+            if not self._pointer:
+                raise ClosedError()
+            if (
+                self._recording
+                or not isinstance(data, np.ndarray)
+                or data.dtype != np.float32
+                or not data.size
+            ):
+                raise InferenceError()
+            return Tensor(self.buffer(data.nbytes, np.ascontiguousarray(data)), data.shape)
 
     def buffer(self, size: int, data: NDArray[Any] | None = None) -> Buffer:
         with self._lock:
@@ -249,7 +268,11 @@ class MetalRuntime:
 
     def close(self) -> None:
         with self._lock:
+            if self._recording:
+                raise InferenceError()
             if self._pointer:
+                for buffer in list(self._buffers):
+                    buffer.close()
                 self._lib.mi_destroy(self._pointer)
                 self._pointer = None
 
