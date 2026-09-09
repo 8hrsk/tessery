@@ -180,7 +180,7 @@ kernel void matmul_f32(device const float *a [[buffer(0)]],
                        constant Params &p [[buffer(8)]],
                        uint row [[threadgroup_position_in_grid]],
                        uint lane [[thread_index_in_threadgroup]]) {
-    uint token = (row/p.cols)*4, channel = row%p.cols;
+    uint token = p.n + (row/p.cols)*4, channel = row%p.cols;
     float total[4] = {0.0f};
     for (uint col = lane; col < p.k; col += 32) {
         float value = bt[channel*p.k+col];
@@ -278,6 +278,30 @@ kernel void matmul_f32_tiled(device const float *a [[buffer(0)]],
         simdgroup_load(left, a + row*p.k + k, p.k);
         simdgroup_load(right, bt + col*p.k + k, p.k, ulong2(0), true);
         simdgroup_multiply_accumulate(accum, left, right, accum);
+    }
+    simdgroup_store(accum, out + row*p.cols + col, p.cols);
+}
+
+// Full 8x32 tile, F32 partial sums reset every 32 products to bound long-K
+// accumulation error. Host restricts this kernel to verified BGE projection
+// shapes and complete row tiles. Remaining rows use the scalar reduction.
+kernel void matmul_f32_chunk32(device const float *a [[buffer(0)]],
+                             device const float *bt [[buffer(1)]],
+                             device float *out [[buffer(2)]],
+                             constant Params &p [[buffer(8)]],
+                             uint tile [[threadgroup_position_in_grid]],
+                             uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*8;
+    uint col = (tile % (p.cols/32))*32 + sg*8;
+    simdgroup_float8x8 accum(0.0f), left, right;
+    for (uint base = 0; base < p.k; base += 32) {
+        simdgroup_float8x8 partial(0.0f);
+        for (uint j = 0; j < 32; j += 8) {
+            simdgroup_load(left, a + row*p.k + base+j, p.k);
+            simdgroup_load(right, bt + col*p.k + base+j, p.k, ulong2(0), true);
+            simdgroup_multiply_accumulate(partial, left, right, partial);
+        }
+        for (uint e = 0; e < 2; ++e) accum.thread_elements()[e] += partial.thread_elements()[e];
     }
     simdgroup_store(accum, out + row*p.cols + col, p.cols);
 }

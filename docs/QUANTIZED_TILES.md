@@ -139,5 +139,6 @@ that the delivered Python dispatch and Metal source agree.
 
 This is a short regression and stress qualification. Previous multi-hour
 qualification runs do not cover this new kernel. Remaining performance work
-includes BGE float32 full tiles with a bounded tail, and evaluating mixed
-16-row/eight-row dispatch for Qwen shapes that currently use the older path.
+includes evaluating mixed 16-row/eight-row dispatch for Qwen shapes that
+currently use the older path. BGE float32 full tiles with a bounded tail are
+now covered by the [subsequent F32 projection report](F32_PROJECTIONS.md).

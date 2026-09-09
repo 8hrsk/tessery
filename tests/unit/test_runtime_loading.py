@@ -84,3 +84,36 @@ def test_stale_or_changing_native_library_has_stable_error(
     with pytest.raises(NativeBuildError) as error:
         metal._library()
     assert str(error.value) == "native_engine_not_built"
+
+
+@pytest.mark.parametrize("rows", [1, 7, 8, 9, 12, 15, 16, 129, 4096])
+@pytest.mark.parametrize(
+    "cols,k",
+    [(384, 384), (1536, 384), (384, 1536), (385, 384), (384, 1535), (384, 512), (384, 2048)],
+)
+def test_f32_verified_shapes_and_tail_dispatch(rows, cols, k):
+    calls = []
+    runtime = SimpleNamespace(_dispatch=lambda *a, **kw: calls.append((a, kw)))
+    metal.MetalRuntime._matmul_f32(runtime, [], rows=rows, cols=cols, k=k)
+    selected = rows >= 8 and (cols, k) in ((384, 384), (1536, 384), (384, 1536))
+    if selected:
+        assert calls[0][0][0] == "matmul_f32_chunk32"
+        assert calls[0][1] == dict(
+            threads=(rows // 8) * (cols // 32) * 128, group_size=128, rows=rows, cols=cols, k=k
+        )
+        assert len(calls) == 1 + bool(rows % 8)
+        if rows % 8:
+            assert calls[1][0][0] == "matmul_f32"
+            assert calls[1][1] == dict(
+                threads=((rows % 8 + 3) // 4) * cols * 32,
+                group_size=32,
+                n=rows // 8 * 8,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+    else:
+        tiled = rows >= 8 and rows % 8 == 0 and cols % 32 == 0 and k % 8 == 0 and k <= 512
+        assert len(calls) == 1
+        assert calls[0][0][0] == ("matmul_f32_tiled" if tiled else "matmul_f32")
+        assert calls[0][1].get("n", 0) == 0

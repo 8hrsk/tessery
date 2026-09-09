@@ -396,6 +396,8 @@ def test_tiled_matmul_and_unaligned_fallback(runtime, shape):
     np.testing.assert_allclose(runtime.matmul(a, b), expected, atol=5e-5, rtol=5e-5)
     tiled = m % 8 == 0 and k % 8 == 0 and k <= 512
     name = "matmul_f32_tiled" if tiled else "matmul_f32"
+    if m >= 8 and (n, k) in ((384, 384), (1536, 384), (384, 1536)):
+        name = "matmul_f32_chunk32"
     assert runtime.diagnostics()["dispatches"] == {name: 1}
     assert runtime.active_bytes == 0
 
@@ -577,3 +579,51 @@ def test_kernel_profile_capacity_aborts_without_publishing_partial_results(runti
         for buffer in buffers:
             buffer.close()
     assert runtime.active_bytes == 0
+
+
+@pytest.mark.parametrize("m", [8, 9, 10, 11, 12, 13, 14, 15, 128, 4096])
+@pytest.mark.parametrize("n,k", [(384, 384), (1536, 384), (384, 1536)])
+@pytest.mark.parametrize("pattern", ["random", "cancellation"])
+def test_f32_chunked_projections_and_bounded_tail(runtime, m, n, k, pattern):
+    rng = np.random.default_rng(2026 + m)
+    x = rng.normal(size=(m, k)).astype(np.float32)
+    w = rng.normal(size=(n, k)).astype(np.float32)
+    if pattern == "cancellation":
+        # Opposing products, with a small representable residual in every pair.
+        x[:, 1::2] = -x[:, ::2]
+        w[:, 1::2] = w[:, ::2] + np.float32(2**-16)
+    expected = x.astype(np.float64) @ w.astype(np.float64).T
+    output = runtime.matmul(x, np.ascontiguousarray(w.T))
+    np.testing.assert_allclose(output, expected, atol=5e-5, rtol=5e-5)
+    dispatches = {"matmul_f32_chunk32": 1}
+    if m % 8:
+        dispatches["matmul_f32"] = 1
+    assert runtime.diagnostics()["dispatches"] == dispatches
+    assert runtime.active_bytes == 0
+
+
+def test_f32_scalar_tail_does_not_touch_complete_rows(runtime):
+    rng = np.random.default_rng(33)
+    x = rng.normal(size=(15, 1536)).astype(np.float32)
+    w = rng.normal(size=(384, 1536)).astype(np.float32)
+    sentinel = np.full((15, 384), np.nan, np.float32)
+    buffers = [runtime.buffer(a.nbytes, a) for a in (x, w, sentinel)]
+    try:
+        with runtime.command():
+            runtime._dispatch(
+                "matmul_f32",
+                buffers,
+                threads=2 * 384 * 32,
+                group_size=32,
+                n=8,
+                rows=15,
+                cols=384,
+                k=1536,
+            )
+        output = runtime.read(buffers[-1], (15, 384))
+        assert np.isnan(output[:8]).all()
+        expected = x[8:].astype(np.float64) @ w.astype(np.float64).T
+        np.testing.assert_allclose(output[8:], expected, atol=5e-5, rtol=5e-5)
+    finally:
+        for buffer in buffers:
+            buffer.close()

@@ -51,6 +51,8 @@ specification is preserved as historical input.
   preserving logical token lengths; see [alignment results](ALIGNED_BATCHING.md).
 * Larger uint4 projection tiles with shared weight reuse and unchanged F32
   reduction order; see [quantized tile results](QUANTIZED_TILES.md).
+* Chunked F32 BGE projection tiles with bounded scalar tails and unchanged
+  accuracy gates; see [F32 projection results](F32_PROJECTIONS.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

@@ -146,3 +146,11 @@ def test_persisted_retrieval_and_http_use_same_real_model(model, tmp_path):
             server.shutdown()
             worker.join(timeout=5)
             assert not worker.is_alive()
+
+
+def test_chunked_kernel_covers_all_six_projections_per_layer(model):
+    runtime = model._backend.runtime
+    kernel = "matmul_f32_chunk32"
+    before = runtime.diagnostics()["dispatches"].get(kernel, 0)
+    model.encode([" token" * 126])
+    assert runtime.diagnostics()["dispatches"][kernel] - before == 6 * model._backend.layers

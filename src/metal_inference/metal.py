@@ -477,8 +477,30 @@ class MetalRuntime:
             return result
 
     def _matmul_f32(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
-        # Longer sequential MMA accumulations need a separate error policy;
-        # retain the original reduction beyond the qualified short-K range.
+        if rows >= 8 and (cols, k) in ((384, 384), (1536, 384), (384, 1536)):
+            complete = rows // 8
+            self._dispatch(
+                "matmul_f32_chunk32",
+                buffers,
+                threads=complete * (cols // 32) * 128,
+                group_size=128,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+            if rows % 8:
+                self._dispatch(
+                    "matmul_f32",
+                    buffers,
+                    threads=((rows % 8 + 3) // 4) * cols * 32,
+                    group_size=32,
+                    n=complete * 8,
+                    rows=rows,
+                    cols=cols,
+                    k=k,
+                )
+            return
+        # Preserve the previous route outside the qualified BGE shapes.
         tiled = rows >= 8 and rows % 8 == 0 and cols % 32 == 0 and k % 8 == 0 and k <= 512
         self._dispatch(
             "matmul_f32_tiled" if tiled else "matmul_f32",
