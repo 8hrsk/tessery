@@ -179,16 +179,13 @@ class BertBackend:
                         linear(
                             x, target, prefix + ".attention.self." + name, self.hidden, self.hidden
                         )
-                    rt._dispatch(
-                        "attention",
+                    rt._attention(
                         [q, k, v, length_buffer, attended],
-                        threads=tokens * self.heads * 32,
-                        group_size=32,
+                        tokens=tokens,
                         seq=seq,
                         heads=self.heads,
                         kv_heads=self.heads,
                         dim=self.head_dim,
-                        scale=self.head_dim**-0.5,
                         bidirectional=True,
                     )
                     linear(

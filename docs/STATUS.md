@@ -44,6 +44,9 @@ specification is preserved as historical input.
 * Opt-in per-kernel GPU stage profiling, small-tail uint4 dispatch, seeded
   cancellation/overload/reload stress and an isolated-process MLX comparison;
   see [profiling and stress](PROFILING_AND_STRESS.md).
+* Bounded F32 tiled attention for verified long aligned shapes, with scalar
+  fallback and stable cosine handling for extreme finite vectors;
+  see [attention results](TILED_ATTENTION.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

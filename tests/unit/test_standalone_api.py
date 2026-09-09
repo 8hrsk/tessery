@@ -21,6 +21,16 @@ class Tokenizer:
         return np.array([[int(t)] for t in texts], dtype=np.uint32), np.ones(len(texts), np.uint32)
 
 
+@pytest.mark.parametrize("scale", [3e38, 1e-40])
+def test_cosine_search_extreme_finite_vectors(scale):
+    query = np.array([scale, scale], np.float32)
+    documents = np.array([[scale, scale], [-scale, -scale], [scale, -scale]], np.float32)
+    with np.errstate(all="raise"):
+        hits = cosine_search(query, documents)
+    assert [h.index for h in hits] == [0, 2, 1]
+    np.testing.assert_allclose([h.score for h in hits], [1, 0, -1], atol=1e-15)
+
+
 class Backend:
     max_padded_tokens = 2
     runtime = SimpleNamespace(active_bytes=100, peak_bytes=200)

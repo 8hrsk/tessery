@@ -31,10 +31,33 @@ def cosine_search(
         or not np.isfinite(documents).all()
     ):
         raise InvalidInputError()
-    qnorm = np.linalg.norm(query)
-    norms = np.linalg.norm(documents, axis=1)
-    if qnorm == 0 or np.any(norms == 0):
-        raise InvalidInputError()
-    scores = (documents @ query) / (norms * qnorm)
+    with np.errstate(over="ignore", under="ignore", invalid="ignore", divide="ignore"):
+        qnorm = np.linalg.norm(query)
+        norms = np.linalg.norm(documents, axis=1)
+        scores = (documents @ query) / (norms * qnorm)
+    # Keep the usual normalized-embedding path unchanged. Rescale extreme finite
+    # inputs before any squaring or dot product, avoiding overflow and underflow.
+    floor = np.sqrt(np.finfo(np.float32).tiny)
+    if (
+        not np.isfinite(qnorm)
+        or not np.isfinite(norms).all()
+        or qnorm < floor
+        or np.any(norms < floor)
+        or not np.isfinite(scores).all()
+    ):
+        q = np.array(query, dtype=np.float64, copy=True)
+        docs = np.array(documents, dtype=np.float64, copy=True)
+        qscale = np.max(np.abs(q), initial=0)
+        scales = np.max(np.abs(docs), axis=1, initial=0)
+        if qscale == 0 or np.any(scales == 0):
+            raise InvalidInputError()
+        q /= qscale
+        docs /= scales[:, None]
+        q /= np.linalg.norm(q)
+        docs /= np.linalg.norm(docs, axis=1)[:, None]
+        scores = docs @ q
+        if not np.isfinite(scores).all():
+            raise InvalidInputError()
+        scores = np.clip(scores, -1, 1)
     order = np.argsort(-scores, kind="stable")[:k]
     return [SearchHit(int(i), float(scores[i])) for i in order]

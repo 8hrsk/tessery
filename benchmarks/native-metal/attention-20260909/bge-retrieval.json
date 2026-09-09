@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "scope": "Hand-authored smoke regression corpus; not a general retrieval benchmark.",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "ec06433b06192b9a72b09b60c4908c913a72b2de5814190df8ed2f048da60481",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "a12b6b341f2632fbad788fd976fe05c1054c3051c0d73d26afeb18deae04f28f",
+    "src/metal_inference/native/kernels.metal": "f581ca30375359b14a01113e961021662c8cec3a4a1d515177343f967e78107a",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "87799bf9d7de5bf2890d16de3ebf9b0b41df965f184166d54da93f0c9ca2b608",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "5b9038a2a73a98aae550cca712aa94a58f5e9d45ccd858b3f2a1bb296b4c4966",
+  "fixture_sha256": "a2e431c4230114e2b37317f3cc73ab2281ae96b8f73ecb8d77073b89170f6ab7",
+  "results": [
+    {
+      "id": "astronomy",
+      "language": "en",
+      "rank": 1,
+      "top_id": "astronomy"
+    },
+    {
+      "id": "bread",
+      "language": "en",
+      "rank": 1,
+      "top_id": "bread"
+    },
+    {
+      "id": "battery",
+      "language": "en",
+      "rank": 1,
+      "top_id": "battery"
+    },
+    {
+      "id": "penguin",
+      "language": "en",
+      "rank": 1,
+      "top_id": "penguin"
+    }
+  ],
+  "contract": {
+    "compatibility_id": "tessery-bert_f32-v1:be9a26877207ec61e25a6874a01646ffee489b802353c3c43f3d82be4db1f3a8",
+    "manifest_sha256": "be9a26877207ec61e25a6874a01646ffee489b802353c3c43f3d82be4db1f3a8",
+    "dimensions": 384,
+    "max_length": 512
+  },
+  "preprocessing": "default API; empty document/query prefixes",
+  "recall_at_1": 1.0,
+  "mrr": 1.0,
+  "baseline_sha256": "6c1842bdad42e983633dba1e1e6df1be7211b73017bcd9efdc805fadf0f7bbcb"
+}

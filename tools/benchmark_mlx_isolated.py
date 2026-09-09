@@ -43,7 +43,7 @@ def worker(args):
         data = read_json(args.model_dir, "tokenizer.json")
         validate_qwen_profile(data)
         model = EmbeddingModel(
-            MLXReference(args.model_dir),
+            MLXReference(args.model_dir, causal_fast_path=args.mlx_mask == "causal"),
             QwenTokenizer(data),
             QWEN3_PROFILE.default_dimensions,
             QWEN3_PROFILE.max_length,
@@ -67,6 +67,8 @@ def worker(args):
             [" token" * (tokens - 1)] * batch
             for batch, tokens in [(1, 7), (1, 8), (1, 31), (4, 33)]
         ] + [["Hello world", "Кошки и собаки", "A much longer passage about Paris in France."]]
+        if args.lengths:
+            cases = [[" token" * (n - 1)] for n in args.lengths]
         for case_id in np.random.default_rng(94).permutation(len(cases)):
             texts = cases[case_id]
             _, lengths = model._tokenizer.batch(texts, max_length=model.max_length)
@@ -117,10 +119,19 @@ def main():
     parser.add_argument("--mlx-python", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--samples", default=30, type=int)
+    parser.add_argument(
+        "--lengths", nargs="+", type=int, help="Override cases with uniform lengths"
+    )
+    parser.add_argument("--mlx-mask", choices=["dense", "causal"], default="dense")
+    parser.add_argument(
+        "--engine-order", choices=["tessery-first", "mlx-first"], default="tessery-first"
+    )
     parser.add_argument("--engine", choices=["tessery", "mlx"], help=argparse.SUPPRESS)
     args = parser.parse_args()
     if not 5 <= args.samples <= 100:
         parser.error("samples must be 5..100")
+    if args.lengths and not all(1 <= n <= 512 for n in args.lengths):
+        parser.error("lengths must be 1..512")
     if args.engine:
         worker(args)
         return
@@ -147,13 +158,19 @@ def main():
             Path(__file__).with_name("benchmark_mlx.py").read_bytes()
         ).hexdigest(),
         "profile_sha256": QWEN3_PROFILE.identity_sha256,
+        "requested_lengths": args.lengths,
+        "mlx_mask": args.mlx_mask,
+        "engine_order": args.engine_order,
         "workers": {},
         "results": [],
     }
     try:
         import json
 
-        for engine, interpreter in [("tessery", sys.executable), ("mlx", args.mlx_python)]:
+        engines = [("tessery", sys.executable), ("mlx", args.mlx_python)]
+        if args.engine_order == "mlx-first":
+            engines.reverse()
+        for engine, interpreter in engines:
             result = args.output.with_name(args.output.stem + f"-{engine}.json")
             with result.open("x") as stream:
                 stream.write('{"status":"starting"}\n')
@@ -171,6 +188,9 @@ def main():
                     str(args.samples),
                     "--output",
                     str(result),
+                    "--mlx-mask",
+                    args.mlx_mask,
+                    *(["--lengths", *map(str, args.lengths)] if args.lengths else []),
                 ],
                 env=environment,
                 check=True,

@@ -102,6 +102,73 @@ kernel void attention(device const float *q [[buffer(0)]],
     for (uint c = lane; c < p.dim; c += 32) out[row*p.dim+c] = accum[c/32]/denominator;
 }
 
+// Eight queries by 32 keys, F32 SIMD matrix products and online softmax.
+// Dispatcher requires sequence alignment to 32 and head dimension 32 or 128.
+// Arrays total 9312 bytes before compiler alignment; no sequence-squared allocation.
+kernel void attention_tiled(device const float *q [[buffer(0)]],
+                            device const float *k [[buffer(1)]],
+                            device const float *v [[buffer(2)]],
+                            device const uint *lengths [[buffer(3)]],
+                            device float *out [[buffer(4)]], constant Params &p [[buffer(8)]],
+                            uint tile [[threadgroup_position_in_grid]],
+                            uint tid [[thread_index_in_threadgroup]],
+                            uint lane [[thread_index_in_simdgroup]],
+                            uint sg [[simdgroup_index_in_threadgroup]]) {
+    threadgroup float scores[8*32], state[8*128], partial[8*128];
+    threadgroup float maxima[8], denominators[8], corrections[8];
+    uint head = tile % p.heads, block = tile / p.heads;
+    uint batch = block / (p.seq/8), position = (block % (p.seq/8))*8;
+    uint kvhead = head / (p.heads/p.kv_heads);
+    for (uint i = tid; i < 8*p.dim; i += 128) state[i] = 0.0f;
+    if (tid < 8) { maxima[tid] = -INFINITY; denominators[tid] = 0.0f; }
+    uint end = p.u0 ? lengths[batch] : min(position+8, lengths[batch]);
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    for (uint base = 0; base < end; base += 32) {
+        simdgroup_float8x8 product(0.0f), left, right;
+        for (uint c = 0; c < p.dim; c += 8) {
+            simdgroup_load(left, q+((batch*p.seq+position)*p.heads+head)*p.dim+c,
+                           p.heads*p.dim);
+            simdgroup_load(right, k+((batch*p.seq+base+sg*8)*p.kv_heads+kvhead)*p.dim+c,
+                           p.kv_heads*p.dim, ulong2(0), true);
+            simdgroup_multiply_accumulate(product, left, right, product);
+        }
+        simdgroup_store(product, scores+sg*8, 32);
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint row = sg; row < 8; row += 4) {
+            uint limit = p.u0 ? lengths[batch] : min(position+row+1, lengths[batch]);
+            float score = base+lane < limit ? scores[row*32+lane]*p.scale : -INFINITY;
+            float maximum = max(maxima[row], simd_max(score));
+            float correction = exp(maxima[row]-maximum);
+            float probability = exp(score-maximum);
+            float denominator = denominators[row]*correction+simd_sum(probability);
+            scores[row*32+lane] = probability;
+            if (lane == 0) {
+                maxima[row] = maximum;
+                denominators[row] = denominator;
+                corrections[row] = correction;
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint c = sg*8; c < p.dim; c += 32) {
+            simdgroup_float8x8 value(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, scores+j, 32);
+                simdgroup_load(right, v+((batch*p.seq+base+j)*p.kv_heads+kvhead)*p.dim+c,
+                               p.kv_heads*p.dim);
+                simdgroup_multiply_accumulate(value, left, right, value);
+            }
+            simdgroup_store(value, partial+c, p.dim);
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint i = tid; i < 8*p.dim; i += 128)
+            state[i] = state[i]*corrections[i/p.dim]+partial[i];
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    for (uint i = tid; i < 8*p.dim; i += 128)
+        out[((batch*p.seq+position+i/p.dim)*p.heads+head)*p.dim+i%p.dim] =
+            state[i]/denominators[i/p.dim];
+}
+
 kernel void add(device const float *a [[buffer(0)]], device const float *b [[buffer(1)]],
                 device float *out [[buffer(2)]], constant Params &p [[buffer(8)]],
                 uint i [[thread_position_in_grid]]) {

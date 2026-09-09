@@ -349,6 +349,31 @@ class MetalRuntime:
                 k=k,
             )
 
+    def _attention(
+        self,
+        buffers: Sequence[Buffer],
+        *,
+        tokens: int,
+        seq: int,
+        heads: int,
+        kv_heads: int,
+        dim: int,
+        bidirectional: int = 0,
+    ) -> None:
+        tiled = seq >= 64 and seq % 32 == 0 and dim in (32, 128)
+        self._dispatch(
+            "attention_tiled" if tiled else "attention",
+            buffers,
+            threads=(tokens // 8 if tiled else tokens) * heads * (128 if tiled else 32),
+            group_size=128 if tiled else 32,
+            seq=seq,
+            heads=heads,
+            kv_heads=kv_heads,
+            dim=dim,
+            scale=dim**-0.5,
+            bidirectional=bidirectional,
+        )
+
     def _dispatch(
         self,
         name: str,

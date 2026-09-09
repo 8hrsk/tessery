@@ -24,7 +24,8 @@ from tessery import EmbeddingModel
 class MLXReference:
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir):
+    def __init__(self, model_dir, *, causal_fast_path=False):
+        self.causal_fast_path = causal_fast_path
         config = read_json(model_dir, "config.json")
         self.layers = config["num_hidden_layers"]
         self.heads = config["num_attention_heads"]
@@ -62,12 +63,15 @@ class MLXReference:
         def linear(value, prefix):
             return mx.quantized_matmul(value, *self.quant(prefix), group_size=64, bits=4)
 
-        positions = mx.arange(seq)
-        allowed = (positions[None, :] <= positions[:, None])[None, None, :, :]
-        allowed = allowed & (
-            positions[None, None, None, :] < mx.array(lengths)[:, None, None, None]
-        )
-        mask = mx.where(allowed, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
+        if self.causal_fast_path and np.all(lengths == seq):
+            mask = "causal"
+        else:
+            positions = mx.arange(seq)
+            allowed = (positions[None, :] <= positions[:, None])[None, None, :, :]
+            allowed = allowed & (
+                positions[None, None, None, :] < mx.array(lengths)[:, None, None, None]
+            )
+            mask = mx.where(allowed, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
         for layer in range(self.layers):
             prefix = f"model.layers.{layer}"
             attention = prefix + ".self_attn"

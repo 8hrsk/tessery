@@ -157,6 +157,86 @@ def test_attention_against_independent_numpy(runtime):
     np.testing.assert_allclose(result, expected, atol=2e-6, rtol=2e-5)
 
 
+@pytest.mark.parametrize("dim", [32, 128])
+@pytest.mark.parametrize("bidirectional", [False, True])
+@pytest.mark.parametrize("seq,length_pair", [(64, (1, 33)), (128, (31, 32)), (512, (511, 512))])
+def test_tiled_attention_ragged_f64(runtime, dim, bidirectional, seq, length_pair):
+    rng = np.random.default_rng(393)
+    heads, kv = 4, 2
+    q = rng.normal(size=(2, seq, heads, dim)).astype(np.float32)
+    k, v = [rng.normal(size=(2, seq, kv, dim)).astype(np.float32) for _ in range(2)]
+    lengths = np.array(length_pair, np.uint32)
+    result = run(
+        runtime,
+        "attention_tiled",
+        [q, k, v, lengths],
+        q.shape,
+        threads=2 * (seq // 8) * heads * 128,
+        group_size=128,
+        seq=seq,
+        heads=heads,
+        kv_heads=kv,
+        dim=dim,
+        scale=dim**-0.5,
+        bidirectional=bidirectional,
+    )
+    expected = np.empty_like(q, dtype=np.float64)
+    for b in range(2):
+        for h in range(heads):
+            kh = h // (heads // kv)
+            length = int(lengths[b])
+            scores = q[b, :, h].astype(np.float64) @ k[b, :length, kh].astype(np.float64).T
+            scores *= dim**-0.5
+            if not bidirectional:
+                scores[np.arange(length)[None, :] > np.arange(seq)[:, None]] = -np.inf
+            probs = np.exp(scores - scores.max(axis=1, keepdims=True))
+            probs /= probs.sum(axis=1, keepdims=True)
+            expected[b, :, h] = probs @ v[b, :length, kh].astype(np.float64)
+    np.testing.assert_allclose(result, expected, atol=2e-6, rtol=2e-5)
+
+
+@pytest.mark.parametrize("bidirectional", [False, True])
+@pytest.mark.parametrize("pattern", ["alternating", "later_maximum", "uniform"])
+def test_tiled_attention_extreme_logits_and_masked_blocks(runtime, bidirectional, pattern):
+    rng = np.random.default_rng(718)
+    seq, heads, dim = 128, 2, 128
+    q = np.full((1, seq, heads, dim), 10, np.float32)
+    k = q.copy()
+    k[:, 1::2] *= -1  # Logits near +/-1131: a naive exp would overflow.
+    if pattern == "later_maximum":
+        k[:] = -10
+        k[:, 32:64] = 10
+    elif pattern == "uniform":
+        k[:] = 0
+    v = rng.normal(size=q.shape).astype(np.float32)
+    length = 65 if pattern == "later_maximum" else 33
+    lengths = np.array([length], np.uint32)
+    v[:, length:] = 1e10  # Entire later blocks are masked, including padded queries.
+    result = run(
+        runtime,
+        "attention_tiled",
+        [q, k, v, lengths],
+        q.shape,
+        threads=(seq // 8) * heads * 128,
+        group_size=128,
+        seq=seq,
+        heads=heads,
+        kv_heads=heads,
+        dim=dim,
+        scale=dim**-0.5,
+        bidirectional=bidirectional,
+    )
+    expected = np.empty_like(q, dtype=np.float64)
+    for pos in range(seq):
+        end = length if bidirectional else min(pos + 1, length)
+        if pattern == "later_maximum":
+            chosen = v[0, 32 : min(end, 64)] if end > 32 else v[0, :end]
+        else:
+            chosen = v[0, :end:2] if pattern == "alternating" else v[0, :end]
+        expected[0, pos] = chosen.astype(np.float64).mean(axis=0)
+    np.testing.assert_allclose(result, expected, atol=2e-6, rtol=2e-5)
+
+
 def test_rope_and_silu(runtime):
     rng = np.random.default_rng(8)
     x = rng.normal(size=(2, 3, 4, 64)).astype(np.float32)
