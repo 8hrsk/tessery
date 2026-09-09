@@ -1,0 +1,241 @@
+{
+  "status": "passed",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "2981688592eb94091db21a0eb38a40d70a31da3834a3fa73173279841c129110",
+    "src/metal_inference/native/kernels.metal": "140493ae39025e4a11f7113f0c2dd61887e863f49867daa2fe0df0176fed60d9",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "87799bf9d7de5bf2890d16de3ebf9b0b41df965f184166d54da93f0c9ca2b608",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "62b291126fccc7590e53558a7fbd697316f96dce0bcc7b320c150d4dbf59b53c",
+  "helper_sha256": "8bb92ef7490affda4b3d1849d76bfca8485998882730eae1a6d0194324ef15fc",
+  "conditions": "Full unprofiled encode API; 3 warmup rounds; paired randomized order; baseline A/B identical; group4 only for gate/up shapes; uncontrolled thermals",
+  "samples": 15,
+  "reverse_cases": true,
+  "results": [
+    {
+      "length": 512,
+      "token_ids_sha256": "031df1a1cd7ab3122221a3958a6777f40b5bcc1e288a3c2a8b8145525b7d7494",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            1.6969820410013199,
+            1.753036374982912,
+            2.0412621250143275,
+            1.7752525000250898,
+            1.7856064999941736,
+            1.7996260829968378,
+            1.7512107500224374,
+            1.7361600420554169,
+            1.7707635830156505,
+            1.8784292920026928,
+            1.8292752919951454,
+            1.7912782080238685,
+            1.7554681670153514,
+            1.6961105420487002,
+            1.8196504169609398
+          ],
+          "p50_seconds": 1.7752525000250898,
+          "p95_seconds": 1.927279141906183,
+          "texts_per_second": 0.5580333908664649
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            1.7409213749924675,
+            1.779882832954172,
+            2.084799957985524,
+            1.794166125007905,
+            1.7653419999987818,
+            1.7788997080060653,
+            1.7404532919754274,
+            1.7081410840037279,
+            1.7728779999888502,
+            2.019322459003888,
+            1.7831538750324398,
+            1.7342342089978047,
+            1.768538291042205,
+            1.7619640000048093,
+            1.8017712500295602
+          ],
+          "p50_seconds": 1.7728779999888502,
+          "p95_seconds": 2.038965708698379,
+          "texts_per_second": 0.5548472322559486
+        },
+        "group4": {
+          "latency_seconds": [
+            1.76571408304153,
+            2.048138457990717,
+            1.784503540955484,
+            1.6774338340037502,
+            1.9751219999743626,
+            1.8220829170313664,
+            1.7626337499823421,
+            1.7502751660067588,
+            1.757125417003408,
+            1.7713403749512509,
+            1.7868882499751635,
+            1.7664998330292292,
+            1.7836169580114074,
+            1.8550444999709725,
+            1.7710097919916734
+          ],
+          "p50_seconds": 1.7713403749512509,
+          "p95_seconds": 1.9970269373792688,
+          "texts_per_second": 0.5539669246236218
+        }
+      },
+      "speedup": 1.0015383125085682,
+      "identical_control_a_over_b": 1.0013393476800179,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 128,
+      "token_ids_sha256": "f73f4e938506dac25f276ecb7e1e6c9770791833012213a639a2c04865c3b743",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.3999462079955265,
+            0.41213883296586573,
+            0.4020405000192113,
+            0.4043089170008898,
+            0.4135434170020744,
+            0.3824050410185009,
+            0.40481679199729115,
+            0.4144643750041723,
+            0.4096638340270147,
+            0.4090423329616897,
+            0.3981685829930939,
+            0.4157341249519959,
+            0.41198054200503975,
+            0.36666604195488617,
+            0.3993989159935154
+          ],
+          "p50_seconds": 0.40481679199729115,
+          "p95_seconds": 0.4148452999885194,
+          "texts_per_second": 2.4816693733960564
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.39686262496979907,
+            0.4110637499834411,
+            0.41336125001544133,
+            0.49353970895754173,
+            0.4119979579700157,
+            0.41329533397220075,
+            0.402381207968574,
+            0.43297774996608496,
+            0.4158898750320077,
+            0.41093379200901836,
+            0.4160471669747494,
+            0.4133713750052266,
+            0.4047749159508385,
+            0.4037745840032585,
+            0.34787991701159626
+          ],
+          "p50_seconds": 0.4119979579700157,
+          "p95_seconds": 0.4511463376635219,
+          "texts_per_second": 2.42398730920952
+        },
+        "group4": {
+          "latency_seconds": [
+            0.39096370805054903,
+            0.40410599997267127,
+            0.40365312504582107,
+            0.40137945796595886,
+            0.367603832972236,
+            0.32300195901189,
+            0.355316125031095,
+            0.41862162499455735,
+            0.3916152919991873,
+            0.382013458001893,
+            0.39657704095588997,
+            0.40554108400829136,
+            0.4101503329584375,
+            0.4896709999884479,
+            0.4163171669933945
+          ],
+          "p50_seconds": 0.40137945796595886,
+          "p95_seconds": 0.43993643749272443,
+          "texts_per_second": 2.5182441720407933
+        }
+      },
+      "speedup": 1.02222175269571,
+      "identical_control_a_over_b": 0.982569899112832,
+      "control_within_10_percent": true
+    }
+  ],
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "experimental_shader_sha256": "f38c245479ae26782f9e22d3ed05b59a97f1aa050ef2a69554dc497b717feefd",
+  "runtime_before_close": {
+    "shader_sha256": "f38c245479ae26782f9e22d3ed05b59a97f1aa050ef2a69554dc497b717feefd",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 939,
+    "allocated_bytes": 374680304,
+    "completed_commands": 108,
+    "gpu_timed_commands": 108,
+    "gpu_seconds": 117.66915929183597,
+    "encode_seconds": 0.6527607108582743,
+    "submit_wait_seconds": 117.78834470454603,
+    "dispatches": {
+      "embedding4": 108,
+      "rms_norm": 12204,
+      "linear4_16x32_k64": 19152,
+      "rope": 6048,
+      "attention_tiled": 3024,
+      "add": 6048,
+      "silu_gate": 3024,
+      "pool_project": 108,
+      "linear4_16x32_k64_group4": 2016
+    },
+    "active_bytes": 335218496,
+    "cache_bytes": 0,
+    "peak_bytes": 374542148
+  },
+  "runtime_after_close": {
+    "shader_sha256": "f38c245479ae26782f9e22d3ed05b59a97f1aa050ef2a69554dc497b717feefd",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 939,
+    "allocated_bytes": 374680304,
+    "completed_commands": 108,
+    "gpu_timed_commands": 108,
+    "gpu_seconds": 117.66915929183597,
+    "encode_seconds": 0.6527607108582743,
+    "submit_wait_seconds": 117.78834470454603,
+    "dispatches": {
+      "embedding4": 108,
+      "rms_norm": 12204,
+      "linear4_16x32_k64": 19152,
+      "rope": 6048,
+      "attention_tiled": 3024,
+      "add": 6048,
+      "silu_gate": 3024,
+      "pool_project": 108,
+      "linear4_16x32_k64_group4": 2016
+    },
+    "active_bytes": 0,
+    "cache_bytes": 0,
+    "peak_bytes": 374542148
+  }
+}

@@ -122,6 +122,9 @@ substituted into these profiles to predict a full-model acceleration.
 
 ## Selected next experiment
 
+The subsequent [traversal experiment](QUANTIZED_TRAVERSAL.md) records the
+measured outcome of this proposal; the text below preserves its rationale.
+
 **Prioritize long Qwen gate/up projections.** Both have the same wide output
 shape; the 264-row cases show a stable 1.38–1.43x Tessery/MLX latency ratio,
 and the 512-row cases show 1.43–1.61x. Their combined stage share is larger

@@ -61,6 +61,8 @@ specification is preserved as historical input.
   before/after vectors; see [mixed tile measurements](MIXED_QUANTIZED_TILES.md).
 * Direct isolated MLP comparisons with real weights, identical-operation timing
   controls and an explicit noise screen; see [MLP comparison](MLP_COMPARISON.md).
+* Reproducible in-memory threadgroup traversal experiments with exact-output
+  and Shader Validation checks; see [traversal results](QUANTIZED_TRAVERSAL.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 
