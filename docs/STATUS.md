@@ -59,6 +59,8 @@ specification is preserved as historical input.
   Qwen/BGE head layouts; see [tail measurements](ATTENTION_TAILS.md).
 * Mixed 16-row/eight-row Qwen projection dispatch with bounded tails and exact
   before/after vectors; see [mixed tile measurements](MIXED_QUANTIZED_TILES.md).
+* Direct isolated MLP comparisons with real weights, identical-operation timing
+  controls and an explicit noise screen; see [MLP comparison](MLP_COMPARISON.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

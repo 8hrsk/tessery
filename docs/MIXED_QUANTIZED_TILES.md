@@ -155,3 +155,6 @@ The next profiling target is the remaining MLP projection cost: refresh direct
 same-input comparisons with MLX before selecting gate/up reuse or another tile
 layout. The noisy isolated controls here make measurement stability part of
 that work, rather than evidence for a more aggressive dispatch guard.
+
+The following phase completes the [direct MLP comparison](MLP_COMPARISON.md)
+and selects a bounded long-Qwen traversal experiment.

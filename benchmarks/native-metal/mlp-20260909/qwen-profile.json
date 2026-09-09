@@ -1,0 +1,328 @@
+{
+  "status": "passed",
+  "mode": "intrusive_stage_timestamps",
+  "execution_policy": "selected",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "2981688592eb94091db21a0eb38a40d70a31da3834a3fa73173279841c129110",
+    "src/metal_inference/native/kernels.metal": "140493ae39025e4a11f7113f0c2dd61887e863f49867daa2fe0df0176fed60d9",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "87799bf9d7de5bf2890d16de3ebf9b0b41df965f184166d54da93f0c9ca2b608",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "41f8622823c90a0735604377c9036480f50fd28ccbb52e5b03c69cc6272f31fc",
+  "results": [
+    {
+      "tokens": 512,
+      "execution_width": 512,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "linear4_16x32_k64",
+          "rows": 512,
+          "cols": 3072,
+          "k": 1024,
+          "calls": 56,
+          "median_gpu_seconds": 0.5321462520000001
+        },
+        {
+          "kernel": "linear4_16x32_k64",
+          "rows": 512,
+          "cols": 1024,
+          "k": 3072,
+          "calls": 28,
+          "median_gpu_seconds": 0.272996373
+        },
+        {
+          "kernel": "attention_tiled",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 28,
+          "median_gpu_seconds": 0.27092021000000005
+        },
+        {
+          "kernel": "linear4_16x32_k64",
+          "rows": 512,
+          "cols": 2048,
+          "k": 1024,
+          "calls": 28,
+          "median_gpu_seconds": 0.20032470600000002
+        },
+        {
+          "kernel": "linear4_16x32_k64",
+          "rows": 512,
+          "cols": 1024,
+          "k": 1024,
+          "calls": 56,
+          "median_gpu_seconds": 0.17282650400000013
+        },
+        {
+          "kernel": "linear4_16x32_k64",
+          "rows": 512,
+          "cols": 1024,
+          "k": 2048,
+          "calls": 28,
+          "median_gpu_seconds": 0.15140303700000002
+        },
+        {
+          "kernel": "silu_gate",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 28,
+          "median_gpu_seconds": 0.036869208000000014
+        },
+        {
+          "kernel": "rope",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 56,
+          "median_gpu_seconds": 0.02994813000000001
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 56,
+          "median_gpu_seconds": 0.015853456000000002
+        },
+        {
+          "kernel": "rms_norm",
+          "rows": 0,
+          "cols": 1024,
+          "k": 0,
+          "calls": 57,
+          "median_gpu_seconds": 0.010570416000000001
+        },
+        {
+          "kernel": "rms_norm",
+          "rows": 0,
+          "cols": 128,
+          "k": 0,
+          "calls": 56,
+          "median_gpu_seconds": 0.009222372000000003
+        },
+        {
+          "kernel": "embedding4",
+          "rows": 0,
+          "cols": 1024,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 6.337500000000001e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 1024,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 1.0625e-05
+        }
+      ],
+      "normal_wall_seconds": [
+        1.8576454159920104,
+        1.7659048329805955,
+        1.7499588749487884
+      ],
+      "profiled_wall_seconds": [
+        1.7857648329809308,
+        1.750010707997717,
+        1.7327584580052644
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.337500000000001e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.025559616999999996
+          },
+          "linear4_16x32_k64": {
+            "calls": 196,
+            "gpu_seconds": 1.339578452999999
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.024294207999999994
+          },
+          "attention_tiled": {
+            "calls": 28,
+            "gpu_seconds": 0.280516042
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.015853456000000002
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.036869208000000014
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.1000000000000001e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 7.4083e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.035118542
+          },
+          "linear4_16x32_k64": {
+            "calls": 196,
+            "gpu_seconds": 1.4054588390000002
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.02994813000000001
+          },
+          "attention_tiled": {
+            "calls": 28,
+            "gpu_seconds": 0.22892829400000006
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.009060710000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.03279875
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0625e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.0167e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.019792788000000002
+          },
+          "linear4_16x32_k64": {
+            "calls": 196,
+            "gpu_seconds": 1.3071799610000006
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.031653128
+          },
+          "attention_tiled": {
+            "calls": 28,
+            "gpu_seconds": 0.27092021000000005
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.021067750999999996
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.044147540000000006
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.958e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_16x32_k64",
+          "calls": 196,
+          "median_gpu_seconds": 1.339578452999999
+        },
+        {
+          "kernel": "attention_tiled",
+          "calls": 28,
+          "median_gpu_seconds": 0.27092021000000005
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.036869208000000014
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.02994813000000001
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.025559616999999996
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.015853456000000002
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 6.337500000000001e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.0625e-05
+        }
+      ]
+    }
+  ],
+  "limitations": "One encoder per dispatch; calibration and encoder costs perturb timing. Normal-path timings are separate. Counter storage excluded from runtime buffer counters.",
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "runtime": {
+    "shader_sha256": "140493ae39025e4a11f7113f0c2dd61887e863f49867daa2fe0df0176fed60d9",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 732,
+    "allocated_bytes": 366695780,
+    "completed_commands": 9,
+    "gpu_timed_commands": 9,
+    "gpu_seconds": 16.849030833283905,
+    "encode_seconds": 0.14875812601530924,
+    "submit_wait_seconds": 17.10566466691671,
+    "dispatches": {
+      "embedding4": 9,
+      "rms_norm": 1017,
+      "linear4_16x32_k64": 1764,
+      "rope": 504,
+      "attention_tiled": 252,
+      "add": 504,
+      "silu_gate": 252,
+      "pool_project": 9
+    },
+    "active_bytes": 366677312,
+    "cache_bytes": 31458816,
+    "peak_bytes": 366679364
+  }
+}

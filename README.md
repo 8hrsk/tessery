@@ -135,6 +135,7 @@ New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
 [updated profiles and MLX comparison](docs/PERFORMANCE_REFRESH.md),
 [bounded attention tails](docs/ATTENTION_TAILS.md),
 [mixed quantized tiles](docs/MIXED_QUANTIZED_TILES.md),
+[direct MLP comparison](docs/MLP_COMPARISON.md),
 [GPU profiling, varied stress and isolated comparisons](docs/PROFILING_AND_STRESS.md),
 [Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 
