@@ -1,0 +1,326 @@
+{
+  "status": "passed",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "2981688592eb94091db21a0eb38a40d70a31da3834a3fa73173279841c129110",
+    "src/metal_inference/native/kernels.metal": "140493ae39025e4a11f7113f0c2dd61887e863f49867daa2fe0df0176fed60d9",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "87799bf9d7de5bf2890d16de3ebf9b0b41df965f184166d54da93f0c9ca2b608",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "cff448c0defd732d66d3139c1336884f03069c7c63e83242b798d8e1444727cb",
+  "experiment_hashes": {
+    "fused_mlp_experiment.py": "1b7f8de5228ed4020e4eb5be6c65173270476c722732c61941b6033d56a479b4",
+    "fused_mlp.metal": "227a77b43543107d42bca76778ce7d92114cac6caada7e363841a05b4cafa4d2",
+    "benchmark_mlp_isolated.py": "4f59a4b90ccb90cb0f4c30c48b933aff1928227d314f26ba6b8e8331f426caec"
+  },
+  "kernel": "fused_mlp_parallel",
+  "conditions": "Full unprofiled encode API; 3 warmup rounds; paired randomized order; baseline A/B identical; fused aligned gate/up/SiLU; up allocation retained; uncontrolled thermals",
+  "samples": 15,
+  "reverse_cases": true,
+  "results": [
+    {
+      "length": 512,
+      "token_ids_sha256": "031df1a1cd7ab3122221a3958a6777f40b5bcc1e288a3c2a8b8145525b7d7494",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            1.7600424170377664,
+            1.7771591250202619,
+            1.7829974580090493,
+            1.769288708048407,
+            1.7838353749830276,
+            1.7398599999723956,
+            1.8344014160102233,
+            1.7989062499837019,
+            1.7713773750001565,
+            1.7746284999884665,
+            1.8018841670127586,
+            1.798644082969986,
+            1.8017972499947064,
+            1.7348808749811724,
+            1.687191667035222
+          ],
+          "p50_seconds": 1.7771591250202619,
+          "p95_seconds": 1.811639341711998,
+          "texts_per_second": 0.563551841347372
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            1.7719832090078853,
+            1.7834724999847822,
+            1.7752707079635002,
+            1.6884312080219388,
+            1.798703790991567,
+            1.7823794579599053,
+            1.758903999987524,
+            1.7822722920100205,
+            1.7791539580211975,
+            1.7687012079986744,
+            1.774705666990485,
+            1.781586833007168,
+            2.031519833020866,
+            1.748781666974537,
+            1.7606746660312638
+          ],
+          "p50_seconds": 1.7752707079635002,
+          "p95_seconds": 1.8685486036003565,
+          "texts_per_second": 0.5599827167358424
+        },
+        "candidate": {
+          "latency_seconds": [
+            1.6388419170398265,
+            1.6844872920191847,
+            1.611508917005267,
+            2.3906558750313707,
+            1.7186784160439856,
+            1.6248911659931764,
+            1.7024645840283483,
+            1.6863439160515554,
+            1.6881694169715047,
+            1.6150961249950342,
+            1.6932341249776073,
+            1.6050256250309758,
+            1.663364417036064,
+            1.6820350000052713,
+            1.64186058298219
+          ],
+          "p50_seconds": 1.6820350000052713,
+          "p95_seconds": 1.9202716537402005,
+          "texts_per_second": 0.5848715401991594
+        }
+      },
+      "speedup": 1.0559916508790332,
+      "identical_control_a_over_b": 1.0010637347015814,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 128,
+      "token_ids_sha256": "f73f4e938506dac25f276ecb7e1e6c9770791833012213a639a2c04865c3b743",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.3798630000092089,
+            0.4012234170222655,
+            0.40825641696574166,
+            0.45680350001202896,
+            0.47700445901136845,
+            0.4124317080131732,
+            0.4006735000293702,
+            0.40731449995655566,
+            0.3931811669608578,
+            0.41699579200940207,
+            0.4037150830263272,
+            0.4407426249817945,
+            0.44427054101834074,
+            0.40994008304551244,
+            0.3603762499988079
+          ],
+          "p50_seconds": 0.40825641696574166,
+          "p95_seconds": 0.4628637877118308,
+          "texts_per_second": 2.4143734247741806
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.3865694170235656,
+            0.39546974998665974,
+            0.36847129202215,
+            0.4012668330105953,
+            0.4033317500143312,
+            0.4036898330086842,
+            0.41173491696827114,
+            0.37747729202965274,
+            0.38137954199919477,
+            0.39812158403219655,
+            0.3974594590254128,
+            0.4510607499978505,
+            0.5543961669900455,
+            0.48133387498091906,
+            0.36025116697419435
+          ],
+          "p50_seconds": 0.39812158403219655,
+          "p95_seconds": 0.5032525625836569,
+          "texts_per_second": 2.430325158680147
+        },
+        "candidate": {
+          "latency_seconds": [
+            0.3960743750212714,
+            0.3862640829756856,
+            0.39564416598295793,
+            0.3402325409697369,
+            0.394952375034336,
+            0.3821624579722993,
+            0.379481041978579,
+            0.3618872920051217,
+            0.38565404200926423,
+            0.40035599999828264,
+            0.3990412500570528,
+            0.384001458005514,
+            0.7425884999684058,
+            0.4012553339707665,
+            0.38579224998829886
+          ],
+          "p50_seconds": 0.3862640829756856,
+          "p95_seconds": 0.503655283770058,
+          "texts_per_second": 2.4448334871639337
+        }
+      },
+      "speedup": 1.0446500446092672,
+      "identical_control_a_over_b": 1.0254566276736343,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 7,
+      "token_ids_sha256": "300d9b51d4262be0932effa5ae74c29e1665f09c0781339180be2baa9efb5e83",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.036028207978233695,
+            0.03394829196622595,
+            0.03827920800540596,
+            0.04272383399074897,
+            0.03661783301504329,
+            0.04205316596198827,
+            0.04545929201412946,
+            0.03359162504784763,
+            0.037526416999753565,
+            0.034040374972391874,
+            0.04189024999504909,
+            0.03431354195345193,
+            0.0332949580042623,
+            0.03908212500391528,
+            0.034022207953967154
+          ],
+          "p50_seconds": 0.03661783301504329,
+          "p95_seconds": 0.043544471397763115,
+          "texts_per_second": 26.64907435189372
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.033723375003319234,
+            0.03408658399712294,
+            0.03713541600154713,
+            0.03266712505137548,
+            0.03373875003308058,
+            0.036951583984773606,
+            0.03495633299462497,
+            0.0370007089804858,
+            0.043952375010121614,
+            0.03323812497546896,
+            0.037743042048532516,
+            0.03380137501517311,
+            0.03227125003468245,
+            0.03395258402451873,
+            0.03690775000723079
+          ],
+          "p50_seconds": 0.03408658399712294,
+          "p95_seconds": 0.03960584193700924,
+          "texts_per_second": 28.188792444377896
+        },
+        "candidate": {
+          "latency_seconds": [
+            0.0326186660095118,
+            0.03388991701649502,
+            0.04434058303013444,
+            0.03266125003574416,
+            0.03372674999991432,
+            0.04490891698515043,
+            0.043905582977458835,
+            0.04426962498109788,
+            0.03560141596244648,
+            0.03300883300835267,
+            0.03415337495971471,
+            0.03374854096909985,
+            0.034145374957006425,
+            0.041175083024427295,
+            0.03565225005149841
+          ],
+          "p50_seconds": 0.03415337495971471,
+          "p95_seconds": 0.044511083216639234,
+          "texts_per_second": 26.89106175036656
+        }
+      },
+      "speedup": 1.0392024368980783,
+      "identical_control_a_over_b": 1.0742593924382096,
+      "control_within_10_percent": true
+    }
+  ],
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "experimental_shader_sha256": "3d21d219b803f495117e2e5bc3563ac7f28f790daf32d9cdee5eb95bd243e1b3",
+  "runtime_before_close": {
+    "shader_sha256": "3d21d219b803f495117e2e5bc3563ac7f28f790daf32d9cdee5eb95bd243e1b3",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 1056,
+    "allocated_bytes": 375173768,
+    "completed_commands": 162,
+    "gpu_timed_commands": 162,
+    "gpu_seconds": 116.71441708342172,
+    "encode_seconds": 0.9864592470694333,
+    "submit_wait_seconds": 116.90496195794549,
+    "dispatches": {
+      "embedding4": 162,
+      "rms_norm": 18306,
+      "linear4_16x32_k64": 19152,
+      "rope": 9072,
+      "attention_tiled": 3024,
+      "add": 9072,
+      "silu_gate": 3528,
+      "pool_project": 162,
+      "fused_mlp_parallel": 1008,
+      "linear4_tiled": 10584,
+      "attention": 1512
+    },
+    "active_bytes": 335218496,
+    "cache_bytes": 0,
+    "peak_bytes": 375033188
+  },
+  "runtime_after_close": {
+    "shader_sha256": "3d21d219b803f495117e2e5bc3563ac7f28f790daf32d9cdee5eb95bd243e1b3",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 1056,
+    "allocated_bytes": 375173768,
+    "completed_commands": 162,
+    "gpu_timed_commands": 162,
+    "gpu_seconds": 116.71441708342172,
+    "encode_seconds": 0.9864592470694333,
+    "submit_wait_seconds": 116.90496195794549,
+    "dispatches": {
+      "embedding4": 162,
+      "rms_norm": 18306,
+      "linear4_16x32_k64": 19152,
+      "rope": 9072,
+      "attention_tiled": 3024,
+      "add": 9072,
+      "silu_gate": 3528,
+      "pool_project": 162,
+      "fused_mlp_parallel": 1008,
+      "linear4_tiled": 10584,
+      "attention": 1512
+    },
+    "active_bytes": 0,
+    "cache_bytes": 0,
+    "peak_bytes": 375033188
+  }
+}

@@ -6,6 +6,7 @@ recursive-include tests *.py *.json
 recursive-include policy *.json
 recursive-include policy *.txt
 recursive-include tools *.py
+recursive-include tools/shaders *.metal
 recursive-include stubs *.pyi
 recursive-include third_party *
 recursive-include src/metal_inference/native *.mm *.metal

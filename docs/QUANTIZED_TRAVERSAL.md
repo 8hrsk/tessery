@@ -96,6 +96,7 @@ all possible traversal orders are equivalent or identify the hardware
 bottleneck.
 
 The next bounded candidate is **fusing gate/up projections with SiLU gating**.
+The subsequent [fusion experiment](FUSED_MLP.md) records its measured outcome.
 The current Qwen path runs two separate projections followed by `silu_gate`,
 materializing both intermediate arrays. A fused implementation could avoid
 those intermediate writes and dispatches. It would also need more live
