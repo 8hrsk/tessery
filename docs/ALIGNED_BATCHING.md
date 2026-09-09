@@ -107,3 +107,7 @@ not qualify this changed batching policy. The next performance target is
 projection work: larger quantized tiles for Qwen and full F32 tiles with a
 bounded tail for BGE, with the same numerical gates. MLX comparisons need a
 fresh run before attributing any change in the cross-engine gap to this work.
+
+Follow-up: larger Qwen projection tiles are implemented and measured in
+[the quantized tile report](QUANTIZED_TILES.md). BGE full-tile/tail work remains
+a separate future step.

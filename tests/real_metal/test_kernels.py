@@ -441,6 +441,62 @@ def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
             buffer.close()
 
 
+@pytest.mark.parametrize(
+    "m,n,k",
+    [
+        (16, 1024, 1024),
+        (32, 2048, 1024),
+        (16, 3072, 1024),
+        (32, 1024, 2048),
+        (32, 1024, 3072),
+        (4096, 1024, 1024),
+    ],
+)
+@pytest.mark.parametrize("pattern", ["random", "cancellation"])
+def test_large_uint4_tile_f64_and_previous_accumulation(runtime, m, n, k, pattern):
+    rng = np.random.default_rng(821)
+    codes = rng.integers(0, 16, size=(n, k), dtype=np.uint32)
+    x = rng.normal(size=(m, k)).astype(np.float32)
+    if pattern == "cancellation":
+        codes[:, 1::2] = codes[:, ::2]
+        x[:, ::2], x[:, 1::2] = 1.0, -1.0
+    packed = np.bitwise_or.reduce(
+        codes.reshape(n, k // 8, 8) << np.arange(0, 32, 4, dtype=np.uint32), axis=-1
+    )
+    scales = bf16(rng.uniform(0.01, 0.2, size=(n, k // 64)))
+    biases = bf16(rng.uniform(-1, 0.1, size=scales.shape))
+    weights = codes.astype(np.float32) * (scales.astype(np.uint32) << 16).view(np.float32).repeat(
+        64, axis=1
+    )
+    weights += (biases.astype(np.uint32) << 16).view(np.float32).repeat(64, axis=1)
+    expected = x.astype(np.float64) @ weights.astype(np.float64).T
+    inputs = [x, packed, scales, biases]
+    previous = run(
+        runtime,
+        "linear4_tiled",
+        inputs,
+        (m, n),
+        threads=(m // 8) * (n // 32) * 128,
+        group_size=128,
+        rows=m,
+        cols=n,
+        k=k,
+    )
+    actual = run(
+        runtime,
+        "linear4_16x32_k64",
+        inputs,
+        (m, n),
+        threads=(m // 16) * (n // 32) * 256,
+        group_size=256,
+        rows=m,
+        cols=n,
+        k=k,
+    )
+    np.testing.assert_allclose(actual, expected, atol=5e-5, rtol=5e-5)
+    np.testing.assert_array_equal(actual, previous)
+
+
 def test_workspace_reuse_bound_abort_and_trim(runtime):
     runtime.workspace_limit_bytes = 1024
     with runtime._workspace() as allocate:

@@ -7,6 +7,33 @@ from metal_inference.errors import NativeBuildError
 
 
 @pytest.mark.parametrize(
+    "rows,cols,k,selected",
+    [
+        (m, n, k, True)
+        for m in (16, 32, 128, 4096)
+        for n, k in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))
+    ]
+    + [(m, 1024, 1024, False) for m in (1, 4, 7, 8, 15, 17, 24, 31, 33, 264)]
+    + [
+        (16, n, k, False)
+        for n, k in ((64, 1024), (1025, 1024), (1024, 64), (1024, 1023), (4096, 1024))
+    ],
+)
+def test_quantized_large_tile_dispatch_guard(rows, cols, k, selected):
+    calls = []
+    runtime = SimpleNamespace(_dispatch=lambda *args, **kwargs: calls.append((args, kwargs)))
+    metal.MetalRuntime._linear4(runtime, [], rows=rows, cols=cols, k=k)
+    assert (calls[0][0][0] == "linear4_16x32_k64") == selected
+    if selected:
+        assert len(calls) == 1
+        assert calls[0][1] == dict(
+            threads=(rows // 16) * (cols // 32) * 256, group_size=256, rows=rows, cols=cols, k=k
+        )
+    else:
+        assert all(args[0] in {"linear4_tiled", "linear4_tail", "linear4"} for args, _ in calls)
+
+
+@pytest.mark.parametrize(
     "seq,dim,tiled",
     [
         (32, 32, False),

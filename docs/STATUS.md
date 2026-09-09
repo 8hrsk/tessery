@@ -49,6 +49,8 @@ specification is preserved as historical input.
   see [attention results](TILED_ATTENTION.md).
 * Bounded execution padding to measured matrix/attention tile shapes while
   preserving logical token lengths; see [alignment results](ALIGNED_BATCHING.md).
+* Larger uint4 projection tiles with shared weight reuse and unchanged F32
+  reduction order; see [quantized tile results](QUANTIZED_TILES.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

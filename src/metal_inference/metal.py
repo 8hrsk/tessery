@@ -313,6 +313,23 @@ class MetalRuntime:
                 self._profile_command.clear()
 
     def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
+        # Measured Qwen projection shapes; incomplete 16-row tiles and other
+        # projection shapes retain the full-tile / small-tail dispatch below.
+        if (
+            rows >= 16
+            and rows % 16 == 0
+            and (cols, k) in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))
+        ):
+            self._dispatch(
+                "linear4_16x32_k64",
+                buffers,
+                threads=(rows // 16) * (cols // 32) * 256,
+                group_size=256,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+            return
         if rows >= 5 and cols % 32 == 0 and k % 64 == 0:
             complete = rows // 8
             if complete:

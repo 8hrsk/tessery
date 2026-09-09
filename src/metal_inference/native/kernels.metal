@@ -315,6 +315,44 @@ kernel void linear4_tiled(device const float *x [[buffer(0)]],
     simdgroup_store(accum, out + row*p.cols + channel+sg*8, p.cols);
 }
 
+// Full 16x32 output tile: eight SIMD groups share 8 KiB of decoded weights.
+// Load 64 K values per step, but sum independent 32-value F32 partials in the
+// same order as linear4_tiled. Host dispatch requires complete aligned tiles.
+kernel void linear4_16x32_k64(device const float *x [[buffer(0)]],
+                             device const uint *w [[buffer(1)]],
+                             device const ushort *s [[buffer(2)]],
+                             device const ushort *b [[buffer(3)]],
+                             device float *out [[buffer(4)]],
+                             constant Params &p [[buffer(8)]],
+                             uint tile [[threadgroup_position_in_grid]],
+                             uint tid [[thread_index_in_threadgroup]],
+                             uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*16 + (sg/4)*8;
+    uint channel = (tile % (p.cols/32))*32;
+    threadgroup float weights[32*64];
+    simdgroup_float8x8 accum(0.0f), left, right;
+    for (uint base = 0; base < p.k; base += 64) {
+        uint c = channel+tid/8, col = base+(tid%8)*8;
+        uint packed = w[c*(p.k/8)+col/8], g = c*(p.k/64)+col/64;
+        float scale = bf16(s[g]), bias = bf16(b[g]);
+        for (uint j = 0; j < 8; ++j)
+            weights[tid*8+j] = float((packed >> (j*4)) & 15)*scale+bias;
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint part = 0; part < 64; part += 32) {
+            simdgroup_float8x8 partial(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, x+row*p.k+base+part+j, p.k);
+                simdgroup_load(right, weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(partial, left, right, partial);
+            }
+            for (uint e = 0; e < 2; ++e)
+                accum.thread_elements()[e] += partial.thread_elements()[e];
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
+}
+
 // Partial row tiles use zero-filled shared input and bounded output stores.
 // Channels and K retain the same alignment contract as linear4_tiled.
 kernel void linear4_tail(device const float *x [[buffer(0)]],
