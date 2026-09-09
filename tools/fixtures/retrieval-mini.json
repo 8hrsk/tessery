@@ -1,0 +1,13 @@
+{
+  "description": "Hand-authored smoke regression corpus; not a general retrieval benchmark.",
+  "cases": [
+    {"id":"astronomy","language":"en","document":"Saturn is surrounded by bright rings made mostly of water ice and rocky particles.","query":"Which planet has prominent icy rings?"},
+    {"id":"bread","language":"en","document":"Bakers use yeast to ferment bread dough. The yeast releases carbon dioxide and makes the dough rise.","query":"What ingredient makes bread dough expand through fermentation?"},
+    {"id":"battery","language":"en","document":"A rechargeable lithium-ion battery stores electrical energy and powers a laptop when its charger is unplugged.","query":"What supplies power to a laptop away from an electrical outlet?"},
+    {"id":"penguin","language":"en","document":"Penguins are flightless seabirds. They swim using their flippers and many species live in the Southern Hemisphere.","query":"Which birds cannot fly but use flippers to swim?"},
+    {"id":"railway","language":"ru","document":"Междугородний поезд отправляется с железнодорожного вокзала. Пассажиры предъявляют билеты перед посадкой в вагон.","query":"Где пассажиры садятся в поезд для поездки в другой город?"},
+    {"id":"library","language":"ru","document":"В библиотеке можно бесплатно взять книги домой на ограниченный срок. После чтения книги необходимо вернуть.","query":"Куда обратиться, чтобы почитать книгу дома, не покупая её?"},
+    {"id":"photosynthesis","language":"ru","document":"При фотосинтезе зелёные растения используют солнечный свет, воду и углекислый газ, образуя органические вещества и выделяя кислород.","query":"Как называется процесс, с помощью которого растения получают энергию света и выделяют кислород?"},
+    {"id":"freezing","language":"ru","document":"При нормальном атмосферном давлении чистая вода превращается в лёд при температуре ноль градусов Цельсия.","query":"При какой температуре вода начинает замерзать?"}
+  ]
+}

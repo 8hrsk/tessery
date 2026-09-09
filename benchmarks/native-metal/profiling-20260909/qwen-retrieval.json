@@ -1,0 +1,91 @@
+{
+  "status": "measured",
+  "scope": "Hand-authored smoke regression corpus; not a general retrieval benchmark.",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "ec06433b06192b9a72b09b60c4908c913a72b2de5814190df8ed2f048da60481",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "637fa07bbac3394a44cd75c09e4e37b891fac92b06d400e35d365d6dc3560b96",
+    "src/metal_inference/native/kernels.metal": "9f4b00af13335a667c7002d2a01a24ad82f6b567b714505a7669dbeecd7e0fb7",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "5b9038a2a73a98aae550cca712aa94a58f5e9d45ccd858b3f2a1bb296b4c4966",
+  "fixture_sha256": "a2e431c4230114e2b37317f3cc73ab2281ae96b8f73ecb8d77073b89170f6ab7",
+  "results": [
+    {
+      "id": "astronomy",
+      "language": "en",
+      "rank": 1,
+      "top_id": "astronomy"
+    },
+    {
+      "id": "bread",
+      "language": "en",
+      "rank": 1,
+      "top_id": "bread"
+    },
+    {
+      "id": "battery",
+      "language": "en",
+      "rank": 1,
+      "top_id": "battery"
+    },
+    {
+      "id": "penguin",
+      "language": "en",
+      "rank": 1,
+      "top_id": "penguin"
+    },
+    {
+      "id": "railway",
+      "language": "ru",
+      "rank": 1,
+      "top_id": "railway"
+    },
+    {
+      "id": "library",
+      "language": "ru",
+      "rank": 1,
+      "top_id": "library"
+    },
+    {
+      "id": "photosynthesis",
+      "language": "ru",
+      "rank": 1,
+      "top_id": "photosynthesis"
+    },
+    {
+      "id": "freezing",
+      "language": "ru",
+      "rank": 1,
+      "top_id": "freezing"
+    }
+  ],
+  "contract": {
+    "compatibility_id": "metal-inference-qwen3-f32-v1",
+    "manifest_sha256": "568459ba34588de3e1864f1bfd4e5a56ea86b50085f92c3966209f6fbc190993",
+    "dimensions": 384,
+    "max_length": 512
+  },
+  "preprocessing": "default API; empty document/query prefixes",
+  "recall_at_1": 1.0,
+  "mrr": 1.0
+}

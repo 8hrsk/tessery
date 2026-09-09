@@ -128,6 +128,7 @@ Performance work: [measurement tools and runtime counters](docs/PERFORMANCE.md),
 [observed speed and stability results](docs/PERFORMANCE_REPORT.md).
 
 New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
+[GPU profiling, varied stress and isolated comparisons](docs/PROFILING_AND_STRESS.md),
 [Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 
 New in 0.5: [uint4 and workspace results](docs/IMPLEMENTATION_05.md),

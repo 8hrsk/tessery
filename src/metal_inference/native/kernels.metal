@@ -37,7 +37,7 @@ kernel void linear4(device const float *x [[buffer(0)]],
                     constant Params &p [[buffer(8)]],
                     uint row [[threadgroup_position_in_grid]],
                     uint lane [[thread_index_in_threadgroup]]) {
-    uint token = (row / p.cols) * 4, channel = row % p.cols;
+    uint token = p.n + (row / p.cols) * 4, channel = row % p.cols;
     float total[4] = {0.0f};
     for (uint col = lane; col < p.k; col += 32) {
         float weight = weight4(w, s, b, channel, col, p.k, p.group);

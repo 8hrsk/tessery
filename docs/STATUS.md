@@ -41,6 +41,9 @@ specification is preserved as historical input.
   shared sync/async submission queue and recovery from partial command creation.
 * Cumulative CPU/GPU command diagnostics and reproducible latency/memory/soak tools;
   see [performance diagnostics](PERFORMANCE.md).
+* Opt-in per-kernel GPU stage profiling, small-tail uint4 dispatch, seeded
+  cancellation/overload/reload stress and an isolated-process MLX comparison;
+  see [profiling and stress](PROFILING_AND_STRESS.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

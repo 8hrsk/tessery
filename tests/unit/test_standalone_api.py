@@ -311,3 +311,15 @@ def test_async_cancellation_during_tokenization_releases_worker(model):
         asyncio.run(exercise())
     finally:
         release.set()
+
+
+def test_stress_harness_queue_overload_and_recovery(monkeypatch):
+    import importlib
+    from pathlib import Path
+
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[2] / "tools"))
+    stress = importlib.import_module("stress_embeddings")
+    with EmbeddingModel(Backend(), Tokenizer(), 384, 512, 4) as model:
+        result = asyncio.run(stress.queue_stress(model, "1"))
+        assert result == {"canceled": 2, "overloaded": 2, "completed": 2}
+        assert model.encode(["2"]).argmax(axis=1).tolist() == [2]

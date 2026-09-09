@@ -1,0 +1,1383 @@
+{
+  "status": "passed",
+  "mode": "intrusive_stage_timestamps",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "ec06433b06192b9a72b09b60c4908c913a72b2de5814190df8ed2f048da60481",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "637fa07bbac3394a44cd75c09e4e37b891fac92b06d400e35d365d6dc3560b96",
+    "src/metal_inference/native/kernels.metal": "9f4b00af13335a667c7002d2a01a24ad82f6b567b714505a7669dbeecd7e0fb7",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "c99b9794d5f793cbee144462ce751ef8dd8a166a146917027e53783aaaa8ff6f",
+  "results": [
+    {
+      "tokens": 7,
+      "normal_wall_seconds": [
+        0.04642162501113489,
+        0.060551000002305955,
+        0.08065616601379588
+      ],
+      "profiled_wall_seconds": [
+        0.07783020898932591,
+        0.09934524999698624,
+        0.1114567500189878
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 4.5e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0018747889999999998
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.04813879900000002
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.002219791999999998
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0006143329999999999
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.000203662
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0005447930000000002
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0500000000000001e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.25e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.006445261000000001
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.07125586700000001
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0006281720000000001
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.000852042
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0013270410000000004
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.00022587399999999999
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0292e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.5000000000000004e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.013261541999999994
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.063743203
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0005900859999999998
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.000900251
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0024894999999999995
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000970791
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.417000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tail",
+          "calls": 196,
+          "median_gpu_seconds": 0.063743203
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.006445261000000001
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.0013270410000000004
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.000852042
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0006281720000000001
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.0005447930000000002
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.0292e-05
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 6.25e-06
+        }
+      ]
+    },
+    {
+      "tokens": 8,
+      "normal_wall_seconds": [
+        0.03237120801350102,
+        0.03644345799693838,
+        0.03204037499381229
+      ],
+      "profiled_wall_seconds": [
+        0.04728029196849093,
+        0.04926516697742045,
+        0.048601165995933115
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.875e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.006217042
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.018667744000000003
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0005447900000000001
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0009469579999999999
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0017275430000000004
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.00024204500000000003
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0167000000000001e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 5.459000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0018176310000000005
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.02103071299999999
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0023319609999999996
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0008414609999999999
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0002614160000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.00022770899999999998
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0167000000000001e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.5000000000000004e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0018941689999999994
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.018654121000000003
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0022502070000000006
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0008740850000000002
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0002827490000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.002225126
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.333000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.018667744000000003
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0022502070000000006
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.0018941689999999994
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.0008740850000000002
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.0002827490000000001
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.00024204500000000003
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.0167000000000001e-05
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 6.5000000000000004e-06
+        }
+      ]
+    },
+    {
+      "tokens": 9,
+      "normal_wall_seconds": [
+        0.08100129198282957,
+        0.08690408297115937,
+        0.08898737502750009
+      ],
+      "profiled_wall_seconds": [
+        0.10715504200197756,
+        0.09894308296497911,
+        0.1018401249893941
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 5.583000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0017829629999999996
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.020901923999999995
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.04041909100000001
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0005722539999999999
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0010482070000000002
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.00030120799999999997
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0002815400000000001
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.417000000000001e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 5.417e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.005425870999999998
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.020174704999999998
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.034471375000000005
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0005359130000000001
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.001098333
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0020919199999999997
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000310788
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 6.8330000000000005e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 5.583000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0017720400000000008
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.01907762400000001
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.035935085000000026
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.002475745
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0010212090000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.004377833999999999
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000276123
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.083e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4",
+          "calls": 196,
+          "median_gpu_seconds": 0.035935085000000026
+        },
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.020174704999999998
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.0020919199999999997
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.0017829629999999996
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.0010482070000000002
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0005722539999999999
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.0002815400000000001
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 8.083e-06
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 5.583000000000001e-06
+        }
+      ]
+    },
+    {
+      "tokens": 31,
+      "normal_wall_seconds": [
+        0.14445512503152713,
+        0.2159020829712972,
+        0.1856355419731699
+      ],
+      "profiled_wall_seconds": [
+        0.17913379200035706,
+        0.18222245801007375,
+        0.16850658296607435
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 9.042e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.00652704
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.05457216500000001
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.07874737200000002
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0011809149999999998
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004374922000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0013427540000000005
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000704793
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.4042e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 0.00037795900000000003
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.007953957
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.05584538199999998
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.06701370200000006
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0011353770000000008
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004525208999999999
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.004842291000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0014267080000000003
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.1416e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 8.958000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0046665429999999996
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.05162124700000002
+          },
+          "linear4_tail": {
+            "calls": 196,
+            "gpu_seconds": 0.061381331999999976
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.005154124999999999
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004350082999999999
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.002109246
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0021691239999999997
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.2583000000000001e-05
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tail",
+          "calls": 196,
+          "median_gpu_seconds": 0.06701370200000006
+        },
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.05457216500000001
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.00652704
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.004374922000000001
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.002109246
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.0014267080000000003
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0011809149999999998
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.2583000000000001e-05
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 9.042e-06
+        }
+      ]
+    },
+    {
+      "tokens": 32,
+      "normal_wall_seconds": [
+        0.14056833396898583,
+        0.1341788750141859,
+        0.1270507910521701
+      ],
+      "profiled_wall_seconds": [
+        0.1267956249648705,
+        0.12041779200080782,
+        0.12202599999727681
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 1.2e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.007114835
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.08117329600000003
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0012466210000000005
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004945291000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.004671003000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0008755389999999999
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.875000000000001e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 9e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.005767706000000003
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.069403333
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.005275248999999999
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.005142414000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0028459989999999997
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.003637833
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0416e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 9.292e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0023711349999999986
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.07669363299999998
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0011923810000000002
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004905463000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.004174705000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0025314989999999996
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.208e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.07669363299999998
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.005767706000000003
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.004945291000000001
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.004174705000000001
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.0025314989999999996
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0012466210000000005
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9.875000000000001e-06
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 9.292e-06
+        }
+      ]
+    },
+    {
+      "tokens": 33,
+      "normal_wall_seconds": [
+        0.16994079196592793,
+        0.15251958300359547,
+        0.19129654101561755
+      ],
+      "profiled_wall_seconds": [
+        0.1770539169665426,
+        0.1847259160131216,
+        0.16850741597590968
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 0.00190075
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.0022616680000000005
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.07784624399999998
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.04640332900000001
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0012083750000000005
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.004940333
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.002459830999999999
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.0006984160000000002
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.1209e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 8.125000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.004697045
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.07868955200000002
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.05580416800000001
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0012604120000000005
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.005185460000000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0013458360000000002
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000718625
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0292e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 9.375000000000001e-06
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.002424840000000001
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.07324452200000005
+          },
+          "linear4": {
+            "calls": 196,
+            "gpu_seconds": 0.04775628599999998
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.001237164
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.0051302480000000004
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.0005767039999999998
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.000708876
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.125000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.07784624399999998
+        },
+        {
+          "kernel": "linear4",
+          "calls": 196,
+          "median_gpu_seconds": 0.04775628599999998
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.0051302480000000004
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.002424840000000001
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.0013458360000000002
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.001237164
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.000708876
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.0292e-05
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 9.375000000000001e-06
+        }
+      ]
+    },
+    {
+      "tokens": 128,
+      "normal_wall_seconds": [
+        0.5878613329841755,
+        0.59053370897891,
+        0.5775625410024077
+      ],
+      "profiled_wall_seconds": [
+        0.6144409580156207,
+        0.6062140419962816,
+        0.5849402499734424
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 1.8959000000000003e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.010563966999999992
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.4417602929999998
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.0038898770000000012
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.104584746
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.009517122999999999
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.004423500000000001
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.25e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 1.9041000000000003e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.008030036999999999
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.44382104100000014
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.005451171999999999
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.095269083
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.01166121
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.008314959000000002
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.025e-05
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 2.3458e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.005636073999999999
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 0.431480122
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.003299878000000001
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 0.08342695800000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.004803919000000001
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.011928544000000003
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0541000000000001e-05
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 0.4417602929999998
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 0.095269083
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.009517122999999999
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.008314959000000002
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.008030036999999999
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.0038898770000000012
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 1.9041000000000003e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.025e-05
+        }
+      ]
+    },
+    {
+      "tokens": 512,
+      "normal_wall_seconds": [
+        3.478651666024234,
+        3.38755908398889,
+        3.3607397919986397
+      ],
+      "profiled_wall_seconds": [
+        3.410081584006548,
+        3.335346667037811,
+        3.5770248329499736
+      ],
+      "samples": [
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 0.0008681250000000001
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.02599262599999999
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 1.7274417099999995
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.014733003000000005
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 1.5597518780000001
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.020837912
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.036398542000000006
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.416000000000001e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.4083e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.04468545700000003
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 1.6728514929999994
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.019492374000000007
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 1.5210650400000005
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.022842289
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.025084290000000006
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.708000000000001e-06
+          }
+        },
+        {
+          "embedding4": {
+            "calls": 1,
+            "gpu_seconds": 6.6958e-05
+          },
+          "rms_norm": {
+            "calls": 113,
+            "gpu_seconds": 0.033150878
+          },
+          "linear4_tiled": {
+            "calls": 196,
+            "gpu_seconds": 1.8300085780000006
+          },
+          "rope": {
+            "calls": 56,
+            "gpu_seconds": 0.033704335
+          },
+          "attention": {
+            "calls": 28,
+            "gpu_seconds": 1.6396588350000003
+          },
+          "add": {
+            "calls": 56,
+            "gpu_seconds": 0.017171917000000002
+          },
+          "silu_gate": {
+            "calls": 28,
+            "gpu_seconds": 0.010742913999999998
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0792000000000001e-05
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "linear4_tiled",
+          "calls": 196,
+          "median_gpu_seconds": 1.7274417099999995
+        },
+        {
+          "kernel": "attention",
+          "calls": 28,
+          "median_gpu_seconds": 1.5597518780000001
+        },
+        {
+          "kernel": "rms_norm",
+          "calls": 113,
+          "median_gpu_seconds": 0.033150878
+        },
+        {
+          "kernel": "silu_gate",
+          "calls": 28,
+          "median_gpu_seconds": 0.025084290000000006
+        },
+        {
+          "kernel": "add",
+          "calls": 56,
+          "median_gpu_seconds": 0.020837912
+        },
+        {
+          "kernel": "rope",
+          "calls": 56,
+          "median_gpu_seconds": 0.019492374000000007
+        },
+        {
+          "kernel": "embedding4",
+          "calls": 1,
+          "median_gpu_seconds": 6.6958e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9.708000000000001e-06
+        }
+      ]
+    }
+  ],
+  "limitations": "One encoder per dispatch; calibration and encoder costs perturb timing. Normal-path timings are separate. Counter storage excluded from runtime buffer counters.",
+  "runtime": {
+    "shader_sha256": "9f4b00af13335a667c7002d2a01a24ad82f6b567b714505a7669dbeecd7e0fb7",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 905,
+    "allocated_bytes": 381939008,
+    "completed_commands": 64,
+    "gpu_timed_commands": 64,
+    "gpu_seconds": 37.64398162503494,
+    "encode_seconds": 0.5521113749127835,
+    "submit_wait_seconds": 37.74278425128432,
+    "dispatches": {
+      "embedding4": 64,
+      "rms_norm": 7232,
+      "linear4_tail": 3136,
+      "rope": 3584,
+      "attention": 1792,
+      "add": 3584,
+      "silu_gate": 1792,
+      "pool_project": 64,
+      "linear4_tiled": 10976,
+      "linear4": 3136
+    },
+    "active_bytes": 381914432,
+    "cache_bytes": 46695936,
+    "peak_bytes": 381916484
+  }
+}

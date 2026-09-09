@@ -49,6 +49,8 @@ def _library() -> Any:
         "mi_finish": ([ct.c_void_p], ct.c_int),
         "mi_gpu_seconds": ([ct.c_void_p], ct.c_double),
         "mi_abort": ([ct.c_void_p], None),
+        "mi_profile_enable": ([ct.c_void_p, ct.c_int], ct.c_int),
+        "mi_profile_read": ([ct.c_void_p, ct.POINTER(ct.c_double), ct.c_uint32], ct.c_int),
         "mi_dispatch": (
             [
                 ct.c_void_p,
@@ -171,6 +173,8 @@ class MetalRuntime:
         self._encode_seconds = 0.0
         self._submit_wait_seconds = 0.0
         self._dispatches: Counter[str] = Counter()
+        self._profile: list[dict[str, Any]] | None = None
+        self._profile_command: list[dict[str, Any]] = []
 
     def diagnostics(self) -> dict[str, Any]:
         """Cumulative counters; GPU time covers completed commands, not individual kernels.
@@ -195,6 +199,30 @@ class MetalRuntime:
                 "cache_bytes": self.cache_bytes,
                 "peak_bytes": self.peak_bytes,
             }
+
+    @contextmanager
+    def profile_kernels(self) -> Iterator[list[dict[str, Any]]]:
+        """Intrusive stage-boundary GPU timings, at most 2048 dispatches per command.
+
+        Hold the runtime lock; call backend.forward directly from this thread, not
+        the model's executor API. Unsupported counters fail explicitly. Results
+        contain completed commands only and are not normal inference latencies.
+        """
+        with self._lock:
+            if not self._pointer:
+                raise ClosedError()
+            if self._recording or self._profile is not None:
+                raise InferenceError()
+            if self._lib.mi_profile_enable(self._pointer, 1):
+                raise InferenceError()
+            records: list[dict[str, Any]] = []
+            self._profile = records
+            try:
+                yield records
+            finally:
+                self._lib.mi_profile_enable(self._pointer, 0)
+                self._profile = None
+                self._profile_command.clear()
 
     @contextmanager
     def _workspace(self) -> Iterator[WorkspaceLease]:
@@ -256,12 +284,21 @@ class MetalRuntime:
                 self._lib.mi_abort(self._pointer)
                 raise InferenceError()
             self._recording = True
+            self._profile_command.clear()
             started = time.perf_counter()
             try:
                 yield
                 submitted = time.perf_counter()
                 if self._lib.mi_finish(self._pointer):
                     raise InferenceError()
+                if self._profile is not None:
+                    timings = (ct.c_double * len(self._profile_command))()
+                    if self._lib.mi_profile_read(self._pointer, timings, len(timings)):
+                        raise InferenceError()
+                    self._profile.extend(
+                        dict(record, gpu_seconds=float(seconds))
+                        for record, seconds in zip(self._profile_command, timings, strict=True)
+                    )
                 self._encode_seconds += submitted - started
                 self._submit_wait_seconds += time.perf_counter() - submitted
                 self._commands += 1
@@ -273,6 +310,7 @@ class MetalRuntime:
                 self._lib.mi_abort(self._pointer)
                 self._recording = False
                 self._inflight.clear()
+                self._profile_command.clear()
 
     def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
         if rows >= 5 and cols % 32 == 0 and k % 64 == 0:
@@ -289,11 +327,12 @@ class MetalRuntime:
                 )
             if rows % 8:
                 # n is the starting row for the single partial row tile.
+                small = rows % 8 <= 4
                 self._dispatch(
-                    "linear4_tail",
+                    "linear4" if small else "linear4_tail",
                     buffers,
-                    threads=(cols // 32) * 128,
-                    group_size=128,
+                    threads=cols * 32 if small else (cols // 32) * 128,
+                    group_size=32 if small else 128,
                     n=complete * 8,
                     rows=rows,
                     cols=cols,
@@ -368,6 +407,18 @@ class MetalRuntime:
         ):
             raise InferenceError()
         self._dispatches[name] += 1
+        if self._profile is not None:
+            self._profile_command.append(
+                {
+                    "kernel": name,
+                    "rows": rows,
+                    "cols": cols,
+                    "k": k,
+                    "seq": seq,
+                    "heads": heads,
+                    "threads": threads,
+                }
+            )
 
     def read(self, buffer: Buffer, shape: tuple[int, ...]) -> NDArray[np.float32]:
         with self._lock:
@@ -450,7 +501,7 @@ class MetalRuntime:
 
     def close(self) -> None:
         with self._lock:
-            if self._recording or self._workspace_active:
+            if self._recording or self._workspace_active or self._profile is not None:
                 raise InferenceError()
             if self._pointer:
                 self.trim_workspace()

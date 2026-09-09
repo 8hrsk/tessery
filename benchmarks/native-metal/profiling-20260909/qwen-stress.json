@@ -1,0 +1,285 @@
+{
+  "status": "passed",
+  "seed": 20260909,
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "ec06433b06192b9a72b09b60c4908c913a72b2de5814190df8ed2f048da60481",
+    "src/metal_inference/backend.py": "c97d574d1a0bd39ee1756abd6c7bc5ccd1b885ce13efcb9b8b5bbae9f78ec02d",
+    "src/metal_inference/batching.py": "01c91bf48c0385dd0791d4a086f646e41e9cbd62e6623a06b6b6864b13011974",
+    "src/metal_inference/bert.py": "d140ad244dff590cbf32ba5b0b0423f0ebdeb78019da38bf5dc73137fcf9f8d6",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "637fa07bbac3394a44cd75c09e4e37b891fac92b06d400e35d365d6dc3560b96",
+    "src/metal_inference/native/kernels.metal": "9f4b00af13335a667c7002d2a01a24ad82f6b567b714505a7669dbeecd7e0fb7",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "d9710aa974e26bc31164c1f2aaefd8d1e9ceb2c9efd7a3395ea57ecfea9c1f3f",
+    "src/metal_inference/retrieval.py": "f182ed53dcf80e5ce8b8328419264d65b01aa7c95fd5227ab8d03f50b11fbf61",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "54c9d11c56563e0111351226999d2f6f0e1c5dfcea7a33656003810a4c200d16",
+  "rounds": [
+    {
+      "round": 0,
+      "batch": 1,
+      "corpus_indices": [
+        8
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 369319256,
+        "cache_bytes": 0,
+        "process_rss_bytes": 839663616,
+        "process_peak_rss_bytes": 839729152
+      },
+      "max_abs_batch_error": 0.0
+    },
+    {
+      "round": 1,
+      "batch": 3,
+      "corpus_indices": [
+        14,
+        11,
+        6
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 375770456,
+        "cache_bytes": 0,
+        "process_rss_bytes": 463683584,
+        "process_peak_rss_bytes": 839827456
+      },
+      "max_abs_batch_error": 0.0
+    },
+    {
+      "round": 2,
+      "batch": 8,
+      "corpus_indices": [
+        13,
+        3,
+        12,
+        11,
+        0,
+        2,
+        6,
+        3
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 457195848,
+        "cache_bytes": 0,
+        "process_rss_bytes": 463929344,
+        "process_peak_rss_bytes": 839827456
+      },
+      "max_abs_batch_error": 0.0
+    },
+    {
+      "round": 3,
+      "batch": 32,
+      "corpus_indices": [
+        6,
+        8,
+        4,
+        0,
+        8,
+        11,
+        8,
+        7,
+        10,
+        7,
+        5,
+        3,
+        6,
+        9,
+        9,
+        10,
+        8,
+        4,
+        12,
+        5,
+        6,
+        6,
+        14,
+        13,
+        8,
+        8,
+        5,
+        9,
+        1,
+        6,
+        4,
+        12
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 527329104,
+        "cache_bytes": 0,
+        "process_rss_bytes": 520585216,
+        "process_peak_rss_bytes": 863993856
+      },
+      "max_abs_batch_error": 1.9371509552001953e-07
+    },
+    {
+      "round": 4,
+      "batch": 1,
+      "corpus_indices": [
+        5
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 527329104,
+        "cache_bytes": 0,
+        "process_rss_bytes": 520617984,
+        "process_peak_rss_bytes": 863993856
+      },
+      "max_abs_batch_error": 0.0
+    },
+    {
+      "round": 5,
+      "batch": 3,
+      "corpus_indices": [
+        14,
+        10,
+        13
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 527329104,
+        "cache_bytes": 0,
+        "process_rss_bytes": 520634368,
+        "process_peak_rss_bytes": 863993856
+      },
+      "max_abs_batch_error": 0.0
+    },
+    {
+      "round": 6,
+      "batch": 8,
+      "corpus_indices": [
+        1,
+        9,
+        7,
+        10,
+        6,
+        5,
+        12,
+        12
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 433688900,
+        "cache_bytes": 0,
+        "process_rss_bytes": 490504192,
+        "process_peak_rss_bytes": 863993856
+      },
+      "max_abs_batch_error": 1.6391277313232422e-07
+    },
+    {
+      "round": 7,
+      "batch": 32,
+      "corpus_indices": [
+        9,
+        8,
+        4,
+        14,
+        12,
+        10,
+        14,
+        12,
+        6,
+        1,
+        4,
+        3,
+        9,
+        8,
+        9,
+        6,
+        5,
+        1,
+        0,
+        5,
+        10,
+        13,
+        0,
+        0,
+        6,
+        3,
+        4,
+        3,
+        12,
+        4,
+        8,
+        12
+      ],
+      "queue": {
+        "canceled": 2,
+        "overloaded": 2,
+        "completed": 2
+      },
+      "forward_canceled": true,
+      "after_trim": {
+        "active_bytes": 335218496,
+        "peak_bytes": 620574044,
+        "cache_bytes": 0,
+        "process_rss_bytes": 490913792,
+        "process_peak_rss_bytes": 863993856
+      },
+      "max_abs_batch_error": 1.9371509552001953e-07
+    }
+  ],
+  "reloads": 2,
+  "closed_lifecycles": 3,
+  "forward_cancellations": 8,
+  "scope": "seeded_correctness_stress_not_latency_benchmark"
+}

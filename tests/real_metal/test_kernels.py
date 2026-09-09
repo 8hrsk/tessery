@@ -322,7 +322,7 @@ def test_tiled_matmul_and_unaligned_fallback(runtime, shape):
 
 @pytest.mark.parametrize(
     "m,n,k",
-    [(m, 64, k) for m in (1, 2, 7, 8, 9, 15, 16, 17, 31) for k in (64, 1024, 3072)]
+    [(m, 64, k) for m in (1, 2, 7, 8, 9, 10, 11, 12, 15, 16, 17, 31) for k in (64, 1024, 3072)]
     + [(7, 33, 128)],
 )
 def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
@@ -353,7 +353,7 @@ def test_uint4_tiled_accuracy_and_route(runtime, m, n, k):
             if m >= 8:
                 expected_dispatches["linear4_tiled"] = 1
             if m % 8:
-                expected_dispatches["linear4_tail"] = 1
+                expected_dispatches["linear4" if m % 8 <= 4 else "linear4_tail"] = 1
         assert runtime.diagnostics()["dispatches"] == expected_dispatches
 
     finally:
@@ -404,3 +404,40 @@ def test_workspace_uploads_are_not_retained_and_live_leases_are_exclusive(runtim
     assert not upload.pointer and scratch.pointer
     runtime.close()
     assert not scratch.pointer and runtime.active_bytes == runtime.cache_bytes == 0
+
+
+def test_kernel_profile_timings_abort_and_recovery(runtime):
+    a = np.arange(4096, dtype=np.float32)
+    with runtime.profile_kernels() as records:
+        np.testing.assert_array_equal(runtime.add(a, a), a + a)
+        assert len(records) == 1 and records[0]["kernel"] == "add"
+        assert np.isfinite(records[0]["gpu_seconds"]) and records[0]["gpu_seconds"] > 0
+        with pytest.raises(InferenceError), runtime.profile_kernels():
+            pass
+        with pytest.raises(InferenceError):
+            runtime.close()
+        with pytest.raises(InferenceError), runtime.command():
+            runtime._dispatch("absent", [], threads=1)
+        assert len(records) == 1
+        np.testing.assert_array_equal(runtime.add(a, a), a + a)
+        assert len(records) == 2
+    np.testing.assert_array_equal(runtime.add(a, a), a + a)
+    assert len(records) == 2
+    assert runtime.active_bytes == 0
+
+
+def test_kernel_profile_capacity_aborts_without_publishing_partial_results(runtime):
+    a = np.ones(1, dtype=np.float32)
+    buffers = [runtime.buffer(a.nbytes, a) for _ in range(3)]
+    try:
+        with runtime.profile_kernels() as records:
+            with pytest.raises(InferenceError), runtime.command():
+                for _ in range(2049):
+                    runtime._dispatch("add", buffers, threads=1, n=1)
+            assert records == []
+            np.testing.assert_array_equal(runtime.add(a, a), a + a)
+            assert len(records) == 1
+    finally:
+        for buffer in buffers:
+            buffer.close()
+    assert runtime.active_bytes == 0
