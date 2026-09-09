@@ -83,7 +83,7 @@ def main():
                         after = rt.diagnostics()["dispatches"]
                         # These singleton cases have the listed execution heights.
                         # Experimental fused kernels support complete 16-row tiles.
-                        expected_rows = (128, 512) if args.kernel == "selected" else (128, 256, 512)
+                        expected_rows = (128, 256, 512)
                         expected = 28 if name == "candidate" and length in expected_rows else 0
                         assert (
                             after.get(dispatch_name, 0) - before.get(dispatch_name, 0) == expected

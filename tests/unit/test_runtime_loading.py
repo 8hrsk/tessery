@@ -144,7 +144,7 @@ def test_f32_verified_shapes_and_tail_dispatch(rows, cols, k):
 
 @pytest.mark.parametrize(
     "rows,cols,k",
-    [(m, 3072, 1024) for m in (7, 16, 48, 127, 128, 129, 256, 511, 512, 513, 4096)]
+    [(m, 3072, 1024) for m in (7, 16, 48, 127, 128, 129, 255, 256, 257, 511, 512, 513, 4096)]
     + [(128, n, k) for n, k in ((1024, 1024), (3072, 2048), (3071, 1024))],
 )
 def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
@@ -155,7 +155,7 @@ def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
     )
     buffers = [object() for _ in range(9)]
     metal.MetalRuntime._gated4(runtime, buffers, rows=rows, cols=cols, k=k)
-    if rows in (128, 512) and (cols, k) == (3072, 1024):
+    if rows in (128, 256, 512) and (cols, k) == (3072, 1024):
         assert len(calls) == 1
         assert calls[0][1] == ("gated4_16x32_k64", buffers[:8])
         assert calls[0][2] == dict(

@@ -138,6 +138,7 @@ New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
 [direct MLP comparison](docs/MLP_COMPARISON.md),
 [quantized traversal experiment](docs/QUANTIZED_TRAVERSAL.md),
 [fused Qwen MLP measurements](docs/FUSED_MLP.md),
+[full MLX comparison after fusion](docs/PERFORMANCE_AFTER_FUSION.md),
 [GPU profiling, varied stress and isolated comparisons](docs/PROFILING_AND_STRESS.md),
 [Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 

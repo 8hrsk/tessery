@@ -727,7 +727,7 @@ def test_quantized_eight_row_offset_preserves_surrounding_rows(runtime):
             buffer.close()
 
 
-@pytest.mark.parametrize("rows", [16, 127, 128, 129, 256, 511, 512, 513])
+@pytest.mark.parametrize("rows", [16, 127, 128, 129, 255, 256, 257, 511, 512, 513])
 @pytest.mark.parametrize("cancellation", [False, True])
 def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, cancellation):
     rng = np.random.default_rng(2401)
@@ -757,7 +757,7 @@ def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, canc
             runtime._gated4(buffers, rows=rows, cols=n, k=k)
         after = runtime.diagnostics()["dispatches"]
         assert after.get("gated4_16x32_k64", 0) - before.get("gated4_16x32_k64", 0) == int(
-            rows in (128, 512)
+            rows in (128, 256, 512)
         )
         selected = runtime.read(buffers[7], sentinel.shape)
         assert np.isnan(selected[rows:]).all()

@@ -77,7 +77,58 @@ of **1.0570x and 1.0563x** for complete public `encode()` calls. A/B control
 ratios are 1.0008 and 1.0029. All 108 calls, including warmups, produce
 bit-identical vectors. The candidate code itself is unchanged; this measures
 whether extending its selection to another height helps the complete model.
-The two prototype reports retain the pre-extension runtime source hashes.
+The two prototype reports retain the pre-extension runtime source hashes;
+the exact tools and reports are preserved in commit `31f38cf`.
+
+The production selector is therefore extended to **128/256/512 rows**, only
+for Qwen's `(N,K)=(3072,1024)` gate/up shape. The shader code and reduction
+order are unchanged. Raw execution matrices of 255/257 rows retain the unfused path. A request
+with 255 logical tokens can still use fusion: the existing attention padding
+policy expands its execution matrix to 256 rows. Batch 4 × 64 also selects
+the new path. The choice depends on execution height, not requested length.
+The full-model benchmark now uses the ordinary production Metal library
+for `--kernel selected`; only explicit experimental candidates append shaders.
+
+Absolute milliseconds differ from earlier sessions and must not be treated
+as a historical before/after speedup. The two same-session prototype runs
+measure approximately 301.6 → 285.3 ms and 301.3 → 285.3 ms; the relative
+paired comparisons, their controls and source hashes are the evidence.
+
+## Post-extension comparison and validation
+
+The updated ordinary production runtime is compared against MLX again at
+256 tokens, in both engine orders with the same A/B controls. Its latency
+ratio is **1.417–1.428**; all controls pass and process drift stays below 0.6%
+for Tessery and 0.3% for MLX. Both native workers record 644 fused dispatches
+(28 layers × 23 calls), confirming that the new path is actually used.
+MLX remains faster here. This pair has the extended selector's source hashes;
+it must not be merged into the earlier snapshot as if the code were identical.
+
+Across the broad snapshot, maximum cross-engine vector differences are
+`6.035e-7` for Qwen and `3.689e-7` for BGE (rounded upward). All numerical
+checks pass, including the rows whose timing controls fail.
+
+The updated runtime passes **893 tests with 94.58% coverage** and **20 Metal
+API/Shader Validation cases**. Six new portable tests exercise full-model
+repeat identity checks and distinguish a stable engine gap from bad controls.
+Additional native coverage checks raw 255/256/257-row boundaries and exact
+full-model outputs for one 256-token input and batch 4 × 64.
+
+An offline wheel and sdist are built and verified. The installed wheel passes
+both Qwen and BGE smoke checks, then checks logical lengths 255/256/257 and
+batch 4 × 64 against an explicitly unfused route with **exact vector equality**.
+Their execution heights are 256/256/257/256; fused call counts are 28/28/0/28.
+After trim only weight bytes remain, and close releases all active bytes.
+Formatting, lint, mypy, dependency and frozen-input checks pass. There are no
+new model downloads or PyPI uploads. The existing shader is unchanged, and
+these short checks do not repeat multi-hour qualification or establish
+performance on another GPU.
+
+The next diagnostic priority is the Qwen mixed-short-batch case: its stable
+1.89–1.93 latency ratio is the largest measured gap. Inspect execution plans
+and CPU/GPU time before changing the batching or padding policy. These
+measurements identify an expensive case, not a specific hardware bottleneck.
+BGE's long-input gap also remains; it needs its own optimization evidence.
 
 ## Reproduction and evidence
 
@@ -106,3 +157,8 @@ cannot be admitted by this repeat-screen tool.
 
 - [256-row first prototype](../benchmarks/native-metal/post-fusion-20260909/fusion-256-first.json)
 - [256-row repeat prototype](../benchmarks/native-metal/post-fusion-20260909/fusion-256-repeat.json)
+
+- [Extended 256-row first pair](../benchmarks/native-metal/post-fusion-20260909/qwen-256-selected-first.json)
+- [Extended 256-row reverse pair](../benchmarks/native-metal/post-fusion-20260909/qwen-256-selected-repeat.json)
+- [Extended 256-row repeat screen](../benchmarks/native-metal/post-fusion-20260909/qwen-256-selected-summary.json)
+- [Validation and build hashes](../benchmarks/native-metal/post-fusion-20260909/validation.json)

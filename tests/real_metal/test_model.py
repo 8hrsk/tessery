@@ -88,14 +88,14 @@ def test_boundaries_and_batch32(model):
     np.testing.assert_allclose(vectors, np.repeat(vectors[:1], 32, axis=0), atol=1e-6)
 
 
-@pytest.mark.parametrize("tokens", [17, 33, 128, 129])
+@pytest.mark.parametrize("tokens", [17, 33, 128, 129, 256, 512])
 def test_large_tile_and_fused_mlp_cover_all_projections_per_layer(model, tokens):
     runtime = model._backend.runtime
     kernel = "linear4_16x32_k64"
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
     model.encode([" token" * (tokens - 1)])
     after = runtime.diagnostics()["dispatches"][kernel]
-    assert after - before == (5 if tokens == 128 else 7) * model._backend.layers
+    assert after - before == (5 if tokens in (128, 256, 512) else 7) * model._backend.layers
 
 
 def test_workspace_reuses_scratch_but_refreshes_inputs(model):
@@ -120,7 +120,9 @@ def test_unaligned_attention_uses_bounded_tile_per_layer(model):
     assert runtime.diagnostics()["dispatches"][kernel] - before == model._backend.layers
 
 
-@pytest.mark.parametrize("batch,tokens", [(1, 7), (1, 128), (1, 129), (1, 512), (4, 32), (8, 16)])
+@pytest.mark.parametrize(
+    "batch,tokens", [(1, 7), (1, 128), (1, 129), (1, 256), (1, 512), (4, 32), (8, 16), (4, 64)]
+)
 def test_fused_mlp_full_vectors_equal_complete_previous_path(model, monkeypatch, batch, tokens):
     runtime = model._backend.runtime
     texts = [" token" * (tokens - 1)] * batch

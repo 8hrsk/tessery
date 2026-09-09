@@ -8,11 +8,12 @@ uint4/BF16 pack. No model or runtime dependency download is needed.
 ## Selected production path
 
 `MetalRuntime._gated4` now selects `gated4_16x32_k64` only for
-`(rows, cols, K) = (128,3072,1024)` or `(512,3072,1024)`. Rows are the actual
+`(rows, cols, K) = (128,3072,1024)`, `(256,3072,1024)` or `(512,3072,1024)`.
+The 256-row case was added after the [follow-up comparison and qualification](PERFORMANCE_AFTER_FUSION.md). Rows are the actual
 execution matrix height, including batches; this is not a requested-token
 limit. Every other shape uses the original two `_linear4` calls and
-`silu_gate`, including unaligned tails and the isolated 256-row case for
-which this phase has no full-model timing qualification.
+`silu_gate`, including unaligned tails and complete tile heights that have not yet been
+qualified for a full-model performance gain.
 
 Qwen calls this shared private method once per layer. The up scratch
 allocation is intentionally retained; there is **no claimed reduction in
