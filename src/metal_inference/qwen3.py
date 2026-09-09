@@ -210,15 +210,17 @@ class Qwen3Backend:
                     )
                     residual(x, projected)
                     norm(x, normalized, prefix + ".post_attention_layernorm", tokens, self.hidden)
-                    linear(
-                        normalized, gate, prefix + ".mlp.gate_proj", self.intermediate, self.hidden
-                    )
-                    linear(normalized, up, prefix + ".mlp.up_proj", self.intermediate, self.hidden)
-                    rt._dispatch(
-                        "silu_gate",
-                        [gate, up],
-                        threads=tokens * self.intermediate,
-                        n=tokens * self.intermediate,
+                    rt._gated4(
+                        [
+                            normalized,
+                            *self._quant(prefix + ".mlp.gate_proj"),
+                            *self._quant(prefix + ".mlp.up_proj"),
+                            gate,
+                            up,
+                        ],
+                        rows=tokens,
+                        cols=self.intermediate,
+                        k=self.hidden,
                     )
                     linear(
                         gate, projected, prefix + ".mlp.down_proj", self.hidden, self.intermediate

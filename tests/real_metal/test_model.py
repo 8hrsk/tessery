@@ -89,13 +89,13 @@ def test_boundaries_and_batch32(model):
 
 
 @pytest.mark.parametrize("tokens", [17, 33, 128, 129])
-def test_large_tile_covers_all_seven_projections_per_layer(model, tokens):
+def test_large_tile_and_fused_mlp_cover_all_projections_per_layer(model, tokens):
     runtime = model._backend.runtime
     kernel = "linear4_16x32_k64"
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
     model.encode([" token" * (tokens - 1)])
     after = runtime.diagnostics()["dispatches"][kernel]
-    assert after - before == 7 * model._backend.layers
+    assert after - before == (5 if tokens == 128 else 7) * model._backend.layers
 
 
 def test_workspace_reuses_scratch_but_refreshes_inputs(model):
@@ -118,3 +118,20 @@ def test_unaligned_attention_uses_bounded_tile_per_layer(model):
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
     model.encode([" token" * 128])
     assert runtime.diagnostics()["dispatches"][kernel] - before == model._backend.layers
+
+
+@pytest.mark.parametrize("batch,tokens", [(1, 7), (1, 128), (1, 129), (1, 512), (4, 32), (8, 16)])
+def test_fused_mlp_full_vectors_equal_complete_previous_path(model, monkeypatch, batch, tokens):
+    runtime = model._backend.runtime
+    texts = [" token" * (tokens - 1)] * batch
+    selected = model.encode(texts)
+
+    def previous(buffers, **kw):
+        runtime._linear4([*buffers[:4], buffers[7]], **kw)
+        runtime._linear4([buffers[0], *buffers[4:7], buffers[8]], **kw)
+        runtime._dispatch(
+            "silu_gate", buffers[7:], threads=kw["rows"] * kw["cols"], n=kw["rows"] * kw["cols"]
+        )
+
+    monkeypatch.setattr(runtime, "_gated4", previous)
+    np.testing.assert_array_equal(model.encode(texts), selected)

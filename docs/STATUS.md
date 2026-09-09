@@ -63,6 +63,8 @@ specification is preserved as historical input.
   controls and an explicit noise screen; see [MLP comparison](MLP_COMPARISON.md).
 * Reproducible in-memory threadgroup traversal experiments with exact-output
   and Shader Validation checks; see [traversal results](QUANTIZED_TRAVERSAL.md).
+* Fused Qwen gate/up/SiLU for measured 128/512-row projection shapes with
+  exact-output checks and fallback; see [fusion measurements](FUSED_MLP.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

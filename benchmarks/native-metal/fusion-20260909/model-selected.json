@@ -1,0 +1,406 @@
+{
+  "status": "passed",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "18082b463486f8554e0e76ca451a086cbaa084b2e21bf5476a812bba3479976f",
+    "src/metal_inference/native/kernels.metal": "82a357159163c4610e882b57bbadeecb9699444a3b6130a8ed0ca903fdca1c11",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "f5153f64fa75faca0e2b2188df1e130b635e51a36bd99ecf757ff3e898d05a88",
+  "experiment_hashes": {
+    "fused_mlp_experiment.py": "1d43c8e16e1c86f3d4fefec90eefa70d801d6fd4ec2233555e4cbb92654dda68",
+    "fused_mlp.metal": "227a77b43543107d42bca76778ce7d92114cac6caada7e363841a05b4cafa4d2",
+    "benchmark_mlp_isolated.py": "4f59a4b90ccb90cb0f4c30c48b933aff1928227d314f26ba6b8e8331f426caec"
+  },
+  "kernel": "selected",
+  "conditions": "Full unprofiled encode API; 3 warmup rounds; paired randomized order; baseline A/B identical; fused aligned gate/up/SiLU; up allocation retained; uncontrolled thermals",
+  "samples": 15,
+  "reverse_cases": false,
+  "results": [
+    {
+      "length": 7,
+      "token_ids_sha256": "300d9b51d4262be0932effa5ae74c29e1665f09c0781339180be2baa9efb5e83",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.046540208044461906,
+            0.03454170800978318,
+            0.03369349997956306,
+            0.033086084004025906,
+            0.03312695794738829,
+            0.03359045897377655,
+            0.03371558402432129,
+            0.037982167035806924,
+            0.032925750012509525,
+            0.03758937498787418,
+            0.03240104200085625,
+            0.035805749997962266,
+            0.041188333998434246,
+            0.03273816598812118,
+            0.03289049997692928
+          ],
+          "p50_seconds": 0.03369349997956306,
+          "p95_seconds": 0.04279389621224254,
+          "texts_per_second": 28.205265929754464
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.036935165990144014,
+            0.043858416960574687,
+            0.03201104199979454,
+            0.032550167001318187,
+            0.032155207998584956,
+            0.03381233400432393,
+            0.0344230419723317,
+            0.04142866702750325,
+            0.03510500001721084,
+            0.04206791700562462,
+            0.04182508302619681,
+            0.042945707973558456,
+            0.03388862498104572,
+            0.037623042007908225,
+            0.03353741700993851
+          ],
+          "p50_seconds": 0.03510500001721084,
+          "p95_seconds": 0.04321952066966332,
+          "texts_per_second": 27.06766095204532
+        },
+        "candidate": {
+          "latency_seconds": [
+            0.054710584052372724,
+            0.03917649999493733,
+            0.03227141703246161,
+            0.03343116695759818,
+            0.03259408299345523,
+            0.03320520801935345,
+            0.03733333299169317,
+            0.033251875021960586,
+            0.03231716598384082,
+            0.040085332992020994,
+            0.03353579202666879,
+            0.04088179103564471,
+            0.036202625022269785,
+            0.032314500014763325,
+            0.03296954103279859
+          ],
+          "p50_seconds": 0.03343116695759818,
+          "p95_seconds": 0.0450304289406631,
+          "texts_per_second": 27.559298115871343
+        }
+      },
+      "speedup": 1.0216763752222484,
+      "identical_control_a_over_b": 0.959792051361465,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 128,
+      "token_ids_sha256": "f73f4e938506dac25f276ecb7e1e6c9770791833012213a639a2c04865c3b743",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.3998274159966968,
+            0.41240870801266283,
+            0.4146027920069173,
+            0.4037552080117166,
+            0.38989350001793355,
+            0.4043777080369182,
+            0.39770566701190546,
+            0.3997630410012789,
+            0.3981449999846518,
+            0.40227333299117163,
+            0.3670482920133509,
+            0.38568812498124316,
+            0.38495687500108033,
+            0.38901545898988843,
+            0.3961143749766052
+          ],
+          "p50_seconds": 0.3981449999846518,
+          "p95_seconds": 0.4130669332109392,
+          "texts_per_second": 2.522884454572489
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.4178599170409143,
+            0.4120685000088997,
+            0.3834764999919571,
+            0.41039841598831117,
+            0.3520142500055954,
+            0.40142354200361297,
+            0.39989191701170057,
+            0.40017370897112414,
+            0.36486083402996883,
+            0.3601627079769969,
+            0.3799345839652233,
+            0.4013797910301946,
+            0.3989013750106096,
+            0.4117959580034949,
+            0.38142629200592637
+          ],
+          "p50_seconds": 0.39989191701170057,
+          "p95_seconds": 0.41380592511850406,
+          "texts_per_second": 2.5528576437835926
+        },
+        "candidate": {
+          "latency_seconds": [
+            0.3879373329691589,
+            0.3877771249972284,
+            0.3814635840244591,
+            0.38613170897588134,
+            0.3935977089568041,
+            0.381245750002563,
+            0.3937267499859445,
+            0.31805708300089464,
+            0.37993595900479704,
+            0.41043508297298104,
+            0.3632381670176983,
+            0.38521479099290445,
+            0.38244150002719834,
+            0.3980543329962529,
+            0.3712476250366308
+          ],
+          "p50_seconds": 0.38521479099290445,
+          "p95_seconds": 0.40176855798927136,
+          "texts_per_second": 2.6221463504624594
+        }
+      },
+      "speedup": 1.0366481696527063,
+      "identical_control_a_over_b": 0.9956315270383481,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 129,
+      "token_ids_sha256": "34ab197d4659d5244c279e1a69e9aabc558fdc2be0695ccc64af5a63cafc5c51",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            0.49720416602212936,
+            0.4840562909957953,
+            0.4826537079643458,
+            0.4266416250029579,
+            0.5001879159826785,
+            0.4416434169979766,
+            0.4356355829513632,
+            0.5159452089574188,
+            0.4804909170488827,
+            0.4819355000508949,
+            0.6136650409898721,
+            0.48685095796827227,
+            0.42350762500427663,
+            0.49572441598866135,
+            0.4972208339604549
+          ],
+          "p50_seconds": 0.4840562909957953,
+          "p95_seconds": 0.5452611585671546,
+          "texts_per_second": 2.065159014469291
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            0.4489888329990208,
+            0.49932954204268754,
+            0.498801541980356,
+            0.45184579194756225,
+            0.509095957968384,
+            0.4952645830344409,
+            0.5014380000066012,
+            0.5094639169983566,
+            0.49733225000090897,
+            0.5330769579741172,
+            0.5008323750225827,
+            0.514083500020206,
+            0.4994292500196025,
+            0.4601549169747159,
+            0.5074279999826103
+          ],
+          "p50_seconds": 0.4994292500196025,
+          "p95_seconds": 0.5197815374063793,
+          "texts_per_second": 2.019776189639433
+        },
+        "candidate": {
+          "latency_seconds": [
+            0.49867025000276044,
+            0.5002140419674106,
+            0.4682142920210026,
+            0.4969066249905154,
+            0.4967381249880418,
+            0.4984684999799356,
+            0.5591162919881754,
+            0.5116524589830078,
+            0.514727458008565,
+            0.4845554159837775,
+            0.5144767919555306,
+            0.5072770840488374,
+            0.5003215839969926,
+            0.494668958010152,
+            0.494408915983513
+          ],
+          "p50_seconds": 0.49867025000276044,
+          "p95_seconds": 0.5280441082024481,
+          "texts_per_second": 1.9892799578542582
+        }
+      },
+      "speedup": 0.9970767255286229,
+      "identical_control_a_over_b": 0.9692189453797434,
+      "control_within_10_percent": true
+    },
+    {
+      "length": 512,
+      "token_ids_sha256": "031df1a1cd7ab3122221a3958a6777f40b5bcc1e288a3c2a8b8145525b7d7494",
+      "max_abs_difference": 0.0,
+      "timings": {
+        "baseline_a": {
+          "latency_seconds": [
+            1.767195625056047,
+            1.777675541001372,
+            1.7703456670278683,
+            1.76231524994364,
+            1.7823798339813948,
+            1.7674080000142567,
+            1.8272287500440143,
+            1.797824916022364,
+            1.6367911249981262,
+            1.8027934169513173,
+            1.7928033750504255,
+            2.064661041018553,
+            1.8002845410373993,
+            1.6877707079984248,
+            1.7896525000105612
+          ],
+          "p50_seconds": 1.7823798339813948,
+          "p95_seconds": 1.8984584373363758,
+          "texts_per_second": 0.5591354661405682
+        },
+        "baseline_b": {
+          "latency_seconds": [
+            1.7586362079600804,
+            1.7709042920032516,
+            2.167524584045168,
+            1.782330165966414,
+            1.7648860409972258,
+            1.7556672079954296,
+            1.7637817080249079,
+            1.799425249977503,
+            1.710073750000447,
+            1.700398041983135,
+            1.7913534169783816,
+            2.010839875030797,
+            2.237021792039741,
+            1.8999827079824172,
+            1.8004402499645948
+          ],
+          "p50_seconds": 1.782330165966414,
+          "p95_seconds": 2.1883737464435398,
+          "texts_per_second": 0.5412570421609124
+        },
+        "candidate": {
+          "latency_seconds": [
+            1.6845940410275944,
+            1.7663154160254635,
+            1.728806208993774,
+            1.6370861670002341,
+            1.6761008749599569,
+            1.6934531669830903,
+            1.7078730830107816,
+            1.7940010409802198,
+            1.6684956660028547,
+            1.735231707978528,
+            1.7866295829880983,
+            1.712616791948676,
+            1.7616189999971539,
+            1.777628916024696,
+            1.8774709159624763
+          ],
+          "p50_seconds": 1.728806208993774,
+          "p95_seconds": 1.8190420034748966,
+          "texts_per_second": 0.576747333583732
+        }
+      },
+      "speedup": 1.0309744323577468,
+      "identical_control_a_over_b": 1.0000278668991465,
+      "control_within_10_percent": true
+    }
+  ],
+  "model": "Qwen3-Embedding-0.6B-4bit-DWQ",
+  "compatibility_id": "metal-inference-qwen3-f32-v1",
+  "experimental_shader_sha256": "cab24dbf61d59a3ed9feee50c38da886691063db8d45cc8d5d04b645a1ba067a",
+  "runtime_before_close": {
+    "shader_sha256": "cab24dbf61d59a3ed9feee50c38da886691063db8d45cc8d5d04b645a1ba067a",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 1173,
+    "allocated_bytes": 383127608,
+    "completed_commands": 216,
+    "gpu_timed_commands": 216,
+    "gpu_seconds": 142.89966283360263,
+    "encode_seconds": 1.3370387060567737,
+    "submit_wait_seconds": 143.09913524473086,
+    "dispatches": {
+      "embedding4": 216,
+      "rms_norm": 24408,
+      "linear4_tiled": 10584,
+      "rope": 12096,
+      "attention": 1512,
+      "add": 12096,
+      "silu_gate": 5040,
+      "pool_project": 216,
+      "linear4_16x32_k64": 29736,
+      "attention_tiled": 3024,
+      "gated4_16x32_k64": 1008,
+      "linear4": 10584,
+      "attention_tail_128": 1512
+    },
+    "active_bytes": 335218496,
+    "cache_bytes": 0,
+    "peak_bytes": 382960964
+  },
+  "runtime_after_close": {
+    "shader_sha256": "cab24dbf61d59a3ed9feee50c38da886691063db8d45cc8d5d04b645a1ba067a",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 1173,
+    "allocated_bytes": 383127608,
+    "completed_commands": 216,
+    "gpu_timed_commands": 216,
+    "gpu_seconds": 142.89966283360263,
+    "encode_seconds": 1.3370387060567737,
+    "submit_wait_seconds": 143.09913524473086,
+    "dispatches": {
+      "embedding4": 216,
+      "rms_norm": 24408,
+      "linear4_tiled": 10584,
+      "rope": 12096,
+      "attention": 1512,
+      "add": 12096,
+      "silu_gate": 5040,
+      "pool_project": 216,
+      "linear4_16x32_k64": 29736,
+      "attention_tiled": 3024,
+      "gated4_16x32_k64": 1008,
+      "linear4": 10584,
+      "attention_tail_128": 1512
+    },
+    "active_bytes": 0,
+    "cache_bytes": 0,
+    "peak_bytes": 382960964
+  }
+}

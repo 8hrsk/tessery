@@ -140,3 +140,30 @@ def test_f32_verified_shapes_and_tail_dispatch(rows, cols, k):
         assert len(calls) == 1
         assert calls[0][0][0] == ("matmul_f32_tiled" if tiled else "matmul_f32")
         assert calls[0][1].get("n", 0) == 0
+
+
+@pytest.mark.parametrize(
+    "rows,cols,k",
+    [(m, 3072, 1024) for m in (7, 16, 48, 127, 128, 129, 256, 511, 512, 513, 4096)]
+    + [(128, n, k) for n, k in ((1024, 1024), (3072, 2048), (3071, 1024))],
+)
+def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
+    calls = []
+    runtime = SimpleNamespace(
+        _dispatch=lambda *a, **kw: calls.append(("dispatch", a, kw)),
+        _linear4=lambda *a, **kw: calls.append(("linear", a, kw)),
+    )
+    buffers = [object() for _ in range(9)]
+    metal.MetalRuntime._gated4(runtime, buffers, rows=rows, cols=cols, k=k)
+    if rows in (128, 512) and (cols, k) == (3072, 1024):
+        assert len(calls) == 1
+        assert calls[0][1] == ("gated4_16x32_k64", buffers[:8])
+        assert calls[0][2] == dict(
+            threads=rows // 16 * (cols // 32) * 256, group_size=256, rows=rows, cols=cols, k=k
+        )
+    else:
+        assert [c[0] for c in calls] == ["linear", "linear", "dispatch"]
+        assert calls[0][1][0] == [*buffers[:4], buffers[7]]
+        assert calls[1][1][0] == [buffers[0], *buffers[4:7], buffers[8]]
+        assert calls[2][1] == ("silu_gate", buffers[7:])
+        assert calls[2][2] == dict(threads=rows * cols, n=rows * cols)

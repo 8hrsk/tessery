@@ -372,6 +372,25 @@ class MetalRuntime:
                 k=k,
             )
 
+    def _gated4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
+        # x, gate weight/scale/bias, up weight/scale/bias, gate output, up scratch.
+        # Only measured full-model shapes use the fused epilogue. Keep the
+        # original complete path for short, ragged and other projection shapes.
+        if rows in (128, 512) and (cols, k) == (3072, 1024):
+            self._dispatch(
+                "gated4_16x32_k64",
+                buffers[:8],
+                threads=(rows // 16) * (cols // 32) * 256,
+                group_size=256,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+            return
+        self._linear4([*buffers[:4], buffers[7]], rows=rows, cols=cols, k=k)
+        self._linear4([buffers[0], *buffers[4:7], buffers[8]], rows=rows, cols=cols, k=k)
+        self._dispatch("silu_gate", [buffers[7], buffers[8]], threads=rows * cols, n=rows * cols)
+
     def _attention(
         self,
         buffers: Sequence[Buffer],

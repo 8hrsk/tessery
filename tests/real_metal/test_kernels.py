@@ -725,3 +725,50 @@ def test_quantized_eight_row_offset_preserves_surrounding_rows(runtime):
     finally:
         for buffer in buffers:
             buffer.close()
+
+
+@pytest.mark.parametrize("rows", [16, 127, 128, 129, 256, 511, 512, 513])
+@pytest.mark.parametrize("cancellation", [False, True])
+def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, cancellation):
+    rng = np.random.default_rng(2401)
+    n, k = 3072, 1024
+    x = (rng.integers(-4, 5, size=(rows, k)) / 8).astype(np.float32)
+    arrays, dense = [], []
+    for _ in range(2):
+        codes = rng.integers(0, 16, size=(n, k), dtype=np.uint32)
+        if cancellation:
+            codes[:, 1::2] = codes[:, ::2]
+            x[:, ::2], x[:, 1::2] = 1.0, -1.0
+        packed = np.bitwise_or.reduce(
+            codes.reshape(n, k // 8, 8) << np.arange(0, 32, 4, dtype=np.uint32), axis=-1
+        )
+        scales = bf16(np.full((n, k // 64), 0.125))
+        biases = bf16(np.full((n, k // 64), -1.0))
+        arrays.extend((packed, scales, biases))
+        dense.append(codes.astype(np.float64) * 0.125 - 1.0)
+    g, u = [x.astype(np.float64) @ weight.T for weight in dense]
+    expected = g / (1 + np.exp(-g)) * u
+    sentinel = np.full((rows + 2, n), np.nan, dtype=np.float32)
+    data = [x, *arrays, sentinel, sentinel]
+    buffers = [runtime.buffer(a.nbytes, a) for a in data]
+    try:
+        before = runtime.diagnostics()["dispatches"]
+        with runtime.command():
+            runtime._gated4(buffers, rows=rows, cols=n, k=k)
+        after = runtime.diagnostics()["dispatches"]
+        assert after.get("gated4_16x32_k64", 0) - before.get("gated4_16x32_k64", 0) == int(
+            rows in (128, 512)
+        )
+        selected = runtime.read(buffers[7], sentinel.shape)
+        assert np.isnan(selected[rows:]).all()
+        np.testing.assert_allclose(selected[:rows], expected, atol=5e-5, rtol=5e-5)
+        with runtime.command():
+            runtime._linear4([*buffers[:4], buffers[7]], rows=rows, cols=n, k=k)
+            runtime._linear4([buffers[0], *buffers[4:7], buffers[8]], rows=rows, cols=n, k=k)
+            runtime._dispatch("silu_gate", buffers[7:], threads=rows * n, n=rows * n)
+        baseline = runtime.read(buffers[7], sentinel.shape)
+        np.testing.assert_array_equal(selected[:rows], baseline[:rows])
+    finally:
+        for buffer in buffers:
+            buffer.close()
+    assert runtime.active_bytes == 0

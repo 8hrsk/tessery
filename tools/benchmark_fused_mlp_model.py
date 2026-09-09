@@ -16,7 +16,7 @@ from tessery import EmbeddingModel
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-dir", required=True)
-    parser.add_argument("--kernel", choices=KERNELS, default="fused_mlp_parallel")
+    parser.add_argument("--kernel", choices=(*KERNELS, "selected"), default="fused_mlp_parallel")
     parser.add_argument("--lengths", type=int, nargs="+", default=[7, 128, 512])
     parser.add_argument("--samples", type=int, default=15)
     parser.add_argument("--reverse-cases", action="store_true")
@@ -66,6 +66,9 @@ def main():
                     for name in rng.permutation(list(timings)):
                         assert selection["pending"] is None and selection["skip"] is None
                         selection["kernel"] = None if name.startswith("baseline") else args.kernel
+                        dispatch_name = (
+                            "gated4_16x32_k64" if args.kernel == "selected" else args.kernel
+                        )
                         before = rt.diagnostics()["dispatches"]
                         started = time.perf_counter()
                         outputs[name] = model.encode(texts)
@@ -73,7 +76,9 @@ def main():
                         assert selection["pending"] is None and selection["skip"] is None
                         after = rt.diagnostics()["dispatches"]
                         expected = 28 if name == "candidate" and length in (128, 512) else 0
-                        assert after.get(args.kernel, 0) - before.get(args.kernel, 0) == expected
+                        assert (
+                            after.get(dispatch_name, 0) - before.get(dispatch_name, 0) == expected
+                        )
                         assert (
                             after.get("silu_gate", 0) - before.get("silu_gate", 0) == 28 - expected
                         )

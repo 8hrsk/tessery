@@ -54,6 +54,30 @@ def install_model_route(model):
     All non-aligned shapes retain the original complete path.
     """
     rt = model._backend.runtime
+    if hasattr(rt, "_gated4"):
+        selected = rt._gated4
+        state = {"kernel": None, "pending": None, "skip": None}
+
+        def gated(buffers, **kw):
+            kernel = state["kernel"]
+            if kernel == "selected":
+                return selected(buffers, **kw)
+            if (
+                kernel is not None
+                and kw["rows"] >= 16
+                and kw["rows"] % 16 == 0
+                and (kw["cols"], kw["k"]) == (3072, 1024)
+            ):
+                return fused(rt, kernel, buffers[:8], **kw)
+            rt._linear4([*buffers[:4], buffers[7]], **kw)
+            rt._linear4([buffers[0], *buffers[4:7], buffers[8]], **kw)
+            rt._dispatch(
+                "silu_gate", buffers[7:], threads=kw["rows"] * kw["cols"], n=kw["rows"] * kw["cols"]
+            )
+            return None
+
+        rt._gated4 = gated
+        return state
     original_linear, original_dispatch = rt._linear4, rt._dispatch
     weights = model._backend.weights
     pairs = {
