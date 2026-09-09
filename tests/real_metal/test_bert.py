@@ -154,3 +154,11 @@ def test_chunked_kernel_covers_all_six_projections_per_layer(model):
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
     model.encode([" token" * 126])
     assert runtime.diagnostics()["dispatches"][kernel] - before == 6 * model._backend.layers
+
+
+def test_unaligned_attention_uses_bounded_tile_per_layer(model):
+    runtime = model._backend.runtime
+    kernel = "attention_tail_32"
+    before = runtime.diagnostics()["dispatches"].get(kernel, 0)
+    model.encode([" token" * 127])
+    assert runtime.diagnostics()["dispatches"][kernel] - before == model._backend.layers

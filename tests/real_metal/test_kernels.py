@@ -159,7 +159,22 @@ def test_attention_against_independent_numpy(runtime):
 
 @pytest.mark.parametrize("dim", [32, 128])
 @pytest.mark.parametrize("bidirectional", [False, True])
-@pytest.mark.parametrize("seq,length_pair", [(64, (1, 33)), (128, (31, 32)), (512, (511, 512))])
+@pytest.mark.parametrize(
+    "seq,length_pair",
+    [
+        (64, (1, 33)),
+        (65, (1, 65)),
+        (71, (33, 71)),
+        (95, (65, 95)),
+        (127, (1, 127)),
+        (128, (31, 32)),
+        (129, (65, 129)),
+        (136, (129, 136)),
+        (255, (254, 255)),
+        (511, (1, 511)),
+        (512, (511, 512)),
+    ],
+)
 def test_tiled_attention_ragged_f64(runtime, dim, bidirectional, seq, length_pair):
     rng = np.random.default_rng(393)
     heads, kv = 4, 2
@@ -168,10 +183,10 @@ def test_tiled_attention_ragged_f64(runtime, dim, bidirectional, seq, length_pai
     lengths = np.array(length_pair, np.uint32)
     result = run(
         runtime,
-        "attention_tiled",
+        f"attention_tail_{dim}" if seq % 32 else "attention_tiled",
         [q, k, v, lengths],
         q.shape,
-        threads=2 * (seq // 8) * heads * 128,
+        threads=2 * ((seq + 7) // 8) * heads * 128,
         group_size=128,
         seq=seq,
         heads=heads,
@@ -197,9 +212,10 @@ def test_tiled_attention_ragged_f64(runtime, dim, bidirectional, seq, length_pai
 
 @pytest.mark.parametrize("bidirectional", [False, True])
 @pytest.mark.parametrize("pattern", ["alternating", "later_maximum", "uniform"])
-def test_tiled_attention_extreme_logits_and_masked_blocks(runtime, bidirectional, pattern):
+@pytest.mark.parametrize("seq", [65, 128, 129, 511])
+def test_tiled_attention_extreme_logits_and_masked_blocks(runtime, bidirectional, pattern, seq):
     rng = np.random.default_rng(718)
-    seq, heads, dim = 128, 2, 128
+    heads, dim = 2, 128
     q = np.full((1, seq, heads, dim), 10, np.float32)
     k = q.copy()
     k[:, 1::2] *= -1  # Logits near +/-1131: a naive exp would overflow.
@@ -214,10 +230,10 @@ def test_tiled_attention_extreme_logits_and_masked_blocks(runtime, bidirectional
     v[:, length:] = 1e10  # Entire later blocks are masked, including padded queries.
     result = run(
         runtime,
-        "attention_tiled",
+        f"attention_tail_{dim}" if seq % 32 else "attention_tiled",
         [q, k, v, lengths],
         q.shape,
-        threads=(seq // 8) * heads * 128,
+        threads=((seq + 7) // 8) * heads * 128,
         group_size=128,
         seq=seq,
         heads=heads,

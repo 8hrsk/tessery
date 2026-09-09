@@ -377,6 +377,20 @@ class MetalRuntime:
         dim: int,
         bidirectional: int = 0,
     ) -> None:
+        if 64 <= seq <= 512 and seq % 32 and dim in (32, 128):
+            self._dispatch(
+                f"attention_tail_{dim}",
+                buffers,
+                threads=(tokens // seq) * ((seq + 7) // 8) * heads * 128,
+                group_size=128,
+                seq=seq,
+                heads=heads,
+                kv_heads=kv_heads,
+                dim=dim,
+                scale=dim**-0.5,
+                bidirectional=bidirectional,
+            )
+            return
         tiled = seq >= 64 and seq % 32 == 0 and dim in (32, 128)
         self._dispatch(
             "attention_tiled" if tiled else "attention",

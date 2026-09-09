@@ -231,3 +231,6 @@ an existing development interpreter. Repeat both comparisons with
 `--engine-order mlx-first` and different output paths. Case-order seed is 94;
 reports require new paths and are checkpointed atomically. The library itself
 continues to depend only on its pinned NumPy and regex packages.
+
+The first follow-up, bounded attention query/key tails, is implemented and
+measured in the [attention-tail report](ATTENTION_TAILS.md).

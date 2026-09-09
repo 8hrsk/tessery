@@ -47,6 +47,11 @@ def test_quantized_large_tile_dispatch_guard(rows, cols, k, selected):
         (512, 128, True),
         (128, 64, False),
         (128, 256, False),
+        (65, 32, False),
+        (71, 128, False),
+        (136, 32, False),
+        (513, 32, False),
+        (1024, 128, True),
     ],
 )
 def test_attention_dispatch_verified_shape_guard(seq, dim, tiled):
@@ -56,9 +61,17 @@ def test_attention_dispatch_verified_shape_guard(seq, dim, tiled):
         runtime, [], tokens=2 * seq, seq=seq, heads=4, kv_heads=2, dim=dim
     )
     args, kwargs = calls[0]
-    assert args[0] == ("attention_tiled" if tiled else "attention")
-    assert kwargs["group_size"] == (128 if tiled else 32)
-    assert kwargs["threads"] == (2 * seq // 8 * 4 * 128 if tiled else 2 * seq * 4 * 32)
+    tail = 64 <= seq <= 512 and seq % 32 and dim in (32, 128)
+    assert args[0] == (
+        f"attention_tail_{dim}" if tail else "attention_tiled" if tiled else "attention"
+    )
+    assert kwargs["group_size"] == (128 if tiled or tail else 32)
+    expected_threads = (
+        2 * ((seq + 7) // 8) * 4 * 128
+        if tail
+        else (2 * seq // 8 * 4 * 128 if tiled else 2 * seq * 4 * 32)
+    )
+    assert kwargs["threads"] == expected_threads
 
 
 @pytest.mark.parametrize("changed_during_load", [False, True])

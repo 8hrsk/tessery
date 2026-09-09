@@ -55,6 +55,8 @@ specification is preserved as historical input.
   accuracy gates; see [F32 projection results](F32_PROJECTIONS.md).
 * Execution-aware GPU profiling and isolated Qwen/BGE MLX baselines checked
   in both engine orders; see [updated comparison and priorities](PERFORMANCE_REFRESH.md).
+* Bounded attention query/key tails for unaligned widths in the verified
+  Qwen/BGE head layouts; see [tail measurements](ATTENTION_TAILS.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

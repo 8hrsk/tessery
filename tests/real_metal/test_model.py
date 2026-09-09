@@ -109,3 +109,11 @@ def test_workspace_reuses_scratch_but_refreshes_inputs(model):
     assert model.memory_stats().cache_bytes == 0
     assert model.memory_stats().active_bytes == 335218496
     np.testing.assert_array_equal(model.encode(texts), expected)
+
+
+def test_unaligned_attention_uses_bounded_tile_per_layer(model):
+    runtime = model._backend.runtime
+    kernel = "attention_tail_128"
+    before = runtime.diagnostics()["dispatches"].get(kernel, 0)
+    model.encode([" token" * 128])
+    assert runtime.diagnostics()["dispatches"][kernel] - before == model._backend.layers

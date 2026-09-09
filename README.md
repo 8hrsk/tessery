@@ -133,6 +133,7 @@ New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
 [larger quantized projection tiles](docs/QUANTIZED_TILES.md),
 [BGE F32 projection tiles](docs/F32_PROJECTIONS.md),
 [updated profiles and MLX comparison](docs/PERFORMANCE_REFRESH.md),
+[bounded attention tails](docs/ATTENTION_TAILS.md),
 [GPU profiling, varied stress and isolated comparisons](docs/PROFILING_AND_STRESS.md),
 [Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 

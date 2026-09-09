@@ -169,6 +169,134 @@ kernel void attention_tiled(device const float *q [[buffer(0)]],
             state[i]/denominators[i/p.dim];
 }
 
+// Bounded query/key tails for unaligned sequence widths. Same F32 arithmetic
+// as attention_tiled; 7264/13408 declared shared bytes for D=32/128, independent of sequence size.
+// Full physical key blocks use direct loads; the boundary block is zero-filled.
+template <uint D>
+inline void attention_tail_impl(device const float *q,
+                            device const float *k,
+                            device const float *v,
+                            device const uint *lengths,
+                            device float *out, constant Params &p,
+                            uint tile,
+                            uint tid,
+                            uint lane,
+                            uint sg, threadgroup float *scores, threadgroup float *state,
+                            threadgroup float *partial, threadgroup float *boundary,
+                            threadgroup float *maxima, threadgroup float *denominators,
+                            threadgroup float *corrections) {
+    uint head = tile % p.heads, block = tile / p.heads;
+    uint blocks = (p.seq+7)/8;
+    uint batch = block / blocks, position = (block % blocks)*8;
+    bool query_tail = position+8 > p.seq;
+    uint kvhead = head / (p.heads/p.kv_heads);
+    for (uint i = tid; i < 8*D; i += 128) state[i] = 0.0f;
+    if (tid < 8) { maxima[tid] = -INFINITY; denominators[tid] = 0.0f; }
+    uint end = p.u0 ? lengths[batch] : min(position+8, lengths[batch]);
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    for (uint base = 0; base < end; base += 32) {
+        bool key_tail = base+32 > p.seq;
+        // partial is free until the value product. Reuse it for bounded queries.
+        if (query_tail) {
+            for (uint i = tid; i < 8*D; i += 128)
+                partial[i] = position+i/D < p.seq
+                    ? q[((batch*p.seq+position+i/D)*p.heads+head)*D+i%D] : 0.0f;
+        }
+        if (query_tail) threadgroup_barrier(mem_flags::mem_threadgroup);
+        simdgroup_float8x8 product(0.0f), left, right;
+        for (uint c = 0; c < D; c += 8) {
+            if (key_tail && c%32 == 0) {
+                // Reuse a 32-feature strip instead of staging the whole head.
+                threadgroup_barrier(mem_flags::mem_threadgroup);
+                for (uint i = tid; i < 32*32; i += 128)
+                    boundary[i] = base+i/32 < p.seq
+                        ? k[((batch*p.seq+base+i/32)*p.kv_heads+kvhead)*D+c+i%32] : 0.0f;
+                threadgroup_barrier(mem_flags::mem_threadgroup);
+            }
+            if (query_tail) simdgroup_load(left, partial+c, D);
+            else simdgroup_load(left, q+((batch*p.seq+position)*p.heads+head)*D+c,
+                           p.heads*D);
+            if (key_tail) simdgroup_load(right, boundary+sg*8*32+c%32, 32, ulong2(0), true);
+            else simdgroup_load(right, k+((batch*p.seq+base+sg*8)*p.kv_heads+kvhead)*D+c,
+                           p.kv_heads*D, ulong2(0), true);
+            simdgroup_multiply_accumulate(product, left, right, product);
+        }
+        simdgroup_store(product, scores+sg*8, 32);
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint row = sg; row < 8; row += 4) {
+            uint limit = p.u0 ? lengths[batch] : min(position+row+1, lengths[batch]);
+            float score = base+lane < limit ? scores[row*32+lane]*p.scale : -INFINITY;
+            float maximum = max(maxima[row], simd_max(score));
+            float correction = exp(maxima[row]-maximum);
+            float probability = exp(score-maximum);
+            float denominator = denominators[row]*correction+simd_sum(probability);
+            scores[row*32+lane] = probability;
+            if (lane == 0) {
+                maxima[row] = maximum;
+                denominators[row] = denominator;
+                corrections[row] = correction;
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint strip = 0; strip < D; strip += 32) {
+            uint c = strip+sg*8;
+            if (key_tail) {
+                for (uint i = tid; i < 32*32; i += 128)
+                    boundary[i] = base+i/32 < p.seq
+                        ? v[((batch*p.seq+base+i/32)*p.kv_heads+kvhead)*D+strip+i%32] : 0.0f;
+                threadgroup_barrier(mem_flags::mem_threadgroup);
+            }
+            simdgroup_float8x8 value(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, scores+j, 32);
+                if (key_tail) simdgroup_load(right, boundary+j*32+sg*8, 32);
+                else simdgroup_load(right, v+((batch*p.seq+base+j)*p.kv_heads+kvhead)*D+c,
+                               p.kv_heads*D);
+                simdgroup_multiply_accumulate(value, left, right, value);
+            }
+            simdgroup_store(value, partial+c, D);
+            if (key_tail) threadgroup_barrier(mem_flags::mem_threadgroup);
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint i = tid; i < 8*D; i += 128)
+            state[i] = state[i]*corrections[i/D]+partial[i];
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    for (uint i = tid; i < 8*D; i += 128)
+        if (position+i/D < p.seq) out[((batch*p.seq+position+i/D)*p.heads+head)*D+i%D] =
+            state[i]/denominators[i/D];
+}
+
+kernel void attention_tail_32(device const float *q [[buffer(0)]],
+                                device const float *k [[buffer(1)]],
+                                device const float *v [[buffer(2)]],
+                                device const uint *lengths [[buffer(3)]],
+                                device float *out [[buffer(4)]], constant Params &p [[buffer(8)]],
+                                uint tile [[threadgroup_position_in_grid]],
+                                uint tid [[thread_index_in_threadgroup]],
+                                uint lane [[thread_index_in_simdgroup]],
+                                uint sg [[simdgroup_index_in_threadgroup]]) {
+    threadgroup float scores[8*32], state[8*32], partial[8*32], boundary[32*32];
+    threadgroup float maxima[8], denominators[8], corrections[8];
+    attention_tail_impl<32>(q, k, v, lengths, out, p, tile, tid, lane, sg,
+                              scores, state, partial, boundary, maxima, denominators, corrections);
+}
+
+kernel void attention_tail_128(device const float *q [[buffer(0)]],
+                                device const float *k [[buffer(1)]],
+                                device const float *v [[buffer(2)]],
+                                device const uint *lengths [[buffer(3)]],
+                                device float *out [[buffer(4)]], constant Params &p [[buffer(8)]],
+                                uint tile [[threadgroup_position_in_grid]],
+                                uint tid [[thread_index_in_threadgroup]],
+                                uint lane [[thread_index_in_simdgroup]],
+                                uint sg [[simdgroup_index_in_threadgroup]]) {
+    threadgroup float scores[8*32], state[8*128], partial[8*128], boundary[32*32];
+    threadgroup float maxima[8], denominators[8], corrections[8];
+    attention_tail_impl<128>(q, k, v, lengths, out, p, tile, tid, lane, sg,
+                              scores, state, partial, boundary, maxima, denominators, corrections);
+}
+
 kernel void add(device const float *a [[buffer(0)]], device const float *b [[buffer(1)]],
                 device float *out [[buffer(2)]], constant Params &p [[buffer(8)]],
                 uint i [[thread_position_in_grid]]) {

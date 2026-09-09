@@ -136,3 +136,7 @@ correctness and performance study. These are hypotheses, not measured speedups.
 Follow-up: bounded alignment-aware padding is now implemented and measured in
 [the execution padding report](ALIGNED_BATCHING.md). The other items remain
 future work.
+
+The original aligned kernel remains in use. A subsequent
+[bounded-tail implementation](ATTENTION_TAILS.md) covers verified unaligned
+sequence widths without changing the execution padding policy.
