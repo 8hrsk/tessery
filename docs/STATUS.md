@@ -47,6 +47,8 @@ specification is preserved as historical input.
 * Bounded F32 tiled attention for verified long aligned shapes, with scalar
   fallback and stable cosine handling for extreme finite vectors;
   see [attention results](TILED_ATTENTION.md).
+* Bounded execution padding to measured matrix/attention tile shapes while
+  preserving logical token lengths; see [alignment results](ALIGNED_BATCHING.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

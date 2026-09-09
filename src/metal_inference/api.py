@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .backend import Backend, Tokenizer
-from .batching import length_batches
+from .batching import execution_batches
 from .bert import BertBackend
 from .errors import (
     CanceledError,
@@ -214,11 +214,21 @@ class EmbeddingModel:
                 )
                 result = np.empty((len(texts), dimensions), dtype=np.float32)
                 # Limit temporary GPU memory independently of caller batch size.
-                for rows, width in length_batches(lengths, self._backend.max_padded_tokens):
+                for rows, width in execution_batches(
+                    lengths,
+                    self._backend.max_padded_tokens,
+                    self.max_length,
+                    self.descriptor.architecture,
+                ):
                     if canceled.is_set():
                         raise CanceledError()
+                    batch_ids = np.ascontiguousarray(ids[rows, :width])
+                    if width > ids.shape[1]:
+                        padded = np.full((len(rows), width), self._tokenizer.pad_id, np.uint32)
+                        padded[:, : ids.shape[1]] = batch_ids
+                        batch_ids = padded
                     result[rows] = self._backend.forward(
-                        np.ascontiguousarray(ids[rows, :width]),
+                        batch_ids,
                         lengths[rows],
                         dimensions=dimensions,
                     )

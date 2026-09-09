@@ -13,6 +13,7 @@ from .metal import MetalRuntime
 
 class Tokenizer(Protocol):
     vocab_size: int
+    pad_id: int
 
     def batch(
         self, texts: list[str], *, max_length: int, canceled: CancelCheck = None

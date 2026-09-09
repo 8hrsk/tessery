@@ -132,3 +132,7 @@ inputs, full F32 tiles plus a bounded tail for BGE, larger quantized projection
 tiles, and fusion where measurements show dispatch overhead. Last-layer
 specialization to compute only the pooled query is promising but needs its own
 correctness and performance study. These are hypotheses, not measured speedups.
+
+Follow-up: bounded alignment-aware padding is now implemented and measured in
+[the execution padding report](ALIGNED_BATCHING.md). The other items remain
+future work.

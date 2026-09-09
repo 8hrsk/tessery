@@ -64,7 +64,9 @@ def main():
         reference = forward("global_padding")
         actual = forward("buckets")
         np.testing.assert_allclose(actual, reference, atol=5e-6, rtol=1e-4)
-        np.testing.assert_array_equal(model.encode(texts), actual)
+        # The public API may additionally align execution width for matrix and
+        # attention tiles while retaining these exact logical token lengths.
+        np.testing.assert_allclose(model.encode(texts), actual, atol=5e-6, rtol=1e-4)
         samples = {key: [] for key in ("global_padding", "buckets")}
         rng = np.random.default_rng(37)
         for _ in range(3):

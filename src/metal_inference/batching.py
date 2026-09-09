@@ -29,3 +29,30 @@ def length_batches(
             end += 1
         yield order[start:end], width
         start = end
+
+
+def execution_batches(
+    lengths: NDArray[np.uint32], max_padded_tokens: int, max_length: int, architecture: str
+) -> Iterator[tuple[NDArray[np.intp], int]]:
+    """Select measured matrix/attention alignment without changing token lengths.
+
+    Eight-row projection tiles use batch * width rows. Do not pad an already
+    aligned matrix unless the new width also enables tiled attention. Qwen's
+    small projection tail becomes negligible at longer lengths, so only align
+    those when the next eight-token boundary is also an attention boundary.
+    Keep the original plan when any padding, context or token budget is exceeded.
+    """
+    for rows, width in length_batches(lengths, max_padded_tokens):
+        aligned = (width + 7) // 8 * 8
+        attention = aligned >= 64 and aligned % 32 == 0
+        projection = width * len(rows) % 8 != 0 and (architecture == "bert_f32" or width < 128)
+        if (
+            architecture in {"qwen3_uint4", "bert_f32"}
+            and width >= 5
+            and (attention or projection)
+            and aligned <= max_length
+            and aligned <= 2 * int(lengths[rows].min())
+            and aligned * len(rows) <= max_padded_tokens
+        ):
+            width = aligned
+        yield rows, width

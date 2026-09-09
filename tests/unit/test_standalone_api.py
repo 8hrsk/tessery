@@ -211,6 +211,37 @@ def test_length_buckets_restore_original_output_order(model):
     assert shapes == [(3, 3), (2, 8)]
 
 
+@pytest.mark.parametrize(
+    "limit, budget, expected_width", [(512, 4096, 8), (7, 4096, 7), (512, 7, 7)]
+)
+def test_execution_padding_keeps_real_lengths_and_uses_tokenizer_pad_id(
+    model, limit, budget, expected_width
+):
+    class PaddingTokenizer:
+        pad_id = 99
+
+        def batch(self, texts, *, max_length, canceled=None):
+            assert max_length == limit
+            return np.array([[3, 4, 5, 6, 7, 8, 9]], np.uint32), np.array([7], np.uint32)
+
+    model._tokenizer = PaddingTokenizer()
+    model.max_length = limit
+    model._backend.max_padded_tokens = budget
+    original = model._backend.forward
+
+    def forward(ids, lengths, **kw):
+        assert ids.shape == (1, expected_width)
+        assert ids.dtype == np.uint32 and ids.flags.c_contiguous
+        assert lengths.tolist() == [7]
+        assert ids[0, :7].tolist() == [3, 4, 5, 6, 7, 8, 9]
+        if expected_width == 8:
+            assert ids[0, 7] == 99
+        return original(ids, lengths, **kw)
+
+    model._backend.forward = forward
+    assert model.encode(["3"]).argmax(axis=1).tolist() == [3]
+
+
 def test_sync_does_not_bypass_admitted_async(monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
 
