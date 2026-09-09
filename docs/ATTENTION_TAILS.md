@@ -160,7 +160,6 @@ METAL_INFERENCE_TEST=1 .venv/bin/python -m pytest --cov
   --output artifacts/bge-attention-tails-new.json
 ```
 
-Use existing verified local model paths and fresh output paths. The next
-projection target is mixed 16-row/eight-row dispatch for Qwen: keep the faster
-large tile for complete regions and handle only the remainder with smaller
-kernels, with unchanged numerical gates and same-input API timing controls.
+Use existing verified local model paths and fresh output paths. The following
+phase implements [mixed 16-row/eight-row Qwen projections](MIXED_QUANTIZED_TILES.md),
+with unchanged numerical gates and same-input API timing controls.

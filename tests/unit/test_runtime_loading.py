@@ -10,10 +10,10 @@ from metal_inference.errors import NativeBuildError
     "rows,cols,k,selected",
     [
         (m, n, k, True)
-        for m in (16, 32, 128, 4096)
+        for m in (16, 17, 23, 24, 25, 31, 32, 33, 40, 129, 264, 4095, 4096)
         for n, k in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))
     ]
-    + [(m, 1024, 1024, False) for m in (1, 4, 7, 8, 15, 17, 24, 31, 33, 264)]
+    + [(m, 1024, 1024, False) for m in (1, 4, 7, 8, 15)]
     + [
         (16, n, k, False)
         for n, k in ((64, 1024), (1025, 1024), (1024, 64), (1024, 1023), (4096, 1024))
@@ -25,9 +25,19 @@ def test_quantized_large_tile_dispatch_guard(rows, cols, k, selected):
     metal.MetalRuntime._linear4(runtime, [], rows=rows, cols=cols, k=k)
     assert (calls[0][0][0] == "linear4_16x32_k64") == selected
     if selected:
-        assert len(calls) == 1
+        assert len(calls) == 1 + bool(rows % 16 >= 8) + bool(rows % 8)
         assert calls[0][1] == dict(
             threads=(rows // 16) * (cols // 32) * 256, group_size=256, rows=rows, cols=cols, k=k
+        )
+        regions = [(0, rows // 16 * 16)]
+        for args, kwargs in calls[1:]:
+            start = kwargs["n"]
+            end = start + 8 if args[0] == "linear4_tiled" else rows
+            regions.append((start, end))
+            assert kwargs["threads"] == ((cols // 32) * 128 if args[0] != "linear4" else cols * 32)
+        assert regions[0][0] == 0 and regions[-1][1] == rows
+        assert all(
+            left[1] == right[0] for left, right in zip(regions[:-1], regions[1:], strict=True)
         )
     else:
         assert all(args[0] in {"linear4_tiled", "linear4_tail", "linear4"} for args, _ in calls)

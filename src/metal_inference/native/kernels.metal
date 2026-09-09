@@ -445,7 +445,7 @@ kernel void linear4_tiled(device const float *x [[buffer(0)]],
                           uint tile [[threadgroup_position_in_grid]],
                           uint tid [[thread_index_in_threadgroup]],
                           uint sg [[simdgroup_index_in_threadgroup]]) {
-    uint row = (tile / (p.cols/32))*8, channel = (tile % (p.cols/32))*32;
+    uint row = p.n + (tile / (p.cols/32))*8, channel = (tile % (p.cols/32))*32;
     threadgroup float weights[32*32];
     simdgroup_float8x8 accum(0.0f), left, right;
     for (uint base = 0; base < p.k; base += 32) {

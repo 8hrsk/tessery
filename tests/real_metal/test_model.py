@@ -88,11 +88,12 @@ def test_boundaries_and_batch32(model):
     np.testing.assert_allclose(vectors, np.repeat(vectors[:1], 32, axis=0), atol=1e-6)
 
 
-def test_large_tile_covers_all_seven_projections_per_layer(model):
+@pytest.mark.parametrize("tokens", [17, 33, 128, 129])
+def test_large_tile_covers_all_seven_projections_per_layer(model, tokens):
     runtime = model._backend.runtime
     kernel = "linear4_16x32_k64"
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
-    model.encode([" token" * 127])
+    model.encode([" token" * (tokens - 1)])
     after = runtime.diagnostics()["dispatches"][kernel]
     assert after - before == 7 * model._backend.layers
 

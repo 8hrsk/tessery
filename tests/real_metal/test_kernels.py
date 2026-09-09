@@ -643,3 +643,85 @@ def test_f32_scalar_tail_does_not_touch_complete_rows(runtime):
     finally:
         for buffer in buffers:
             buffer.close()
+
+
+@pytest.mark.parametrize(
+    "m,cancellation",
+    [(m, False) for m in list(range(17, 32)) + [40, 129, 257, 4095]] + [(31, True), (129, True)],
+)
+@pytest.mark.parametrize(
+    "n,k", [(1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072)]
+)
+def test_mixed_quantized_tiles_match_previous_and_f64(runtime, m, n, k, cancellation):
+    rng = np.random.default_rng(481 + m)
+    x = rng.normal(size=(m, k)).astype(np.float32)
+    codes = rng.integers(0, 16, size=(n, k), dtype=np.uint32)
+    if cancellation:
+        x[:, 1::2] = -x[:, ::2]
+        codes[:, 1::2] = codes[:, ::2]
+    packed = np.bitwise_or.reduce(
+        codes.reshape(n, k // 8, 8) << np.arange(0, 32, 4, dtype=np.uint32), axis=-1
+    )
+    scales = bf16(rng.uniform(0.01, 0.2, size=(n, k // 64)))
+    biases = bf16(rng.uniform(-1, 0.1, size=scales.shape))
+    weights = codes.astype(np.float32) * (scales.astype(np.uint32) << 16).view(np.float32).repeat(
+        64, axis=1
+    )
+    weights += (biases.astype(np.uint32) << 16).view(np.float32).repeat(64, axis=1)
+    expected = x.astype(np.float64) @ weights.astype(np.float64).T
+    arrays = [x, packed, scales, biases, np.full((m, n), np.nan, np.float32)]
+    buffers = [runtime.buffer(a.nbytes, a) for a in arrays]
+    try:
+        with runtime.command():
+            runtime._linear4(buffers, rows=m, cols=n, k=k)
+        actual = runtime.read(buffers[-1], (m, n))
+        np.testing.assert_allclose(actual, expected, atol=5e-5, rtol=5e-5)
+        with runtime.command():
+            runtime._dispatch(
+                "linear4_tiled",
+                buffers,
+                threads=(m // 8) * (n // 32) * 128,
+                group_size=128,
+                rows=m,
+                cols=n,
+                k=k,
+            )
+            if m % 8:
+                small = m % 8 <= 4
+                runtime._dispatch(
+                    "linear4" if small else "linear4_tail",
+                    buffers,
+                    threads=n * 32 if small else (n // 32) * 128,
+                    group_size=32 if small else 128,
+                    n=m // 8 * 8,
+                    rows=m,
+                    cols=n,
+                    k=k,
+                )
+        np.testing.assert_array_equal(actual, runtime.read(buffers[-1], (m, n)))
+    finally:
+        for buffer in buffers:
+            buffer.close()
+
+
+def test_quantized_eight_row_offset_preserves_surrounding_rows(runtime):
+    m, n, k = 32, 32, 64
+    inputs = [
+        np.ones((m, k), np.float32),
+        np.full((n, k // 8), 0x11111111, np.uint32),
+        bf16(np.ones((n, 1))),
+        bf16(np.zeros((n, 1))),
+        np.full((m, n), np.nan, np.float32),
+    ]
+    buffers = [runtime.buffer(a.nbytes, a) for a in inputs]
+    try:
+        with runtime.command():
+            runtime._dispatch(
+                "linear4_tiled", buffers, threads=128, group_size=128, n=16, rows=m, cols=n, k=k
+            )
+        out = runtime.read(buffers[-1], (m, n))
+        assert np.isnan(out[:16]).all() and np.isnan(out[24:]).all()
+        np.testing.assert_array_equal(out[16:24], 64)
+    finally:
+        for buffer in buffers:
+            buffer.close()

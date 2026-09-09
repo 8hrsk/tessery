@@ -313,12 +313,15 @@ class MetalRuntime:
                 self._profile_command.clear()
 
     def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
-        # Measured Qwen projection shapes; incomplete 16-row tiles and other
-        # projection shapes retain the full-tile / small-tail dispatch below.
-        if (
-            rows >= 16
-            and rows % 16 == 0
-            and (cols, k) in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))
+        # Partition verified Qwen shapes into full 16-row tiles, then at most
+        # one eight-row tile and one bounded tail. Regions never overlap.
+        start = 0
+        if rows >= 16 and (cols, k) in (
+            (1024, 1024),
+            (2048, 1024),
+            (3072, 1024),
+            (1024, 2048),
+            (1024, 3072),
         ):
             self._dispatch(
                 "linear4_16x32_k64",
@@ -329,15 +332,18 @@ class MetalRuntime:
                 cols=cols,
                 k=k,
             )
-            return
+            start = (rows // 16) * 16
+            if start == rows:
+                return
         if rows >= 5 and cols % 32 == 0 and k % 64 == 0:
-            complete = rows // 8
+            complete = (rows - start) // 8
             if complete:
                 self._dispatch(
                     "linear4_tiled",
                     buffers,
                     threads=complete * (cols // 32) * 128,
                     group_size=128,
+                    n=start,
                     rows=rows,
                     cols=cols,
                     k=k,
@@ -350,7 +356,7 @@ class MetalRuntime:
                     buffers,
                     threads=cols * 32 if small else (cols // 32) * 128,
                     group_size=32 if small else 128,
-                    n=complete * 8,
+                    n=start + complete * 8,
                     rows=rows,
                     cols=cols,
                     k=k,

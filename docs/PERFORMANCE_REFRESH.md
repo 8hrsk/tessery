@@ -155,6 +155,10 @@ Reports: [Tessery first](../benchmarks/native-metal/refresh-20260909/bge-tessery
 
 ## Priorities supported by these measurements
 
+Follow-up status: priorities 1 and 2 are now implemented and validated in
+[attention tails](ATTENTION_TAILS.md) and [mixed projections](MIXED_QUANTIZED_TILES.md).
+The ranking below records the evidence at the time of this refresh.
+
 1. **Handle incomplete attention tiles.** Qwen width 129 and BGE width 136
    fall back to scalar attention. Support bounded query/key tails in the
    existing tiled algorithm, with masked loads and stores, while preserving

@@ -1,5 +1,9 @@
 # Larger uint4 projection tiles
 
+This records the initial aligned-row optimization. The later
+[mixed tile phase](MIXED_QUANTIZED_TILES.md) extends dispatch to incomplete
+16-row inputs; the measurements below retain their original scope.
+
 Tessery's selected Qwen projection kernel uses a **16-row by 32-channel**
 output tile, eight SIMD groups (256 threads), and **8 KiB of threadgroup
 memory** for 32-by-64 decoded weights. It reuses each decoded weight across
@@ -27,7 +31,7 @@ the cancellation fixture and 4096-row resource boundary.
 These cover all seven projections in each current Qwen3 0.6B layer, including
 the attention output projection with 2048 input channels. Other shapes retain the
 existing eight-row tiles and small-tail handling. In particular, eight-row
-inputs and batches with 264 projection rows keep the previous path. No model
+inputs and batches with 264 projection rows kept the previous path in this phase. No model
 profile, tokenizer, padding rule, embedding contract or Python API changed.
 BGE's float32 projection path does not use the new kernel.
 

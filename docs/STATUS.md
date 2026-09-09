@@ -57,6 +57,8 @@ specification is preserved as historical input.
   in both engine orders; see [updated comparison and priorities](PERFORMANCE_REFRESH.md).
 * Bounded attention query/key tails for unaligned widths in the verified
   Qwen/BGE head layouts; see [tail measurements](ATTENTION_TAILS.md).
+* Mixed 16-row/eight-row Qwen projection dispatch with bounded tails and exact
+  before/after vectors; see [mixed tile measurements](MIXED_QUANTIZED_TILES.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 
