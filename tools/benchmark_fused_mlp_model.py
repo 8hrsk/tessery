@@ -10,7 +10,7 @@ import numpy as np
 from diagnose_metal import save_json, source_hashes, summarize
 from fused_mlp_experiment import KERNELS, experimental_runtime, hashes, install_model_route
 
-from tessery import EmbeddingModel
+from tessery import EmbeddingModel, MetalRuntime
 
 
 def main():
@@ -22,8 +22,8 @@ def main():
     parser.add_argument("--reverse-cases", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    if not 3 <= args.samples <= 100 or any(n not in (7, 128, 129, 512) for n in args.lengths):
-        parser.error("samples 3..100; lengths from 7,128,129,512")
+    if not 3 <= args.samples <= 100 or any(n not in (7, 128, 129, 256, 512) for n in args.lengths):
+        parser.error("samples 3..100; lengths from 7,128,129,256,512")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x") as stream:
         stream.write('{"status":"starting"}\n')
@@ -43,14 +43,20 @@ def main():
         "results": [],
     }
     try:
-        with patch("metal_inference.qwen3.MetalRuntime", experimental_runtime):
+        with patch(
+            "metal_inference.qwen3.MetalRuntime",
+            MetalRuntime if args.kernel == "selected" else experimental_runtime,
+        ):
             model = EmbeddingModel.load(args.model_dir)
         with model:
             rt = model._backend.runtime
             selection = install_model_route(model)
             payload["model"] = model.descriptor.model_id
             payload["compatibility_id"] = model.descriptor.compatibility_id
-            payload["experimental_shader_sha256"] = rt.diagnostics()["shader_sha256"]
+            payload["runtime_shader_sha256"] = rt.diagnostics()["shader_sha256"]
+            payload["runtime_library"] = (
+                "production" if args.kernel == "selected" else "production_plus_candidate_shaders"
+            )
             cases = list(args.lengths)
             if args.reverse_cases:
                 cases.reverse()
@@ -75,7 +81,10 @@ def main():
                         elapsed = time.perf_counter() - started
                         assert selection["pending"] is None and selection["skip"] is None
                         after = rt.diagnostics()["dispatches"]
-                        expected = 28 if name == "candidate" and length in (128, 512) else 0
+                        # These singleton cases have the listed execution heights.
+                        # Experimental fused kernels support complete 16-row tiles.
+                        expected_rows = (128, 512) if args.kernel == "selected" else (128, 256, 512)
+                        expected = 28 if name == "candidate" and length in expected_rows else 0
                         assert (
                             after.get(dispatch_name, 0) - before.get(dispatch_name, 0) == expected
                         )

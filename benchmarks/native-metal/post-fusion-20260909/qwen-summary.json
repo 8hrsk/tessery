@@ -1,0 +1,155 @@
+{
+  "status": "passed",
+  "meaning": "Identity/numerical checks passed; timing_screen_passed is separate per case",
+  "inputs": {
+    "qwen-first.json": "89de0565d80ad0d64e14f663c69e86bc36b544c4d2c5e6295fd0ebeaff3c239d",
+    "qwen-repeat.json": "4aaebc099bdab96fa6c17b2e6f1a7465a84b943876ec266ccacc0899d1e0e8d5"
+  },
+  "harness_sha256": "3a8208c80efc70dc6076485c5915d8580dfb77743f8cd850c75cfb9906316ecd",
+  "screen_helper_sha256": "4f59a4b90ccb90cb0f4c30c48b933aff1928227d314f26ba6b8e8331f426caec",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "18082b463486f8554e0e76ca451a086cbaa084b2e21bf5476a812bba3479976f",
+    "src/metal_inference/native/kernels.metal": "82a357159163c4610e882b57bbadeecb9699444a3b6130a8ed0ca903fdca1c11",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "results": [
+    {
+      "case": "0",
+      "tessery_over_mlx_range": [
+        0.818100261803133,
+        0.8227903368545705
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0098269418590573,
+        "mlx": 1.0040707194848515
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        7
+      ]
+    },
+    {
+      "case": "1",
+      "tessery_over_mlx_range": [
+        1.33050285972333,
+        1.346474983454781
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0080699068683683,
+        "mlx": 1.0039031716766231
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        128
+      ]
+    },
+    {
+      "case": "2",
+      "tessery_over_mlx_range": [
+        1.521574052995232,
+        1.5400351571814042
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0095265974007817,
+        "mlx": 1.0025817066406852
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        129
+      ]
+    },
+    {
+      "case": "3",
+      "tessery_over_mlx_range": [
+        1.4969017823180013,
+        1.5064373491574092
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0063716681831703,
+        "mlx": 1.0000014568281381
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        256
+      ]
+    },
+    {
+      "case": "4",
+      "tessery_over_mlx_range": [
+        1.5536963545928908,
+        1.5548321170417534
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0044177076387966,
+        "mlx": 1.003684007901825
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        512
+      ]
+    },
+    {
+      "case": "5",
+      "tessery_over_mlx_range": [
+        1.4765870685734097,
+        1.480577320862046
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0090324467459693,
+        "mlx": 1.011759203681357
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ]
+    },
+    {
+      "case": "6",
+      "tessery_over_mlx_range": [
+        1.889327542320032,
+        1.9347745475189846
+      ],
+      "repeat_max_over_min": {
+        "tessery": 1.0248944057131977,
+        "mlx": 1.00082008581657
+      },
+      "all_identical_controls_within_10_percent": true,
+      "timing_screen_passed": true,
+      "lengths": [
+        3,
+        7,
+        10
+      ]
+    }
+  ]
+}

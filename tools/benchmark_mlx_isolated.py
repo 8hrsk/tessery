@@ -109,25 +109,45 @@ def worker(args):
                 [" token" * (33 - special)] * 4,
                 [" token" * (n - special) for n in (3, 7, 10)],
             ]
-        for case_id in np.random.default_rng(94).permutation(len(cases)):
+        order = np.random.default_rng(94).permutation(len(cases))
+        if args.reverse_cases:
+            order = order[::-1]
+        for case_id in order:
             texts = cases[case_id]
             ids, lengths = model._tokenizer.batch(texts, max_length=model.max_length)
-            for _ in range(3):
+            warm_start = time.perf_counter()
+            warmups = 0
+            while warmups < 3 or (args.paired_controls and time.perf_counter() - warm_start < 0.1):
                 model.encode(texts)
-            latencies = []
+                warmups += 1
+            controls = {label: [] for label in (["a", "b"] if args.paired_controls else ["a"])}
             reference = None
+            rng = np.random.default_rng(1000 + int(case_id))
             for _ in range(args.samples):
-                started = time.perf_counter()
-                output = model.encode(texts)
-                latencies.append(time.perf_counter() - started)
-                if reference is None:
-                    reference = output
-                else:
-                    np.testing.assert_array_equal(output, reference)
-                assert np.isfinite(output).all()
+                for label in rng.permutation(list(controls)):
+                    started = time.perf_counter()
+                    output = model.encode(texts)
+                    controls[label].append(time.perf_counter() - started)
+                    if reference is None:
+                        reference = output
+                    else:
+                        np.testing.assert_array_equal(output, reference)
+                    assert np.isfinite(output).all()
+            latencies = [value for values in controls.values() for value in values]
+            control_ratio = (
+                float(np.median(controls["a"]) / np.median(controls["b"]))
+                if args.paired_controls
+                else None
+            )
             payload["results"].append(
                 {
                     "case": int(case_id),
+                    "warmups": warmups,
+                    "control_timings": {k: summarize(v, len(texts)) for k, v in controls.items()},
+                    "identical_control_a_over_b": control_ratio,
+                    "control_within_10_percent": (
+                        0.9 <= control_ratio <= 1.1 if control_ratio is not None else None
+                    ),
                     "lengths": lengths.tolist(),
                     "input_ids_sha256": hashlib.sha256(ids.tobytes()).hexdigest(),
                     "plans": [
@@ -149,6 +169,7 @@ def worker(args):
             import mlx.core as mx
 
             payload["mlx_version"] = importlib.metadata.version("mlx")
+            payload["mlx_device"] = mx.device_info()
             payload["allocator"] = {
                 "active_bytes": mx.get_active_memory(),
                 "cache_bytes": mx.get_cache_memory(),
@@ -168,6 +189,12 @@ def main():
     parser.add_argument("--model-dir", required=True)
     parser.add_argument("--profile-file")
     parser.add_argument("--include-batches", action="store_true")
+    parser.add_argument(
+        "--paired-controls",
+        action="store_true",
+        help="Randomized identical A/B calls; samples per label",
+    )
+    parser.add_argument("--reverse-cases", action="store_true")
     parser.add_argument("--mlx-python", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--samples", default=30, type=int)
@@ -202,7 +229,9 @@ def main():
         "scope": "isolated_process_full_embedding_public_api",
         "baseline": "independent public MLX F32 graph; not mlx-embeddings",
         "conditions": (
-            "sequential fresh processes; 3 warmups; same seeded case order; uncontrolled thermals"
+            "sequential fresh processes; >=3 warmups (>=100ms with paired controls); "
+            "seeded case order; samples per label; paired labels are identical; "
+            "uncontrolled thermals"
         ),
         "memory_note": (
             "RSS and peak RSS belong to one engine process each; peaks include load; "
@@ -219,6 +248,9 @@ def main():
         "reference_file": reference_file,
         "mlx_mask": args.mlx_mask,
         "engine_order": args.engine_order,
+        "paired_controls": args.paired_controls,
+        "reverse_cases": args.reverse_cases,
+        "samples_per_label": args.samples,
         "workers": {},
         "results": [],
     }
@@ -250,6 +282,8 @@ def main():
                     args.mlx_mask,
                     *(["--profile-file", args.profile_file] if args.profile_file else []),
                     *(["--include-batches"] if args.include_batches else []),
+                    *(["--paired-controls"] if args.paired_controls else []),
+                    *(["--reverse-cases"] if args.reverse_cases else []),
                     *(["--lengths", *map(str, args.lengths)] if args.lengths else []),
                 ],
                 env=environment,
