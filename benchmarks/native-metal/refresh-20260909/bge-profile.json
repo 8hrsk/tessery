@@ -1,0 +1,2323 @@
+{
+  "status": "passed",
+  "mode": "intrusive_stage_timestamps",
+  "execution_policy": "selected",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "202238a58ee19bb99c854b29d2585b7b99e61de0606eca4db909384e9e5038ec",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "1e13d9c07f7fcdb597bbddc9dca5db5573c1d49068197f79168419dc88eb6a85",
+    "src/metal_inference/native/kernels.metal": "959e5eafb46aeb61568f5a9c8563a65b91c5e63d473a3c6e14f6d87ea1f3b964",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "87799bf9d7de5bf2890d16de3ebf9b0b41df965f184166d54da93f0c9ca2b608",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "harness_sha256": "41f8622823c90a0735604377c9036480f50fd28ccbb52e5b03c69cc6272f31fc",
+  "results": [
+    {
+      "tokens": 7,
+      "execution_width": 8,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 8,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.0008224140000000002
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 8,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.0006337490000000002
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 8,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.000625129
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.000397834
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.0002867500000000001
+        },
+        {
+          "kernel": "attention",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00023466400000000004
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.000100958
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 6.933300000000001e-05
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 6.8249e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 8.5e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 6.583e-06
+        }
+      ],
+      "normal_wall_seconds": [
+        0.005816082993987948,
+        0.003918458998668939,
+        0.004440707969479263,
+        0.00428591703530401,
+        0.004305207985453308
+      ],
+      "profiled_wall_seconds": [
+        0.017439000017475337,
+        0.014060332963708788,
+        0.013497749983798712,
+        0.012730041984468699,
+        0.01273316697916016
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.583e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0003989180000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.004580039
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.000353917
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.0010342910000000001
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010128800000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 7.4666e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.667e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 5.125e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000384915
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.00276633
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.002411873
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.000215081
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 9.699900000000001e-05
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 6.375200000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.5e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.2080000000000005e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000397834
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0019861279999999998
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0009884200000000005
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00023466400000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0019153360000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 6.6377e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 7.833000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 0.001366208
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000378041
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.002080039
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.00034116400000000014
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00023308400000000005
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 9.703900000000003e-05
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 6.933300000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 7.875e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 0.000604459
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00040016800000000006
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0020819980000000003
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0003921220000000001
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00023474900000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000100958
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 7.2207e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.084e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.0020819980000000003
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.000397834
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.0003921220000000001
+        },
+        {
+          "kernel": "attention",
+          "calls": 12,
+          "median_gpu_seconds": 0.00023466400000000004
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.000100958
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 6.933300000000001e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 8.5e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 6.583e-06
+        }
+      ]
+    },
+    {
+      "tokens": 9,
+      "execution_width": 16,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.0026960450000000006
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 16,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.001071584
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 16,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.0009271209999999999
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 16,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.0007817500000000001
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.000333586
+        },
+        {
+          "kernel": "attention",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00029746000000000004
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.00011491800000000001
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 8.416800000000001e-05
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 8.296e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 9.250000000000001e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 6.750000000000001e-06
+        }
+      ],
+      "normal_wall_seconds": [
+        0.005020458018407226,
+        0.004737416980788112,
+        0.006625999987591058,
+        0.005627540987916291,
+        0.007894457958173007
+      ],
+      "profiled_wall_seconds": [
+        0.014730082999449223,
+        0.01783554197754711,
+        0.017403458012267947,
+        0.017281125008594245,
+        0.01582887500990182
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.958e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.002700414
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.002394004
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0003981640000000001
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.000312667
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0008038350000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 8.804200000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.709000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 0.000683125
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.002730957
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.002938624
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.00041654599999999995
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00031225000000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00011491800000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 8.2125e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.1416e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 5.500000000000001e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0004175030000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0031940010000000006
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.002571039
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00029746000000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010841300000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 8.416800000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.000000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.750000000000001e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0026960450000000006
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.002714494000000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.00038203900000000003
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00027162500000000006
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000888288
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 8.550000000000002e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.292000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.125000000000001e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00037883399999999993
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.003059289000000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0021433339999999998
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00026933400000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010317000000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 7.120700000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.250000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.002938624
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.0026960450000000006
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.00041654599999999995
+        },
+        {
+          "kernel": "attention",
+          "calls": 12,
+          "median_gpu_seconds": 0.00029746000000000004
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.00011491800000000001
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 8.416800000000001e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9.250000000000001e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 6.750000000000001e-06
+        }
+      ]
+    },
+    {
+      "tokens": 31,
+      "execution_width": 32,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.0017892919999999996
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 32,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.0014163340000000002
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 32,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.0010852090000000002
+        },
+        {
+          "kernel": "attention",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.001052457
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 32,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.0008555860000000001
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.00037125100000000007
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.00011154200000000002
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00010220899999999998
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 9.237600000000001e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 9e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 8.334e-06
+        }
+      ],
+      "normal_wall_seconds": [
+        0.008063957968261093,
+        0.008867042022757232,
+        0.006246792036108673,
+        0.009230291994754225,
+        0.007722000009380281
+      ],
+      "profiled_wall_seconds": [
+        0.019058417004998773,
+        0.01570516702486202,
+        0.01518333301646635,
+        0.017871957970783114,
+        0.014870458981022239
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.875e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0006187930000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0038159159999999995
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0010354960000000001
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.0011412090000000002
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00011229200000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0019382889999999997
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.334e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00037125100000000007
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0035625469999999997
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0021994609999999985
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.0010770000000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00011154200000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000100834
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.2292e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.083e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00034849999999999996
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0034752930000000013
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0018787919999999996
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.00101096
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010408200000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00010220899999999998
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.3041000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 6.8330000000000005e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000362918
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.004201834000000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0020689209999999996
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.001052457
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00011241700000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00010417
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.334e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 0.000215958
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0021508279999999987
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0028796580000000007
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.00036287300000000005
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.000993084
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 9.712300000000001e-05
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 9.974900000000001e-05
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 7.667000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.0035625469999999997
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.0018787919999999996
+        },
+        {
+          "kernel": "attention",
+          "calls": 12,
+          "median_gpu_seconds": 0.001052457
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.00037125100000000007
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.00011154200000000002
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 0.00010220899999999998
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 8.334e-06
+        }
+      ]
+    },
+    {
+      "tokens": 33,
+      "execution_width": 40,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 40,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.0019317510000000002
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 40,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.001882998
+        },
+        {
+          "kernel": "attention",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.001810708
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 40,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.001080208
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.000803874
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.00036270800000000005
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00012699899999999998
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.00010675200000000002
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00010370600000000001
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 9.834000000000001e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 9.5e-06
+        }
+      ],
+      "normal_wall_seconds": [
+        0.011330999957863241,
+        0.011341583973262459,
+        0.011358666990417987,
+        0.010251750005409122,
+        0.010250041028484702
+      ],
+      "profiled_wall_seconds": [
+        0.018084708019159734,
+        0.018794833042193204,
+        0.018853167013730854,
+        0.015083000005688518,
+        0.019672624999657273
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.0875e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00037042
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0052849950000000015
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.00041920400000000006
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.0023985010000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010987800000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000121167
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.1125000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 9.5e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0003558310000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.005682124
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.000990415
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.001706584
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010562300000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000127835
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.834000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.0083e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00036824899999999996
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.004473586000000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0009081649999999998
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.0031737510000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00011321100000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00012699899999999998
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0875e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.750000000000001e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00036270800000000005
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0038269659999999994
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.000418957
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.001810708
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010675200000000002
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000129417
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 7.667000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.084000000000001e-06
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0003383310000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.005184040000000002
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0022543319999999986
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.001594209
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00010583200000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000117124
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.709000000000001e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.005184040000000002
+        },
+        {
+          "kernel": "attention",
+          "calls": 12,
+          "median_gpu_seconds": 0.001810708
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.0009081649999999998
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.00036270800000000005
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 0.00012699899999999998
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.00010675200000000002
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9.834000000000001e-06
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 9.5e-06
+        }
+      ]
+    },
+    {
+      "tokens": 128,
+      "execution_width": 128,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 128,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.006825707000000001
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 128,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.006645085
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 128,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.004846957000000001
+        },
+        {
+          "kernel": "attention_tiled",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.0035634599999999996
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.0011917920000000001
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.000658919
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.000493127
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00045095800000000006
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.00029925400000000005
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 1.8792000000000002e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 1.3000000000000001e-05
+        }
+      ],
+      "normal_wall_seconds": [
+        0.02848916599759832,
+        0.021161833952646703,
+        0.0242328749736771,
+        0.05713783303508535,
+        0.06166683399351314
+      ],
+      "profiled_wall_seconds": [
+        0.03320691699627787,
+        0.030472499958705157,
+        0.0479237079853192,
+        0.10619945800863206,
+        0.048912375001236796
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.5459000000000002e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00039412700000000003
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.014689834000000002
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0014331640000000004
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.004263915
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000178376
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.002132834
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 7.667000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.8792000000000002e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00046254400000000006
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.014927539000000005
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0014760840000000003
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.002749874
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.002794799
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000393539
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.4041000000000002e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.1458000000000001e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000493127
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.016737214000000004
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0010592419999999995
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.0028606670000000008
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000202584
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0004263740000000001
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.3000000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 2.5458000000000003e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0033968340000000005
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.06117617200000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.008418955999999998
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.018347335000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00029925400000000005
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.000658919
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.775e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 2.525e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0005861219999999999
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.021445708
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.002650544
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.0035634599999999996
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0025396260000000006
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0038435830000000002
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0167000000000001e-05
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.016737214000000004
+        },
+        {
+          "kernel": "attention_tiled",
+          "calls": 12,
+          "median_gpu_seconds": 0.0035634599999999996
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.0014760840000000003
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 0.000658919
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.000493127
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.00029925400000000005
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 1.8792000000000002e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.3000000000000001e-05
+        }
+      ]
+    },
+    {
+      "tokens": 129,
+      "execution_width": 136,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "attention",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.023279292000000004
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 136,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.007402459000000001
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 136,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.005438710000000001
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 136,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.004580161000000002
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.0008169110000000004
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.00041387300000000004
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00033221000000000005
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.00031529
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.00021283400000000004
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 1.5125000000000002e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 9.958e-06
+        }
+      ],
+      "normal_wall_seconds": [
+        0.05133824999211356,
+        0.043813416035845876,
+        0.04373954102629796,
+        0.047076083021238446,
+        0.04720412497408688
+      ],
+      "profiled_wall_seconds": [
+        0.0630402909591794,
+        0.055475124972872436,
+        0.05653291702037677,
+        0.055437292030546814,
+        0.05583779199514538
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.2917e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000463126
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.023744040000000008
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0009632900000000002
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.024080667
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00021283400000000004
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00037520800000000003
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0333000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.5125000000000002e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000374042
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.017894625
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.001669708
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.022793915
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00022833500000000003
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00031258300000000007
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.291000000000001e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.6125000000000002e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00041387300000000004
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.0166105
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.002573581000000001
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.023279292000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000188833
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00033221000000000005
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.2542000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.2250000000000001e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.00036445600000000004
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.018725493
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.000790212
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.021670292
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00017837499999999996
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00031229300000000005
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.958e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 1.7375000000000002e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0004499630000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.015996708000000005
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0011401160000000003
+          },
+          "attention": {
+            "calls": 12,
+            "gpu_seconds": 0.028633624000000003
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0005397060000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.00034412200000000004
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.917e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "attention",
+          "calls": 12,
+          "median_gpu_seconds": 0.023279292000000004
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.017894625
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.0011401160000000003
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.00041387300000000004
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 0.00033221000000000005
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.00021283400000000004
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 1.5125000000000002e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 9.958e-06
+        }
+      ]
+    },
+    {
+      "tokens": 512,
+      "execution_width": 512,
+      "max_abs_difference_vs_public_api": 0.0,
+      "shape_ranking": [
+        {
+          "kernel": "attention_tiled",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.036784582
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 512,
+          "cols": 1536,
+          "k": 384,
+          "calls": 12,
+          "median_gpu_seconds": 0.029422374
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 512,
+          "cols": 384,
+          "k": 1536,
+          "calls": 12,
+          "median_gpu_seconds": 0.017542415
+        },
+        {
+          "kernel": "matmul_f32_chunk32",
+          "rows": 512,
+          "cols": 384,
+          "k": 384,
+          "calls": 48,
+          "median_gpu_seconds": 0.015323412000000002
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 60,
+          "median_gpu_seconds": 0.0023255380000000003
+        },
+        {
+          "kernel": "gelu_f32",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.0012944630000000003
+        },
+        {
+          "kernel": "add_bias",
+          "rows": 0,
+          "cols": 1536,
+          "k": 0,
+          "calls": 12,
+          "median_gpu_seconds": 0.001253292
+        },
+        {
+          "kernel": "add",
+          "rows": 0,
+          "cols": 0,
+          "k": 0,
+          "calls": 24,
+          "median_gpu_seconds": 0.0007034580000000001
+        },
+        {
+          "kernel": "layer_norm",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 25,
+          "median_gpu_seconds": 0.0006058750000000001
+        },
+        {
+          "kernel": "embedding_position",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 4.3667e-05
+        },
+        {
+          "kernel": "pool_project",
+          "rows": 0,
+          "cols": 384,
+          "k": 0,
+          "calls": 1,
+          "median_gpu_seconds": 1.0333000000000001e-05
+        }
+      ],
+      "normal_wall_seconds": [
+        0.11677624995354563,
+        0.11119854199932888,
+        0.12004991603316739,
+        0.10569379100343212,
+        0.10860762500669807
+      ],
+      "profiled_wall_seconds": [
+        0.11760541598778218,
+        0.11828770802821964,
+        0.12248520797584206,
+        0.12137679196894169,
+        0.12320191698381677
+      ],
+      "samples": [
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 3.6333e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.002403044
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.058097536000000005
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.005179960999999999
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.03613687299999999
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.00146279
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.001278249
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.2375000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 3.9875e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0005730010000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.059502621000000006
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.006872672999999998
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.036784582
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000678459
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0012631220000000002
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0416e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 4.3667e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0011987489999999996
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.06758583600000001
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0028246649999999996
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.035160500000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.000711545
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.001296499
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 8.416e-06
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 0.0013629590000000002
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.000587917
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.060397914000000025
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.0033856169999999996
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.039716918000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0007034580000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0014462499999999998
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 1.0333000000000001e-05
+          }
+        },
+        {
+          "embedding_position": {
+            "calls": 1,
+            "gpu_seconds": 8.091700000000001e-05
+          },
+          "layer_norm": {
+            "calls": 25,
+            "gpu_seconds": 0.0006058750000000001
+          },
+          "matmul_f32_chunk32": {
+            "calls": 72,
+            "gpu_seconds": 0.059851165
+          },
+          "add_bias": {
+            "calls": 72,
+            "gpu_seconds": 0.009330626999999998
+          },
+          "attention_tiled": {
+            "calls": 12,
+            "gpu_seconds": 0.039010499000000004
+          },
+          "add": {
+            "calls": 24,
+            "gpu_seconds": 0.0006561220000000001
+          },
+          "gelu_f32": {
+            "calls": 12,
+            "gpu_seconds": 0.0012944630000000003
+          },
+          "pool_project": {
+            "calls": 1,
+            "gpu_seconds": 9.625e-06
+          }
+        }
+      ],
+      "ranking": [
+        {
+          "kernel": "matmul_f32_chunk32",
+          "calls": 72,
+          "median_gpu_seconds": 0.059851165
+        },
+        {
+          "kernel": "attention_tiled",
+          "calls": 12,
+          "median_gpu_seconds": 0.036784582
+        },
+        {
+          "kernel": "add_bias",
+          "calls": 72,
+          "median_gpu_seconds": 0.005179960999999999
+        },
+        {
+          "kernel": "gelu_f32",
+          "calls": 12,
+          "median_gpu_seconds": 0.0012944630000000003
+        },
+        {
+          "kernel": "add",
+          "calls": 24,
+          "median_gpu_seconds": 0.0007034580000000001
+        },
+        {
+          "kernel": "layer_norm",
+          "calls": 25,
+          "median_gpu_seconds": 0.0006058750000000001
+        },
+        {
+          "kernel": "embedding_position",
+          "calls": 1,
+          "median_gpu_seconds": 4.3667e-05
+        },
+        {
+          "kernel": "pool_project",
+          "calls": 1,
+          "median_gpu_seconds": 1.0333000000000001e-05
+        }
+      ]
+    }
+  ],
+  "limitations": "One encoder per dispatch; calibration and encoder costs perturb timing. Normal-path timings are separate. Counter storage excluded from runtime buffer counters.",
+  "model": "BAAI/bge-small-en-v1.5",
+  "compatibility_id": "tessery-bert_f32-v1:be9a26877207ec61e25a6874a01646ffee489b802353c3c43f3d82be4db1f3a8",
+  "runtime": {
+    "shader_sha256": "959e5eafb46aeb61568f5a9c8563a65b91c5e63d473a3c6e14f6d87ea1f3b964",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 426,
+    "allocated_bytes": 145257612,
+    "completed_commands": 91,
+    "gpu_timed_commands": 91,
+    "gpu_seconds": 3.0196555001311935,
+    "encode_seconds": 0.23539329407503828,
+    "submit_wait_seconds": 3.1027579181827605,
+    "dispatches": {
+      "embedding_position": 91,
+      "layer_norm": 2275,
+      "matmul_f32_chunk32": 6552,
+      "add_bias": 6552,
+      "attention": 780,
+      "add": 2184,
+      "gelu_f32": 1092,
+      "pool_project": 91,
+      "attention_tiled": 312
+    },
+    "active_bytes": 145211904,
+    "cache_bytes": 12363264,
+    "peak_bytes": 145213956
+  }
+}

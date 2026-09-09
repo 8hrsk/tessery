@@ -131,6 +131,6 @@ MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 METAL_INFERENCE_TEST=1 \
 ```
 
 Set `BGE_MODEL_DIR` to the existing verified local pack. Reports require new
-output paths. Next useful work is a fresh full-model profile and paired MLX
-comparison on the updated runtime, followed by measurement of fusion for
-BGE's separate bias, activation and residual passes.
+output paths. The subsequent [profile and MLX comparison refresh](PERFORMANCE_REFRESH.md)
+identifies remaining projection and attention-tail work and places fusion in
+context.
