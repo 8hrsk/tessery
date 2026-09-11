@@ -775,7 +775,9 @@ def test_quantized_eight_row_offset_preserves_surrounding_rows(runtime):
             buffer.close()
 
 
-@pytest.mark.parametrize("rows", [16, 127, 128, 129, 255, 256, 257, 511, 512, 513])
+@pytest.mark.parametrize(
+    "rows", [16, 23, 24, 25, 127, 128, 129, 159, 160, 161, 255, 256, 257, 511, 512, 513]
+)
 @pytest.mark.parametrize("cancellation", [False, True])
 def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, cancellation):
     rng = np.random.default_rng(2401)
@@ -805,8 +807,9 @@ def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, canc
             runtime._gated4(buffers, rows=rows, cols=n, k=k)
         after = runtime.diagnostics()["dispatches"]
         assert after.get("gated4_16x32_k64", 0) - before.get("gated4_16x32_k64", 0) == int(
-            rows in (128, 256, 512)
+            rows in (24, 128, 160, 256, 512)
         )
+        assert after.get("gated4_8x32", 0) - before.get("gated4_8x32", 0) == int(rows == 24)
         selected = runtime.read(buffers[7], sentinel.shape)
         assert np.isnan(selected[rows:]).all()
         np.testing.assert_allclose(selected[:rows], expected, atol=5e-5, rtol=5e-5)
@@ -820,3 +823,37 @@ def test_selected_gated4_reference_fallback_and_output_guard(runtime, rows, canc
         for buffer in buffers:
             buffer.close()
     assert runtime.active_bytes == 0
+
+
+@pytest.mark.parametrize("offset", [0, 16])
+def test_gated8_complete_tile_offset_and_output_guard(runtime, offset):
+    # Minimal input rows expose accidental reads beyond the last complete tile.
+    n, k = 32, 64
+    x = np.ones((offset + 8, k), dtype=np.float32)
+    packed = np.full((n, k // 8), 0x11111111, dtype=np.uint32)
+    scales = bf16(np.ones((n, 1)))
+    biases = bf16(np.zeros((n, 1)))
+    sentinel = np.full((offset + 10, n), np.nan, dtype=np.float32)
+    arrays = [x, packed, scales, biases, packed, scales, biases, sentinel]
+    buffers = [runtime.buffer(a.nbytes, a) for a in arrays]
+    try:
+        with runtime.command():
+            runtime._dispatch(
+                "gated4_8x32",
+                buffers,
+                threads=128,
+                group_size=128,
+                n=offset,
+                rows=offset + 8,
+                cols=n,
+                k=k,
+            )
+        output = runtime.read(buffers[-1], sentinel.shape)
+        assert np.isnan(output[:offset]).all()
+        assert np.isnan(output[offset + 8 :]).all()
+        np.testing.assert_allclose(
+            output[offset : offset + 8], 64.0 / (1 + np.exp(-64.0)) * 64.0, rtol=5e-5, atol=5e-5
+        )
+    finally:
+        for buffer in buffers:
+            buffer.close()

@@ -108,14 +108,28 @@ def test_boundaries_and_batch32(model):
     np.testing.assert_allclose(vectors, np.repeat(vectors[:1], 32, axis=0), atol=1e-6)
 
 
-@pytest.mark.parametrize("tokens", [17, 33, 128, 129, 256, 512])
-def test_large_tile_and_fused_mlp_cover_all_projections_per_layer(model, tokens):
+@pytest.mark.parametrize(
+    "tokens,fused",
+    [
+        (17, True),
+        (24, True),
+        (33, False),
+        (128, True),
+        (129, False),
+        (159, True),
+        (160, True),
+        (161, False),
+        (256, True),
+        (512, True),
+    ],
+)
+def test_large_tile_and_fused_mlp_cover_all_projections_per_layer(model, tokens, fused):
     runtime = model._backend.runtime
     kernel = "linear4_16x32_k64"
     before = runtime.diagnostics()["dispatches"].get(kernel, 0)
     model.encode([" token" * (tokens - 1)])
     after = runtime.diagnostics()["dispatches"][kernel]
-    assert after - before == (5 if tokens in (128, 256, 512) else 7) * model._backend.layers
+    assert after - before == (5 if fused else 7) * model._backend.layers
 
 
 def test_workspace_reuses_scratch_but_refreshes_inputs(model):

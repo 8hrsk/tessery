@@ -387,8 +387,8 @@ class MetalRuntime:
     def _gated4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
         # x, gate weight/scale/bias, up weight/scale/bias, gate output, up scratch.
         # Only measured full-model shapes use the fused epilogue. Keep the
-        # original complete path for short, ragged and other projection shapes.
-        if rows in (128, 256, 512) and (cols, k) == (3072, 1024):
+        # original complete path for all other heights and projection shapes.
+        if rows in (24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
             self._dispatch(
                 "gated4_16x32_k64",
                 buffers[:8],
@@ -398,6 +398,18 @@ class MetalRuntime:
                 cols=cols,
                 k=k,
             )
+            if rows == 24:
+                # One complete 16-row prefix followed by a disjoint 8-row tile.
+                self._dispatch(
+                    "gated4_8x32",
+                    buffers[:8],
+                    threads=(cols // 32) * 128,
+                    group_size=128,
+                    n=16,
+                    rows=rows,
+                    cols=cols,
+                    k=k,
+                )
             return
         self._linear4([*buffers[:4], buffers[7]], rows=rows, cols=cols, k=k)
         self._linear4([buffers[0], *buffers[4:7], buffers[8]], rows=rows, cols=cols, k=k)

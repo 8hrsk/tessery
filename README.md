@@ -141,6 +141,7 @@ New in this checkout: [0.6 results and limits](docs/IMPLEMENTATION_06.md),
 [full MLX comparison after fusion](docs/PERFORMANCE_AFTER_FUSION.md),
 [short Qwen batch alignment](docs/SHORT_BATCH_ALIGNMENT.md),
 [three-row Qwen projection specialization](docs/SMALL_QWEN_PROJECTIONS.md),
+[fused MLP for 160 and 24 rows](docs/BATCHED_FUSED_MLP.md),
 [GPU profiling, varied stress and isolated comparisons](docs/PROFILING_AND_STRESS.md),
 [Kaggle qualification notebook](notebooks/kaggle-portable-soak.ipynb).
 

@@ -20,6 +20,7 @@ from pathlib import Path
 import numpy as np
 
 from metal_inference import EmbeddingModel, ModelProfile, get_profile
+from metal_inference.batching import execution_batches
 from metal_inference.errors import ClosedError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -154,8 +155,34 @@ def soak(model, seconds, on_checkpoint=None):
         [" token" * 510, "short", "a different text"],
         ["retrieval system"] * 32,
     ]
+    special = 2 if model.descriptor.architecture == "bert_f32" else 1
+    # Exercise both new MLP heights, the short scalar path, and neighboring
+    # fallback widths during every cycle of a long qualification run.
+    batches += [
+        [" token" * (length - special) for length in lengths]
+        for lengths in ([3], [3, 7, 10], [33] * 4, [20] * 8, [24], [25], [159], [161])
+    ]
+    plans = []
+    for texts in batches:
+        _, lengths = model._tokenizer.batch(texts, max_length=model.max_length)
+        plans.append(
+            {
+                "lengths": lengths.tolist(),
+                "completed_calls": 0,
+                "execution": [
+                    (r.tolist(), w)
+                    for r, w in execution_batches(
+                        lengths,
+                        model._backend.max_padded_tokens,
+                        model.max_length,
+                        model.descriptor.architecture,
+                    )
+                ],
+            }
+        )
     references = [model.encode(batch) for batch in batches]
     baseline = memory(model)
+    before = model._backend.runtime.diagnostics()
     points = [{"elapsed_seconds": 0.0, **baseline}]
     started = time.perf_counter()
     count, next_sample = 0, 10.0
@@ -169,6 +196,8 @@ def soak(model, seconds, on_checkpoint=None):
                     "elapsed_seconds": time.perf_counter() - started,
                     "completed_calls": count,
                     "checkpoints": points,
+                    "cases": plans,
+                    "runtime": delta(before, model._backend.runtime.diagnostics()),
                 }
             )
 
@@ -184,6 +213,7 @@ def soak(model, seconds, on_checkpoint=None):
             raise AssertionError("Live Metal buffers grew between completed requests")
         if stats.cache_bytes > model._backend.runtime.workspace_limit_bytes:
             raise AssertionError("Workspace cache exceeded its budget")
+        plans[i]["completed_calls"] += 1
         count += 1
         elapsed = time.perf_counter() - started
         if elapsed >= next_sample:
@@ -203,6 +233,8 @@ def soak(model, seconds, on_checkpoint=None):
         "rss_end_minus_start_bytes": rss[-1] - rss[0],
         "rss_sample_range_bytes": max(rss) - min(rss),
         "checkpoints": points,
+        "cases": plans,
+        "runtime": delta(before, model._backend.runtime.diagnostics()),
     }
 
 

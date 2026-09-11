@@ -166,8 +166,31 @@ def test_f32_verified_shapes_and_tail_dispatch(rows, cols, k):
 
 @pytest.mark.parametrize(
     "rows,cols,k",
-    [(m, 3072, 1024) for m in (7, 16, 48, 127, 128, 129, 255, 256, 257, 511, 512, 513, 4096)]
-    + [(128, n, k) for n, k in ((1024, 1024), (3072, 2048), (3071, 1024))],
+    [
+        (m, 3072, 1024)
+        for m in (
+            7,
+            16,
+            23,
+            24,
+            25,
+            48,
+            127,
+            128,
+            129,
+            159,
+            160,
+            161,
+            255,
+            256,
+            257,
+            511,
+            512,
+            513,
+            4096,
+        )
+    ]
+    + [(m, n, k) for m in (24, 128, 160) for n, k in ((1024, 1024), (3072, 2048), (3071, 1024))],
 )
 def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
     calls = []
@@ -177,12 +200,17 @@ def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
     )
     buffers = [object() for _ in range(9)]
     metal.MetalRuntime._gated4(runtime, buffers, rows=rows, cols=cols, k=k)
-    if rows in (128, 256, 512) and (cols, k) == (3072, 1024):
-        assert len(calls) == 1
+    if rows in (24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
+        assert len(calls) == (2 if rows == 24 else 1)
         assert calls[0][1] == ("gated4_16x32_k64", buffers[:8])
         assert calls[0][2] == dict(
             threads=rows // 16 * (cols // 32) * 256, group_size=256, rows=rows, cols=cols, k=k
         )
+        if rows == 24:
+            assert calls[1][1] == ("gated4_8x32", buffers[:8])
+            assert calls[1][2] == dict(
+                threads=(cols // 32) * 128, group_size=128, n=16, rows=rows, cols=cols, k=k
+            )
     else:
         assert [c[0] for c in calls] == ["linear", "linear", "dispatch"]
         assert calls[0][1][0] == [*buffers[:4], buffers[7]]
