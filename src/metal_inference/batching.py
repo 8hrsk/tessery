@@ -41,6 +41,9 @@ def execution_batches(
     small projection tail becomes negligible at longer lengths, so only align
     those when the next eight-token boundary is also an attention boundary.
     Keep the original plan when any padding, context or token budget is exceeded.
+    If eight-token padding is blocked, a short two-input Qwen bucket can still
+    align its matrix with four-token padding. Larger buckets retain the old
+    policy: their extra padded rows can cost more than the projection tail.
     """
     for rows, width in length_batches(lengths, max_padded_tokens):
         aligned = (width + 7) // 8 * 8
@@ -55,4 +58,12 @@ def execution_batches(
             and aligned * len(rows) <= max_padded_tokens
         ):
             width = aligned
+        elif architecture == "qwen3_uint4" and len(rows) == 2 and 5 <= width < 128 and projection:
+            aligned = (width + 3) // 4 * 4
+            if (
+                aligned <= max_length
+                and aligned <= 2 * int(lengths[rows].min())
+                and aligned * len(rows) <= max_padded_tokens
+            ):
+                width = aligned
         yield rows, width

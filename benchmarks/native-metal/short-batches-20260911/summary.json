@@ -1,0 +1,702 @@
+{
+  "status": "passed",
+  "meaning": "Identity and dispatch checks passed; numerical gates executed independently in each process; timing screen is separate per case. No cross-process vector comparison in this harness.",
+  "inputs": {
+    "first.json": "60b763b429abf6cda69b03fd7f0b2c8454f319852abb96c4180db81dfe3f5c7d",
+    "repeat.json": "4d3820de1a3e7120aae7ed7246f914f8564e3fed84bbf47cc1d01bb82664bfc5"
+  },
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "de41ce973ce790a3325bb8423ed06e0c83ae30af2d7ed2768c97209ea8f143f2",
+    "src/metal_inference/native/kernels.metal": "82a357159163c4610e882b57bbadeecb9699444a3b6130a8ed0ca903fdca1c11",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "results": [
+    {
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0
+            ],
+            3
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            10
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0
+            ],
+            3
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            12
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0
+            ],
+            3
+          ],
+          [
+            [
+              1,
+              2
+            ],
+            10
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.1822833535747517,
+        1.289797312272484
+      ],
+      "previous_p50_seconds": [
+        0.19685724948067218,
+        0.19036116648931056
+      ],
+      "selected_p50_seconds": [
+        0.15262649999931455,
+        0.16101145796710625
+      ],
+      "identical_control_a_over_b": [
+        0.9445462174151597,
+        0.9059686598899571
+      ],
+      "process_drift": {
+        "previous": 1.0341250429967626,
+        "selected": 1.054937759614676
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.601874828338623e-07
+    },
+    {
+      "lengths": [
+        7,
+        10
+      ],
+      "plans": {
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            12
+          ]
+        ],
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            10
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            10
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.3308477331586674,
+        1.3567932512266052
+      ],
+      "previous_p50_seconds": [
+        0.11281058299937285,
+        0.11328460450749844
+      ],
+      "selected_p50_seconds": [
+        0.08476595795946196,
+        0.08349437499418855
+      ],
+      "identical_control_a_over_b": [
+        0.9204276964589879,
+        1.035633148061637
+      ],
+      "process_drift": {
+        "previous": 1.0042019241060762,
+        "selected": 1.0152295644510414
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.601874828338623e-07
+    },
+    {
+      "lengths": [
+        6,
+        9
+      ],
+      "plans": {
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            12
+          ]
+        ],
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            9
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            9
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.2168251293368106,
+        1.4105559233573883
+      ],
+      "previous_p50_seconds": [
+        0.10760354198282585,
+        0.11051499997847714
+      ],
+      "selected_p50_seconds": [
+        0.08842975000152364,
+        0.07834854198154062
+      ],
+      "identical_control_a_over_b": [
+        0.9487882804061395,
+        0.9058541122807309
+      ],
+      "process_drift": {
+        "previous": 1.0270572691381847,
+        "selected": 1.12867129068411
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.4156103134155273e-07
+    },
+    {
+      "lengths": [
+        7,
+        11
+      ],
+      "plans": {
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            12
+          ]
+        ],
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            11
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            11
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.4494294493371496,
+        1.5171859611912084
+      ],
+      "previous_p50_seconds": [
+        0.11942895851098001,
+        0.11709668752155267
+      ],
+      "selected_p50_seconds": [
+        0.07871741603594273,
+        0.08078812499297783
+      ],
+      "identical_control_a_over_b": [
+        0.9767916790628399,
+        0.9960669126025985
+      ],
+      "process_drift": {
+        "previous": 1.019917480492333,
+        "selected": 1.0263056012419107
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 0.0
+    },
+    {
+      "lengths": [
+        10,
+        18
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            18
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            20
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            18
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.1974943776411966,
+        1.316349927107567
+      ],
+      "previous_p50_seconds": [
+        0.1727155625121668,
+        0.1825329789717216
+      ],
+      "selected_p50_seconds": [
+        0.1442307920078747,
+        0.13866599998436868
+      ],
+      "identical_control_a_over_b": [
+        0.8714102829828817,
+        1.1324792554046799
+      ],
+      "process_drift": {
+        "previous": 1.056841527866739,
+        "selected": 1.0401309046495415
+      },
+      "timing_screen_passed": false,
+      "max_abs_difference": 2.123415470123291e-07
+    },
+    {
+      "lengths": [
+        30,
+        58
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            58
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            58
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            60
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.1063604959819158,
+        1.1181235793497102
+      ],
+      "previous_p50_seconds": [
+        0.4763769790006336,
+        0.4666362499992829
+      ],
+      "selected_p50_seconds": [
+        0.4305802500457503,
+        0.41733870800817385
+      ],
+      "identical_control_a_over_b": [
+        0.9841280563408614,
+        0.9962898191255222
+      ],
+      "process_drift": {
+        "previous": 1.020874351277608,
+        "selected": 1.031728525975398
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.5273690223693848e-07
+    },
+    {
+      "lengths": [
+        46,
+        90
+      ],
+      "plans": {
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            90
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            92
+          ]
+        ],
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            90
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.0689911151660232,
+        1.0704185432218203
+      ],
+      "previous_p50_seconds": [
+        0.6706481454893947,
+        0.669413353985874
+      ],
+      "selected_p50_seconds": [
+        0.6273655000259168,
+        0.625375333998818
+      ],
+      "identical_control_a_over_b": [
+        0.9977701957790246,
+        1.0092728738093384
+      ],
+      "process_drift": {
+        "previous": 1.0018445874976476,
+        "selected": 1.003182354529996
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.862645149230957e-07
+    },
+    {
+      "lengths": [
+        62,
+        122
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0,
+              1
+            ],
+            122
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1
+            ],
+            122
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1
+            ],
+            124
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.0381109615523927,
+        1.05889675854996
+      ],
+      "previous_p50_seconds": [
+        0.8960346874955576,
+        0.9588290000101551
+      ],
+      "selected_p50_seconds": [
+        0.8461964589660056,
+        0.9236286249943078
+      ],
+      "identical_control_a_over_b": [
+        1.0063596553011558,
+        1.0282557873422762
+      ],
+      "process_drift": {
+        "previous": 1.0700802250079284,
+        "selected": 1.0915061333663805
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 1.1175870895385742e-07
+    },
+    {
+      "lengths": [
+        7
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0
+            ],
+            8
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0
+            ],
+            8
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0
+            ],
+            8
+          ]
+        ]
+      },
+      "speedup_range": [
+        1.0050360486908025,
+        1.0645876024336178
+      ],
+      "previous_p50_seconds": [
+        0.035768646019278094,
+        0.038684229512000456
+      ],
+      "selected_p50_seconds": [
+        0.03558941598748788,
+        0.03633729100693017
+      ],
+      "identical_control_a_over_b": [
+        1.14309799275089,
+        0.9785076276133859
+      ],
+      "process_drift": {
+        "previous": 1.0815122689058725,
+        "selected": 1.021013972797565
+      },
+      "timing_screen_passed": false,
+      "max_abs_difference": 0.0
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            40
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            40
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            40
+          ]
+        ]
+      },
+      "speedup_range": [
+        0.9959132031774692,
+        1.0065457788603642
+      ],
+      "previous_p50_seconds": [
+        0.5304732084914576,
+        0.5429273124900647
+      ],
+      "selected_p50_seconds": [
+        0.532650040986482,
+        0.5393965420080349
+      ],
+      "identical_control_a_over_b": [
+        1.0038743394438323,
+        0.9946194387993968
+      ],
+      "process_drift": {
+        "previous": 1.0234773477703494,
+        "selected": 1.0126659166477452
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 0.0
+    },
+    {
+      "lengths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        10
+      ],
+      "plans": {
+        "previous_a": [
+          [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            10
+          ]
+        ],
+        "selected": [
+          [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            10
+          ]
+        ],
+        "previous_b": [
+          [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            10
+          ]
+        ]
+      },
+      "speedup_range": [
+        0.9660140556932966,
+        0.9898072676106751
+      ],
+      "previous_p50_seconds": [
+        0.2725063539983239,
+        0.2731468335259706
+      ],
+      "selected_p50_seconds": [
+        0.2753125410526991,
+        0.2827565830084495
+      ],
+      "identical_control_a_over_b": [
+        1.0014455904284643,
+        0.9704189543207524
+      ],
+      "process_drift": {
+        "previous": 1.002350328784079,
+        "selected": 1.0270385138551517
+      },
+      "timing_screen_passed": true,
+      "max_abs_difference": 0.0
+    }
+  ]
+}

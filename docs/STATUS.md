@@ -67,6 +67,8 @@ specification is preserved as historical input.
   exact-output checks and fallback; see [fusion measurements](FUSED_MLP.md).
 * Refreshed full Qwen/BGE comparisons against MLX with repeated identical-call
   controls; see [results and limits](PERFORMANCE_AFTER_FUSION.md).
+* Bounded four-token fallback alignment for short two-input Qwen buckets;
+  see [short batch measurements](SHORT_BATCH_ALIGNMENT.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

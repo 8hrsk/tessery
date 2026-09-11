@@ -40,7 +40,22 @@ def model(request):
         yield loaded
 
 
-@pytest.mark.parametrize("lengths", [[7], [9, 12], [31, 33], [63, 65], [127, 129], [511]])
+@pytest.mark.parametrize(
+    "lengths",
+    [
+        [7],
+        [9, 12],
+        [31, 33],
+        [63, 65],
+        [127, 129],
+        [511],
+        [3, 7, 10],
+        [10, 3, 7],
+        [6, 9],
+        [7, 11],
+        [62, 122],
+    ],
+)
 def test_aligned_api_matches_unaligned_same_tokens(model, lengths):
     special = 2 if model.descriptor.architecture == "bert_f32" else 1
     texts = [" token" * (n - special) for n in lengths]

@@ -162,3 +162,6 @@ cannot be admitted by this repeat-screen tool.
 - [Extended 256-row reverse pair](../benchmarks/native-metal/post-fusion-20260909/qwen-256-selected-repeat.json)
 - [Extended 256-row repeat screen](../benchmarks/native-metal/post-fusion-20260909/qwen-256-selected-summary.json)
 - [Validation and build hashes](../benchmarks/native-metal/post-fusion-20260909/validation.json)
+
+The [short-batch alignment follow-up](SHORT_BATCH_ALIGNMENT.md) diagnoses the
+mixed-short case and records the subsequent planner change and new comparison.

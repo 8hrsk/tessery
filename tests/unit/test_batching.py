@@ -31,7 +31,7 @@ def test_empty_and_uniform_batches():
 @pytest.mark.parametrize("architecture", ["qwen3_uint4", "bert_f32"])
 def test_execution_padding_keeps_membership_and_all_resource_bounds(architecture):
     for maximum in (7, 31, 65, 127, 511, 512):
-        for count in (1, 3, 8, 9, 32):
+        for count in (1, 2, 3, 4, 6, 8, 9, 32):
             for longest in range(1, maximum + 1):
                 lengths = np.full(count, longest, np.uint32)
                 if count > 1:
@@ -66,3 +66,29 @@ def test_execution_padding_selection(length, count, architecture, expected):
     groups = list(execution_batches(np.full(count, length, np.uint32), 4096, 512, architecture))
     assert len(groups) == 1
     assert groups[0][1] == expected
+
+
+@pytest.mark.parametrize(
+    "lengths, budget, maximum, architecture, expected",
+    [
+        ([3, 7, 10], 4096, 512, "qwen3_uint4", [([0], 3), ([1, 2], 12)]),
+        ([10, 3, 7], 4096, 512, "qwen3_uint4", [([1], 3), ([2, 0], 12)]),
+        ([6, 9], 4096, 512, "qwen3_uint4", [([0, 1], 12)]),
+        ([7, 11], 4096, 512, "qwen3_uint4", [([0, 1], 12)]),
+        ([62, 122], 4096, 512, "qwen3_uint4", [([0, 1], 124)]),
+        ([5, 9], 4096, 512, "qwen3_uint4", [([0, 1], 9)]),
+        ([7, 10], 4096, 11, "qwen3_uint4", [([0, 1], 10)]),
+        ([7, 10], 4096, 12, "qwen3_uint4", [([0, 1], 12)]),
+        ([7, 10], 23, 512, "qwen3_uint4", [([0, 1], 10)]),
+        ([7, 10], 24, 512, "qwen3_uint4", [([0, 1], 12)]),
+        ([7, 10], 4096, 512, "bert_f32", [([0, 1], 10)]),
+        ([7, 10], 4096, 512, "future_backend", [([0, 1], 10)]),
+        ([7, 7, 7, 7, 7, 10], 4096, 512, "qwen3_uint4", [(list(range(6)), 10)]),
+        ([3, 5, 5, 5], 4096, 512, "qwen3_uint4", [(list(range(4)), 5)]),
+        ([70, 130], 4096, 512, "qwen3_uint4", [([0, 1], 130)]),
+        ([2, 3], 4096, 512, "qwen3_uint4", [([0, 1], 3)]),
+    ],
+)
+def test_two_input_fallback_alignment(lengths, budget, maximum, architecture, expected):
+    groups = execution_batches(np.array(lengths, np.uint32), budget, maximum, architecture)
+    assert [(rows.tolist(), width) for rows, width in groups] == expected
