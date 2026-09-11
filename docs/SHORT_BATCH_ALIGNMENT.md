@@ -144,3 +144,6 @@ short local qualification, not a new multi-hour soak or PyPI release.
 - [MLX-first comparison](../benchmarks/native-metal/short-batches-20260911/mlx-repeat.json)
 - [MLX repeat screen](../benchmarks/native-metal/short-batches-20260911/mlx-summary.json)
 - [Validation and local build hashes](../benchmarks/native-metal/short-batches-20260911/validation.json)
+
+The [three-row projection follow-up](SMALL_QWEN_PROJECTIONS.md) addresses the
+remaining short scalar bucket and records its separate qualification.

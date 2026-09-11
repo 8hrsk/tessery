@@ -599,3 +599,34 @@ kernel void gated4_16x32_k64(device const float *x [[buffer(0)]],
     }
     simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
 }
+
+// Exactly three rows, one SIMD group per output channel. Reuse each
+// BF16 scale/bias for two K32 steps; preserve linear4 accumulation order.
+// Host restricts this entry point to the five verified Qwen projections.
+kernel void linear4_small3(device const float *x [[buffer(0)]],
+                    device const uint *w [[buffer(1)]],
+                    device const ushort *s [[buffer(2)]],
+                    device const ushort *b [[buffer(3)]],
+                    device float *out [[buffer(4)]],
+                    constant Params &p [[buffer(8)]],
+                    uint row [[threadgroup_position_in_grid]],
+                    uint lane [[thread_index_in_threadgroup]]) {
+    uint token = 0, channel = row;
+    float total[3] = {0.0f};
+    uint shift = (lane % 8)*4;
+    for (uint base = 0; base < p.k; base += 64) {
+        uint g = channel*(p.k/64)+base/64;
+        float scale = bf16(s[g]), bias = bf16(b[g]);
+        for (uint part = 0; part < 64; part += 32) {
+            uint col = base+part+lane;
+            uint packed = w[channel*(p.k/8)+col/8];
+            float weight = float((packed >> shift) & 15)*scale+bias;
+            for (uint t = 0; t < 3; ++t)
+                total[t] += x[t*p.k+col]*weight;
+        }
+    }
+    for (uint t = 0; t < 3; ++t) {
+        float sum = simd_sum(total[t]);
+        if (lane == 0) out[(token+t)*p.cols+channel] = sum;
+    }
+}

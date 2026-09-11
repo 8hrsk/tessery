@@ -64,6 +64,26 @@ def test_semantics_repeat_and_no_framework(model):
     )
 
 
+@pytest.mark.parametrize("dimensions", [32, 1024])
+def test_three_row_projection_preserves_distinct_embeddings(model, monkeypatch, dimensions):
+    rt = model._backend.runtime
+    original = rt._dispatch
+
+    def scalar(name, buffers, **kwargs):
+        return original("linear4" if name == "linear4_small3" else name, buffers, **kwargs)
+
+    for text in (" token token", " tree tree", " code code"):
+        _, lengths = model._tokenizer.batch([text], max_length=model.max_length)
+        assert lengths.tolist() == [3]
+        before = rt.diagnostics()["dispatches"].get("linear4_small3", 0)
+        actual = model.encode([text], dimensions=dimensions)
+        assert rt.diagnostics()["dispatches"]["linear4_small3"] - before == 196
+        with monkeypatch.context() as context:
+            context.setattr(rt, "_dispatch", scalar)
+            expected = model.encode([text], dimensions=dimensions)
+        np.testing.assert_array_equal(actual, expected)
+
+
 def test_dimensions_batch_order_and_memory(model):
     texts = ["a", "Короткий текст.", "Text with several words and punctuation!"]
     native = model.encode(texts, dimensions=1024)

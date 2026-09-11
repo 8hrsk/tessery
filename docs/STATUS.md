@@ -69,6 +69,8 @@ specification is preserved as historical input.
   controls; see [results and limits](PERFORMANCE_AFTER_FUSION.md).
 * Bounded four-token fallback alignment for short two-input Qwen buckets;
   see [short batch measurements](SHORT_BATCH_ALIGNMENT.md).
+* A scalar specialization for three-row Qwen projections, preserving the
+  previous accumulation order; see [small projection results](SMALL_QWEN_PROJECTIONS.md).
 * Native macOS arm64 wheel and source builds. Runtime dependencies are only
   NumPy and regex, with no MLX, torch, transformers or Hugging Face runtime.
 

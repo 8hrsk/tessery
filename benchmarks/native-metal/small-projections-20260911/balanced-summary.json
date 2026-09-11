@@ -1,0 +1,173 @@
+{
+  "status": "passed",
+  "inputs": {
+    "balanced-first.json": "ca29f76505dd783743f9d80fa903a0d8bc355bc19b743004b7c4f81534c83ce3",
+    "balanced-repeat.json": "984e26efe348d7ba89004659979617bd057be724b862cc0b35d3c1146b068d5e"
+  },
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "853386c12872955f51878b66c54371d346081e89898ca8207ec24d01c3fc7381",
+    "src/metal_inference/native/kernels.metal": "db437d638be82e854357b4c2efe9448d60e4d865214ff421bc52a3ded8770fa7",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "results": [
+    {
+      "lengths": [
+        2
+      ],
+      "speedup_range": [
+        0.9906288718555781,
+        1.0054104820921799
+      ],
+      "identical_control_a_over_b": [
+        1.0059008949010706,
+        0.9539833334107627
+      ],
+      "repeat_drift": {
+        "previous": 1.0684351930502696,
+        "selected": 1.052726989417985
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        3
+      ],
+      "speedup_range": [
+        1.4946169291836822,
+        1.5886225663922324
+      ],
+      "identical_control_a_over_b": [
+        1.0189331272716837,
+        1.0908237512467767
+      ],
+      "repeat_drift": {
+        "previous": 1.044309206253729,
+        "selected": 1.0177983059949405
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        4
+      ],
+      "speedup_range": [
+        0.900216087948182,
+        0.9642896806777327
+      ],
+      "identical_control_a_over_b": [
+        1.0941167071292945,
+        1.065443967665473
+      ],
+      "repeat_drift": {
+        "previous": 1.0606266891284317,
+        "selected": 1.0099461032284003
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "speedup_range": [
+        1.2172630975330314,
+        1.2798672058723644
+      ],
+      "identical_control_a_over_b": [
+        0.9716703569578714,
+        1.0087048456505787
+      ],
+      "repeat_drift": {
+        "previous": 1.0152883701538227,
+        "selected": 1.0675048739232962
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        10,
+        3,
+        7
+      ],
+      "speedup_range": [
+        1.194771047580343,
+        1.3054532958464549
+      ],
+      "identical_control_a_over_b": [
+        1.025664667671203,
+        1.0353975866252643
+      ],
+      "repeat_drift": {
+        "previous": 1.0734530028288507,
+        "selected": 1.017873045436473
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        7
+      ],
+      "speedup_range": [
+        0.9757575129943804,
+        0.9859502491040115
+      ],
+      "identical_control_a_over_b": [
+        0.9755368846435946,
+        0.9891399953500191
+      ],
+      "repeat_drift": {
+        "previous": 1.0195271440723344,
+        "selected": 1.0301770965428465
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    },
+    {
+      "lengths": [
+        3,
+        3
+      ],
+      "speedup_range": [
+        0.9858596171993461,
+        1.0181678963701217
+      ],
+      "identical_control_a_over_b": [
+        1.0168445032274456,
+        0.986296116690474
+      ],
+      "repeat_drift": {
+        "previous": 1.018086829268821,
+        "selected": 1.0144239701633686
+      },
+      "timing_screen_passed": true,
+      "cross_process_vectors_exact": true
+    }
+  ]
+}

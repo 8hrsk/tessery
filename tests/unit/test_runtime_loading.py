@@ -9,6 +9,28 @@ from metal_inference.errors import NativeBuildError
 @pytest.mark.parametrize(
     "rows,cols,k,selected",
     [
+        (3, n, k, True)
+        for n, k in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))
+    ]
+    + [(m, 1024, 1024, False) for m in (1, 2, 4, 5, 19)]
+    + [
+        (3, n, k, False)
+        for n, k in ((64, 1024), (1025, 1024), (1024, 64), (1024, 1023), (4096, 1024))
+    ],
+)
+def test_three_row_projection_guard(rows, cols, k, selected):
+    calls = []
+    runtime = SimpleNamespace(_dispatch=lambda *a, **kw: calls.append((a, kw)))
+    metal.MetalRuntime._linear4(runtime, [], rows=rows, cols=cols, k=k)
+    assert any(a[0] == "linear4_small3" for a, _ in calls) == selected
+    if selected:
+        assert len(calls) == 1
+        assert calls[0][1] == dict(threads=cols * 32, group_size=32, rows=3, cols=cols, k=k)
+
+
+@pytest.mark.parametrize(
+    "rows,cols,k,selected",
+    [
         (m, n, k, True)
         for m in (16, 17, 23, 24, 25, 31, 32, 33, 40, 129, 264, 4095, 4096)
         for n, k in ((1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072))

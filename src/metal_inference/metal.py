@@ -313,16 +313,28 @@ class MetalRuntime:
                 self._profile_command.clear()
 
     def _linear4(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
-        # Partition verified Qwen shapes into full 16-row tiles, then at most
-        # one eight-row tile and one bounded tail. Regions never overlap.
-        start = 0
-        if rows >= 16 and (cols, k) in (
+        qwen_shape = (cols, k) in (
             (1024, 1024),
             (2048, 1024),
             (3072, 1024),
             (1024, 2048),
             (1024, 3072),
-        ):
+        )
+        if rows == 3 and qwen_shape:
+            self._dispatch(
+                "linear4_small3",
+                buffers,
+                threads=cols * 32,
+                group_size=32,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+            return
+        # Partition verified Qwen shapes into full 16-row tiles, then at most
+        # one eight-row tile and one bounded tail. Regions never overlap.
+        start = 0
+        if rows >= 16 and qwen_shape:
             self._dispatch(
                 "linear4_16x32_k64",
                 buffers,

@@ -704,6 +704,54 @@ def test_mixed_quantized_tiles_match_previous_and_f64(runtime, m, n, k, cancella
             buffer.close()
 
 
+@pytest.mark.parametrize(
+    "m,pattern", [(3, "random"), (3, "cancellation"), (3, "edges"), (2, "random"), (4, "random")]
+)
+@pytest.mark.parametrize(
+    "n,k", [(1024, 1024), (2048, 1024), (3072, 1024), (1024, 2048), (1024, 3072)]
+)
+def test_three_row_projection_reference_and_output_guard(runtime, m, pattern, n, k):
+    rng = np.random.default_rng(2030 + m)
+    x = rng.normal(size=(m, k)).astype(np.float32)
+    codes = rng.integers(0, 16, size=(n, k), dtype=np.uint32)
+    if pattern == "cancellation":
+        x[:, 1::2] = -x[:, ::2]
+        codes[:, 1::2] = codes[:, ::2]
+    elif pattern == "edges":
+        x.fill(0)
+        for row in range(m):
+            x[row, [0, 31, 32, 63, 64, k - 1]] = np.roll([1, -2, 3, -4, 5, -6], row)
+    packed = np.bitwise_or.reduce(
+        codes.reshape(n, k // 8, 8) << np.arange(0, 32, 4, dtype=np.uint32), axis=-1
+    )
+    scales = bf16(rng.uniform(0.01, 0.2, size=(n, k // 64)))
+    biases = bf16(rng.uniform(-1, 0.1, size=scales.shape))
+    weights = codes.astype(np.float32) * (scales.astype(np.uint32) << 16).view(np.float32).repeat(
+        64, axis=1
+    )
+    weights += (biases.astype(np.uint32) << 16).view(np.float32).repeat(64, axis=1)
+    expected = x.astype(np.float64) @ weights.astype(np.float64).T
+    sentinel = np.full((m + 2, n), np.nan, np.float32)
+    arrays = [x, packed, scales, biases, sentinel]
+    buffers = [runtime.buffer(a.nbytes, a) for a in arrays]
+    try:
+        with runtime.command():
+            runtime._linear4(buffers, rows=m, cols=n, k=k)
+        actual = runtime.read(buffers[-1], sentinel.shape)
+        assert np.isnan(actual[m:]).all()
+        np.testing.assert_allclose(actual[:m], expected, atol=5e-5, rtol=5e-5)
+        assert runtime.diagnostics()["dispatches"] == {"linear4_small3" if m == 3 else "linear4": 1}
+        with runtime.command():
+            runtime._dispatch(
+                "linear4", buffers, threads=n * 32, group_size=32, rows=m, cols=n, k=k
+            )
+        np.testing.assert_array_equal(actual[:m], runtime.read(buffers[-1], sentinel.shape)[:m])
+    finally:
+        for buffer in buffers:
+            buffer.close()
+    assert runtime.active_bytes == 0
+
+
 def test_quantized_eight_row_offset_preserves_surrounding_rows(runtime):
     m, n, k = 32, 32, 64
     inputs = [
