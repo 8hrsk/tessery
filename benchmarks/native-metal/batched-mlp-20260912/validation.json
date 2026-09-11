@@ -1,0 +1,122 @@
+{
+  "status": "short_qualification_passed_long_pending",
+  "development_source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+    "src/metal_inference/bert.py": "d647a3a087e52fea6262a2d88769b88bb12512234b9dac5eff3b3790080a5499",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "46ac3917a4b78e2c6aeb9018507552d63bb71ea78bffde3da5f3d7312624aa13",
+    "src/metal_inference/native/kernels.metal": "2b869949681df08601e6018a85f16eec998e0d041ffc7b77ef8068137186eee3",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "full_tests": {
+    "passed": 991,
+    "coverage_percent": 94.62,
+    "log_sha256": "7e207ab1a35da312ea4a1efe5f0babc40a66013e4fc52a7f0d810bf5a34e8f40"
+  },
+  "shader_validation": {
+    "passed": 34,
+    "log_sha256": "a1d79062dc2595af955b32bf02f3c1b45ba58194519d3cbe057a4eaf84f254e0"
+  },
+  "checks": [
+    "ruff format",
+    "ruff check",
+    "mypy",
+    "dependency policy",
+    "frozen inputs",
+    "git diff --check",
+    "release payload validation",
+    "installed dependency policy"
+  ],
+  "installed_wheel": {
+    "cases": 51,
+    "dimensions": [
+      64,
+      384,
+      1024
+    ],
+    "qwen_and_bge_smoke": true,
+    "report_sha256": "9a225fa7ad7d4bb5fe8ce0569fab8bf8218167b5d1e05027aa58cb9879a7628d",
+    "harness_sha256": "242eddd35f9e6870ce26318a182fd67fa26731237dcfe9298237da4a6ad8523f",
+    "smoke_log_sha256": "00b1f4848552b1ff65146df624101b57de7ee15946914b4681c64a8ef969e833"
+  },
+  "artifacts": {
+    "tessery-0.6.0a1-py3-none-macosx_14_0_arm64.whl": "08505944037b73a947307eaa44e408e0e08f3fb31d73bf17676cc3ddb16cefde",
+    "tessery-0.6.0a1.tar.gz": "bba5a43e13c6d0a137a944cd2fad666ffec23574f717801f5e3702ac50ef72c9"
+  },
+  "stress": {
+    "qwen": {
+      "rounds": 8,
+      "forward_cancellations": 8,
+      "reloads": 2,
+      "closed_lifecycles": 3,
+      "report_sha256": "df18155bda6847fc463e3a612edf448cccaa0efcf232342b9b042b30a63603e4"
+    },
+    "bge": {
+      "rounds": 8,
+      "forward_cancellations": 8,
+      "reloads": 2,
+      "closed_lifecycles": 3,
+      "report_sha256": "97da8c302c539089cd45c0d0fa885310139b9076fd9cb117a473b51773a54b00"
+    }
+  },
+  "rehearsals": {
+    "qwen": {
+      "elapsed_seconds": 30.163469832972623,
+      "completed_calls": 156,
+      "live_buffers_stable": true,
+      "workspace_cache_bounded": true,
+      "bitwise_repeatability": true
+    },
+    "bge": {
+      "elapsed_seconds": 30.021145458042156,
+      "completed_calls": 1200,
+      "live_buffers_stable": true,
+      "workspace_cache_bounded": true,
+      "bitwise_repeatability": true
+    }
+  },
+  "comparisons": {
+    "qwen": {
+      "numerical_checks": "passed",
+      "timing_cases": 10,
+      "timing_screen_passed": 10,
+      "summary_sha256": "41e8ba9679966d7e24da228999c910fffae35ad352b573c618dd372988c91c0c"
+    },
+    "bge": {
+      "numerical_checks": "passed",
+      "timing_cases": 6,
+      "timing_screen_passed": 4,
+      "summary_sha256": "a1a00a4aaebbc74b672bf00de0b8ad5f18bd87c1518fe5b4adc7d2a636d8d13f"
+    }
+  },
+  "core_ci": {
+    "commit": "93cdcd8493b47186d2e6bad4c59bb636cf668da2",
+    "run_id": 34648275204,
+    "portable": "success",
+    "native": "skipped; local opt-in tests passed"
+  },
+  "long_qualification": {
+    "status": "pending_launch",
+    "planned_native_seconds_per_model": 7200,
+    "planned_kaggle_cpu_seconds": 14400,
+    "local_directory": "artifacts/qualification-20260912"
+  }
+}

@@ -1,0 +1,667 @@
+{
+  "status": "passed",
+  "imported_from": "/private/tmp/metal inference smoke \u03a9/.venv/lib/python3.12/site-packages/tessery/__init__.py",
+  "cases": [
+    {
+      "lengths": [
+        160
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        160
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        160
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33,
+        33
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        32,
+        32,
+        32,
+        32,
+        32
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        161
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        161
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        161
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        24
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        24
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        24
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        12,
+        12
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        12,
+        12
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        12,
+        12
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        8,
+        8,
+        8
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        8,
+        8,
+        8
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        8,
+        8,
+        8
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3,
+        7,
+        10
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        25
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        25
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        25
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        3
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        17
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        17
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        17
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        19
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        19
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        19
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        23
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        23
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        23
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        159
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        159
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        159
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        10,
+        3,
+        7
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        10,
+        3,
+        7
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        10,
+        3,
+        7
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 28,
+        "gated4_8x32": 28
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33
+      ],
+      "dimensions": 64,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33
+      ],
+      "dimensions": 384,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    },
+    {
+      "lengths": [
+        33,
+        33,
+        33
+      ],
+      "dimensions": 1024,
+      "dispatches": {
+        "gated4_16x32_k64": 0,
+        "gated4_8x32": 0
+      },
+      "exact_baseline_equality": true
+    }
+  ],
+  "runtime_after_close": {
+    "shader_sha256": "2b869949681df08601e6018a85f16eec998e0d041ffc7b77ef8068137186eee3",
+    "native_library_sha256": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "allocations": 1002,
+    "allocated_bytes": 366081840,
+    "completed_commands": 114,
+    "gpu_timed_commands": 114,
+    "gpu_seconds": 9.619224874710198,
+    "encode_seconds": 0.6785541299032047,
+    "submit_wait_seconds": 9.714636031829286,
+    "dispatches": {
+      "embedding4": 114,
+      "rms_norm": 12882,
+      "linear4_16x32_k64": 16632,
+      "rope": 6384,
+      "attention_tiled": 336,
+      "add": 6384,
+      "gated4_16x32_k64": 1092,
+      "pool_project": 114,
+      "silu_gate": 2100,
+      "attention": 2688,
+      "linear4": 1176,
+      "attention_tail_128": 168,
+      "linear4_tiled": 9240,
+      "gated4_8x32": 672,
+      "linear4_small3": 3528
+    },
+    "active_bytes": 0,
+    "cache_bytes": 0,
+    "peak_bytes": 366049836
+  }
+}

@@ -53,6 +53,14 @@ launch but repeated weight decoding across three tiles; it gave weaker
 results for the homogeneous 24-row cases and was not selected. It has only
 one exploratory run, so no definitive cross-variant ranking is claimed.
 
+In the first paired run, four-by-33 dispatches fall from 479 to 423 per call,
+median GPU time from 180.1 to 170.4 ms and command encoding from 5.79 to
+5.14 ms. In the mixed short case dispatches fall from 1,154 to 1,070, GPU time
+from 48.0 to 46.6 ms and encoding from 12.72 to 12.07 ms. These are normal
+command diagnostics, not intrusive per-kernel profiles. GPU time overlaps
+submit/wait time and must not be added to it. The remaining encoding cost in
+the short case is a useful target for a future measured optimization.
+
 Raw evidence and paired summaries are in
 `benchmarks/native-metal/batched-mlp-20260912/`. The 160-row evidence used the
 previous production shader; the 24-row evidence appended the new kernel.
@@ -98,3 +106,53 @@ three closed lifecycles. Thirty-second rehearsals completed 156 Qwen and 1,200
 BGE calls, visiting every workload case and preserving bitwise repeatability,
 live buffer ownership and workspace bounds. These rehearsals are not the
 multi-hour qualification.
+
+
+## Refreshed direct MLX comparison
+
+Both engines run sequentially in fresh processes in both engine orders,
+with 30 samples per identical-operation A/B label. The baseline is the
+independent MLX 0.32.2 F32 graph using causal SDPA for unpadded Qwen inputs
+and the additive mask otherwise. It uses the same tokenizer and execution
+plans. This is neither `mlx-embeddings` nor a compiled `mx.compile` graph.
+BGE additionally validates its frozen CPU reference in every worker. All
+cross-engine vector checks retain `atol=5e-6, rtol=1e-4`.
+
+Ratios below are **Tessery latency / MLX latency**, across both engine orders;
+less than one favors Tessery. The screen requires all four A/B controls
+within 10% and each engine's process-median drift within 15%.
+
+| Qwen logical lengths | Tessery/MLX ratio | Timing screen |
+|---|---:|---|
+| 3 | 1.585–1.630 | pass |
+| 7 | 0.717–0.803 | pass |
+| 17 | 0.944–0.996 | pass |
+| 24 | 0.943–1.026 | pass |
+| 159 | 1.346–1.363 | pass |
+| 160 | 1.405–1.435 | pass |
+| 256 | 1.428–1.435 | pass |
+| 512 | 1.551–1.566 | pass |
+| 33, 33, 33, 33 | 1.399–1.415 | pass |
+| 3, 7, 10 | 1.104–1.124 | pass |
+
+All ten Qwen cases pass the screen. The 24-token ratio crosses one, so it
+shows approximate parity rather than a stable win. The mixed short batch
+still has about 10–12% more latency than MLX, and four-by-33 about 40–41%.
+The paired old/new measurements establish the incremental improvement;
+absolute comparisons with past sessions do not. These results do not
+establish an advantage across arbitrary workloads or other Apple GPUs.
+
+| BGE logical lengths | Tessery/MLX ratio | Timing screen |
+|---|---:|---|
+| 7 | 1.228–1.501 | pass |
+| 24 | 1.202–1.668 | fail |
+| 160 | 1.408–1.482 | pass |
+| 512 | 1.470–1.581 | pass |
+| 33, 33, 33, 33 | 1.689–1.732 | pass |
+| 3, 7, 10 | 1.601–1.635 | fail |
+
+BGE numerical checks all pass, but only four of six timing rows pass the
+screen. The 24-token row has 1.397× Tessery process drift; the mixed row fails
+an identical-operation control. The seven-token case passes narrowly, with
+14.9% Tessery drift. Retain these noisy rows as evidence; they do not support
+changing BGE dispatch. MLX remains faster on the passing BGE cases.
