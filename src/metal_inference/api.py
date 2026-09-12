@@ -202,7 +202,11 @@ class EmbeddingModel:
         return snapshot, dims
 
     def _run(
-        self, texts: list[str], dimensions: int, canceled: threading.Event
+        self,
+        texts: list[str],
+        dimensions: int,
+        canceled: threading.Event,
+        prepared: tuple[NDArray[np.uint32], NDArray[np.uint32], int] | None = None,
     ) -> NDArray[np.float32]:
         try:
             with self._metal_lock:
@@ -210,9 +214,12 @@ class EmbeddingModel:
                     raise ClosedError()
                 if canceled.is_set():
                     raise CanceledError()
-                ids, lengths = self._tokenizer.batch(
-                    texts, max_length=self.max_length, canceled=canceled.is_set
-                )
+                if prepared is None or prepared[2] != self.max_length:
+                    ids, lengths = self._tokenizer.batch(
+                        texts, max_length=self.max_length, canceled=canceled.is_set
+                    )
+                else:
+                    ids, lengths, _ = prepared
                 result = np.empty((len(texts), dimensions), dtype=np.float32)
                 # Limit temporary GPU memory independently of caller batch size.
                 for rows, width in execution_batches(
@@ -252,15 +259,61 @@ class EmbeddingModel:
         except FutureCancelledError:
             raise ClosedError() from None
 
+    def _encode_prepared(
+        self,
+        texts: Sequence[str],
+        tokens: Sequence[NDArray[np.uint32]],
+        *,
+        max_length: int,
+    ) -> NDArray[np.float32]:
+        """Index-only reuse of accepted tokenizer rows; not an unchecked public ID API.
+
+        Revalidates text limits and token bounds, then owns an independent padded
+        snapshot. Admission, FIFO, cancellation and execution use the normal worker.
+        A changed tokenizer cap falls back to ordinary tokenization in that worker.
+        """
+        snapshot, dims = self._prepare(texts, None)
+        if len(tokens) != len(snapshot) or type(max_length) is not int or max_length < 1:
+            raise InvalidInputError()
+        for row in tokens:
+            if (
+                not isinstance(row, np.ndarray)
+                or row.dtype != np.uint32
+                or row.ndim != 1
+                or not 1 <= row.size <= min(max_length, self.descriptor.max_length)
+                or np.any(row >= self._tokenizer.vocab_size)
+            ):
+                raise InvalidInputError()
+        if not snapshot:
+            return np.empty((0, dims), dtype=np.float32)
+        lengths = np.asarray([row.size for row in tokens], dtype=np.uint32)
+        ids = np.full((len(tokens), int(lengths.max())), self._tokenizer.pad_id, np.uint32)
+        for i, row in enumerate(tokens):
+            ids[i, : row.size] = row
+        ids.flags.writeable = lengths.flags.writeable = False
+        try:
+            return self._submit(
+                snapshot, dims, threading.Event(), (ids, lengths, max_length)
+            ).result()
+        except FutureCancelledError:
+            raise ClosedError() from None
+
     def _submit(
-        self, snapshot: list[str], dims: int, canceled: threading.Event
+        self,
+        snapshot: list[str],
+        dims: int,
+        canceled: threading.Event,
+        prepared: tuple[NDArray[np.uint32], NDArray[np.uint32], int] | None = None,
     ) -> Future[NDArray[np.float32]]:
         # Both APIs submit to the same single worker so synchronous callers do
         # not bypass already queued asynchronous work by racing for a lock.
         if not self._admission.acquire(blocking=False):
             raise OverloadError()
         try:
-            future = self._executor.submit(self._run, snapshot, dims, canceled)
+            if prepared is None:
+                future = self._executor.submit(self._run, snapshot, dims, canceled)
+            else:
+                future = self._executor.submit(self._run, snapshot, dims, canceled, prepared)
         except RuntimeError:
             self._admission.release()
             raise ClosedError() from None

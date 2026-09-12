@@ -1,0 +1,404 @@
+{
+  "runs": [
+    {
+      "scope": "Index build with actual local tokenizers and deterministic CPU-only fake backend; no model inference",
+      "platform": "macOS-26.3-arm64-arm-64bit",
+      "python": "3.12.13 (main, Mar  3 2026, 15:35:03) [Clang 21.1.4 ]",
+      "numpy": "2.5.2",
+      "reverse": false,
+      "source_sha256": {
+        "src/metal_inference/api.py": "8277f1745cff45c8f92f2dcbbb0341e6408a45e159568145b8e4d3ca0b4d1bdd",
+        "src/metal_inference/index.py": "f2c1c843057445259ac355ae9a9026e57901a4e9f4038e27ac99447cc036eb09",
+        "tools/benchmark_index_token_reuse.py": "3b42afe57bb8fa83db868e76cd68606f8d5830cd1422fcf97464582b2d4d6575"
+      },
+      "cases": [
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 256,
+          "max_length": 512,
+          "chunks": 53,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "341bcde5261c1522ab2e269085d986a63164cea182709423fc85d0fce8d196b2",
+          "timings_ms": {
+            "False": {
+              "p50": 34.946604,
+              "p95": 35.24884985
+            },
+            "True": {
+              "p50": 17.910229,
+              "p95": 17.9663333
+            }
+          },
+          "old_over_reuse": 1.9512092223946438,
+          "tokenized_texts": {
+            "False": 106,
+            "True": 53
+          },
+          "peak_traced_bytes": {
+            "False": 394655,
+            "True": 402306
+          },
+          "paired_saving_ms_ci95": [
+            16.9320835,
+            17.224756999999997
+          ]
+        },
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 600,
+          "max_length": 512,
+          "chunks": 23,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "8b06067bef8ad29f108010ef0198504e98f05811d6257588503c45afdb846e07",
+          "timings_ms": {
+            "False": {
+              "p50": 31.7973125,
+              "p95": 31.967767
+            },
+            "True": {
+              "p50": 16.0741035,
+              "p95": 16.4048106
+            }
+          },
+          "old_over_reuse": 1.9781701977967232,
+          "tokenized_texts": {
+            "False": 46,
+            "True": 23
+          },
+          "peak_traced_bytes": {
+            "False": 209845,
+            "True": 223783
+          },
+          "paired_saving_ms_ci95": [
+            15.494576666666667,
+            15.741469083333334
+          ]
+        },
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 600,
+          "max_length": 128,
+          "chunks": 36,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "334c5c042f9c18f6773a07895247c3cda89de97d952e89006379e62eaacef794",
+          "timings_ms": {
+            "False": {
+              "p50": 51.520270499999995,
+              "p95": 51.998751899999995
+            },
+            "True": {
+              "p50": 35.481708499999996,
+              "p95": 36.1975436
+            }
+          },
+          "old_over_reuse": 1.4520233855142572,
+          "tokenized_texts": {
+            "False": 98,
+            "True": 62
+          },
+          "peak_traced_bytes": {
+            "False": 269827,
+            "True": 271927
+          },
+          "paired_saving_ms_ci95": [
+            15.865822058333329,
+            16.189808833333334
+          ]
+        },
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 256,
+          "max_length": 512,
+          "chunks": 53,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "9956ff30d69982a2b622670e66bcbfa72d331a3c14c3c2ef5075b5117382429b",
+          "timings_ms": {
+            "False": {
+              "p50": 39.460416499999994,
+              "p95": 40.0055276
+            },
+            "True": {
+              "p50": 20.040188,
+              "p95": 20.362241299999997
+            }
+          },
+          "old_over_reuse": 1.9690641874217942,
+          "tokenized_texts": {
+            "False": 106,
+            "True": 53
+          },
+          "peak_traced_bytes": {
+            "False": 393895,
+            "True": 405705
+          },
+          "paired_saving_ms_ci95": [
+            19.310607916666665,
+            19.59973583333333
+          ]
+        },
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 600,
+          "max_length": 512,
+          "chunks": 23,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "f78b4b72147d773a60bbb0db8c1d6112d81ebab8c2dbf0949427817b55dffbff",
+          "timings_ms": {
+            "False": {
+              "p50": 35.742208500000004,
+              "p95": 36.04475595
+            },
+            "True": {
+              "p50": 18.029833,
+              "p95": 18.3344599
+            }
+          },
+          "old_over_reuse": 1.9823926544411146,
+          "tokenized_texts": {
+            "False": 46,
+            "True": 23
+          },
+          "peak_traced_bytes": {
+            "False": 209277,
+            "True": 235945
+          },
+          "paired_saving_ms_ci95": [
+            17.579194166666667,
+            17.695885333333333
+          ]
+        },
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 600,
+          "max_length": 128,
+          "chunks": 120,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "2fc0b17a6f53de07f0a23451ef7b6c31fedd867db158f8f62713254b3c61d8b1",
+          "timings_ms": {
+            "False": {
+              "p50": 185.1132505,
+              "p95": 186.71719375
+            },
+            "True": {
+              "p50": 161.1662505,
+              "p95": 164.947025
+            }
+          },
+          "old_over_reuse": 1.148585699088408,
+          "tokenized_texts": {
+            "False": 531,
+            "True": 411
+          },
+          "peak_traced_bytes": {
+            "False": 826020,
+            "True": 837591
+          },
+          "paired_saving_ms_ci95": [
+            22.18962059791666,
+            24.089555999999998
+          ]
+        }
+      ]
+    },
+    {
+      "scope": "Index build with actual local tokenizers and deterministic CPU-only fake backend; no model inference",
+      "platform": "macOS-26.3-arm64-arm-64bit",
+      "python": "3.12.13 (main, Mar  3 2026, 15:35:03) [Clang 21.1.4 ]",
+      "numpy": "2.5.2",
+      "reverse": true,
+      "source_sha256": {
+        "src/metal_inference/api.py": "8277f1745cff45c8f92f2dcbbb0341e6408a45e159568145b8e4d3ca0b4d1bdd",
+        "src/metal_inference/index.py": "f2c1c843057445259ac355ae9a9026e57901a4e9f4038e27ac99447cc036eb09",
+        "tools/benchmark_index_token_reuse.py": "3b42afe57bb8fa83db868e76cd68606f8d5830cd1422fcf97464582b2d4d6575"
+      },
+      "cases": [
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 600,
+          "max_length": 128,
+          "chunks": 120,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "2fc0b17a6f53de07f0a23451ef7b6c31fedd867db158f8f62713254b3c61d8b1",
+          "timings_ms": {
+            "False": {
+              "p50": 184.1299585,
+              "p95": 185.00171685
+            },
+            "True": {
+              "p50": 160.43004150000002,
+              "p95": 162.8517891
+            }
+          },
+          "old_over_reuse": 1.1477274254772287,
+          "tokenized_texts": {
+            "False": 531,
+            "True": 411
+          },
+          "peak_traced_bytes": {
+            "False": 826084,
+            "True": 837640
+          },
+          "paired_saving_ms_ci95": [
+            22.39386516666667,
+            24.193423749999994
+          ]
+        },
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 600,
+          "max_length": 512,
+          "chunks": 23,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "f78b4b72147d773a60bbb0db8c1d6112d81ebab8c2dbf0949427817b55dffbff",
+          "timings_ms": {
+            "False": {
+              "p50": 35.924938,
+              "p95": 36.27123925
+            },
+            "True": {
+              "p50": 18.0874795,
+              "p95": 18.3905394
+            }
+          },
+          "old_over_reuse": 1.9861771232415217,
+          "tokenized_texts": {
+            "False": 46,
+            "True": 23
+          },
+          "peak_traced_bytes": {
+            "False": 209277,
+            "True": 235798
+          },
+          "paired_saving_ms_ci95": [
+            17.654149416666666,
+            17.8393257625
+          ]
+        },
+        {
+          "tokenizer": "bert",
+          "chunk_chars": 256,
+          "max_length": 512,
+          "chunks": 53,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "9956ff30d69982a2b622670e66bcbfa72d331a3c14c3c2ef5075b5117382429b",
+          "timings_ms": {
+            "False": {
+              "p50": 39.5695835,
+              "p95": 39.8411394
+            },
+            "True": {
+              "p50": 20.1294585,
+              "p95": 20.9246375
+            }
+          },
+          "old_over_reuse": 1.9657549903789018,
+          "tokenized_texts": {
+            "False": 106,
+            "True": 53
+          },
+          "peak_traced_bytes": {
+            "False": 393895,
+            "True": 405705
+          },
+          "paired_saving_ms_ci95": [
+            19.000586833333333,
+            19.5540369625
+          ]
+        },
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 600,
+          "max_length": 128,
+          "chunks": 36,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "334c5c042f9c18f6773a07895247c3cda89de97d952e89006379e62eaacef794",
+          "timings_ms": {
+            "False": {
+              "p50": 51.338583,
+              "p95": 51.8819728
+            },
+            "True": {
+              "p50": 35.207396,
+              "p95": 35.6295583
+            }
+          },
+          "old_over_reuse": 1.4581760889104094,
+          "tokenized_texts": {
+            "False": 98,
+            "True": 62
+          },
+          "peak_traced_bytes": {
+            "False": 269947,
+            "True": 271704
+          },
+          "paired_saving_ms_ci95": [
+            16.011805416666665,
+            16.321451166666666
+          ]
+        },
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 600,
+          "max_length": 512,
+          "chunks": 23,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "8b06067bef8ad29f108010ef0198504e98f05811d6257588503c45afdb846e07",
+          "timings_ms": {
+            "False": {
+              "p50": 31.44225,
+              "p95": 31.698539250000003
+            },
+            "True": {
+              "p50": 15.8850625,
+              "p95": 16.0789936
+            }
+          },
+          "old_over_reuse": 1.9793595398192485,
+          "tokenized_texts": {
+            "False": 46,
+            "True": 23
+          },
+          "peak_traced_bytes": {
+            "False": 209845,
+            "True": 223979
+          },
+          "paired_saving_ms_ci95": [
+            15.520371833333336,
+            15.696093431250002
+          ]
+        },
+        {
+          "tokenizer": "qwen",
+          "chunk_chars": 256,
+          "max_length": 512,
+          "chunks": 53,
+          "exact_chunks_vectors": true,
+          "backend_token_sha256": "341bcde5261c1522ab2e269085d986a63164cea182709423fc85d0fce8d196b2",
+          "timings_ms": {
+            "False": {
+              "p50": 35.121125,
+              "p95": 35.3647103
+            },
+            "True": {
+              "p50": 17.996312500000002,
+              "p95": 18.1647144
+            }
+          },
+          "old_over_reuse": 1.9515734126088329,
+          "tokenized_texts": {
+            "False": 106,
+            "True": 53
+          },
+          "peak_traced_bytes": {
+            "False": 394471,
+            "True": 402137
+          },
+          "paired_saving_ms_ci95": [
+            16.981520749999998,
+            17.2826945
+          ]
+        }
+      ]
+    }
+  ]
+}

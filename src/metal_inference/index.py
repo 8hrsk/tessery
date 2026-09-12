@@ -20,6 +20,8 @@ from .retrieval import _cached_cosine_search, _prepare_document_norms
 MAX_CHUNKS = 10000
 MAX_TEXT_BYTES = 16 * 1024 * 1024
 MAX_INDEX_BYTES = 128 * 1024 * 1024
+# Temporary ingestion cache, independent of persistent vector/snapshot limits.
+_MAX_PREPARED_TOKEN_BYTES = 16 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -124,6 +126,10 @@ class DocumentIndex:
         ):
             raise InvalidInputError()
         chunks: list[Chunk] = []
+        prepared: list[NDArray[np.uint32] | None] = []
+        prepared_bytes = 0
+        prepared_cap = model.max_length
+        reuse = isinstance(model, EmbeddingModel) and getattr(model, "_reuse_index_tokens", True)
         total = 0
         for source, text in documents.items():
             if (
@@ -147,16 +153,27 @@ class DocumentIndex:
                 # A saturated tokenizer length might conceal truncation. Shrink
                 # conservatively until strictly below the cap, including prefix.
                 while text[start:end].strip():
-                    _, lengths = model._tokenizer.batch(
-                        [document_prefix + text[start:end]], max_length=model.max_length
+                    probe_cap = model.max_length
+                    if probe_cap != prepared_cap:
+                        reuse = False
+                    probe_ids, lengths = model._tokenizer.batch(
+                        [document_prefix + text[start:end]], max_length=probe_cap
                     )
-                    if int(lengths[0]) < model.max_length:
+                    if int(lengths[0]) < probe_cap:
                         break
                     if end - start == 1:
                         raise InvalidInputError()
                     end = start + (end - start) // 2
                 if text[start:end].strip():
                     chunks.append(Chunk(source, start, end, text[start:end]))
+                    row_bytes = int(lengths[0]) * 4
+                    if reuse and prepared_bytes + row_bytes <= _MAX_PREPARED_TOKEN_BYTES:
+                        row = np.array(probe_ids[0, : int(lengths[0])], dtype=np.uint32, copy=True)
+                        row.flags.writeable = False
+                        prepared.append(row)
+                        prepared_bytes += row.nbytes
+                    else:
+                        prepared.append(None)
                 if len(chunks) > MAX_CHUNKS:
                     raise InvalidInputError()
                 if end == len(text):
@@ -171,12 +188,21 @@ class DocumentIndex:
         payload_bytes += len(chunks) * model.dimensions * 4
         if text_bytes > 2 * MAX_TEXT_BYTES or payload_bytes > MAX_INDEX_BYTES // 2:
             raise InvalidInputError()
-        vectors = np.concatenate(
-            [
-                model.encode([document_prefix + c.text for c in chunks[offset : offset + 32]])
-                for offset in range(0, len(chunks), 32)
-            ]
-        )
+        batches = []
+        for offset in range(0, len(chunks), 32):
+            texts = [document_prefix + c.text for c in chunks[offset : offset + 32]]
+            rows = prepared[offset : offset + 32]
+            if reuse and all(row is not None for row in rows):
+                batches.append(
+                    model._encode_prepared(
+                        texts, [row for row in rows if row is not None], max_length=prepared_cap
+                    )
+                )
+            else:
+                batches.append(model.encode(texts))
+            # Token snapshots are unnecessary after their batch has completed.
+            prepared[offset : offset + 32] = [None] * len(rows)
+        vectors = np.concatenate(batches)
         metadata = {
             "format": "tessery-exact-index-v1",
             "contract": _contract(model),
