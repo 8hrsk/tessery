@@ -688,7 +688,7 @@ class MetalRuntime:
 
     def _matmul_bias_f32(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
         """Affine BGE projection; buffers are input, transposed weight, output, bias."""
-        if (cols, k) not in ((384, 384), (1536, 384), (384, 1536)):
+        if rows < 8 or (cols, k) not in ((384, 384), (1536, 384), (384, 1536)):
             self._matmul_f32(buffers[:3], rows=rows, cols=cols, k=k)
             self._dispatch(
                 "add_bias", [buffers[2], buffers[3]], threads=rows * cols, n=rows * cols, cols=cols

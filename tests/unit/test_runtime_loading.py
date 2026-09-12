@@ -229,7 +229,7 @@ def test_bge_affine_guarded_dispatch(rows, cols, k):
     )
     buffers = [object() for _ in range(4)]
     metal.MetalRuntime._matmul_bias_f32(runtime, buffers, rows=rows, cols=cols, k=k)
-    if cols == 385:
+    if cols == 385 or rows < 8:
         assert [c[0][0] for c in calls] == ["old_matmul", "add_bias"]
         assert calls[0][0][1] == buffers[:3]
         assert calls[1][0][1] == buffers[2:]

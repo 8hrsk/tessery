@@ -105,7 +105,8 @@ def main():
                             d = delta(before, rt.diagnostics())
                             np.testing.assert_array_equal(output, refs["previous_a"])
                             if name == "selected":
-                                assert not d["dispatches"].get("add_bias", 0)
+                                fallback_buckets = sum(len(r) * w < 8 for r, w in plans)
+                                assert d["dispatches"].get("add_bias", 0) == 72 * fallback_buckets
                             else:
                                 assert d["dispatches"]["add_bias"] == 72 * len(plans)
                             timings[name].append(elapsed)

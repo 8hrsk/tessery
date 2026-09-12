@@ -1,16 +1,19 @@
 # BGE affine projection fusion
 
 This isolated prototype fuses the bias addition into the existing BGE F32
-matrix multiplication for the three previously qualified `(N,K)` pairs:
+matrix multiplication at **eight or more execution rows** for the three
+previously qualified `(N,K)` pairs:
 `(384,384)`, `(1536,384)` and `(384,1536)`. Complete eight-row tiles preserve
 independent K32 partial sums; residual rows use the same scalar SIMD reduction.
-Both epilogues add bias after the completed F32 sum. Other shapes keep the
+Both epilogues add bias after the completed F32 sum. Fewer than eight rows
+and other projection shapes keep the
 separate matmul and bias launches. GELU remains the existing erf formulation.
 
 The tile epilogue repeats 32 bias values across an eight-row, 1 KiB shared
 matrix and uses one barrier. This avoids assumptions about which SIMD lane
 owns each matrix element. No model or workspace buffers are added. A full
-BGE forward removes 72 `add_bias` launches per execution bucket.
+BGE forward removes 72 `add_bias` launches per eligible execution bucket.
+Small standalone buckets retain the old route because their timing remained noisy.
 
 ## Evidence on Apple M1
 
@@ -31,7 +34,7 @@ measurements under uncontrolled thermals, not universal speed guarantees.
 
 | Logical lengths | Old/new p50 ratio | Evidence |
 |---|---:|---|
-| 3 | 1.115–1.258 | Still noisy; no performance claim |
+| 3 | Unchanged route | Scalar fusion excluded from final guard |
 | 7 | 1.130–1.210 | Initial paired pass |
 | 17 | 1.053–1.118 | Positive intervals, but 15.2% drift fails screen |
 | 24 | 1.099–1.113 | Targeted paired pass |
@@ -41,18 +44,25 @@ measurements under uncontrolled thermals, not universal speed guarantees.
 | 256 | 1.034–1.036 | Initial paired pass |
 | 512 | 1.023–1.029 | Initial paired pass |
 | 4 × 33 | 1.037–1.057 | Initial paired pass |
-| 3, 7, 10 | 1.062–1.074 | Targeted paired pass |
+| 3, 7, 10 | 1.011–1.028 | Final guarded paired pass |
 
 The 17- and 24-token cases share the same 24-row execution kernel; the
 remaining noisy API timings are not evidence of a shape-specific regression.
 They nevertheless do not justify a performance claim for those inputs.
+The final guard retains the old route below eight execution rows. Fresh
+60-sample mixed-batch repeats with that guard show a much smaller 1.011–1.028
+ratio; both block intervals are positive, but their lower bounds are only
+0.041 ms and the unchanged three-row control still displays substantial noise.
+Do not treat the original unguarded mixed result as the final benefit.
 Native-plan interaction needs separate joint qualification before promotion.
 
 Validation: 231 runtime unit tests; 44 affine kernel cases covering scalar,
 full tile, mixed tail and fallback shapes against the old route and independent
 F64 products; exact output sentinels; seven existing BGE model tests including
 frozen CPU embeddings, persisted retrieval and HTTP. All 44 affine cases also
-pass Metal Shader Validation. Ruff and strict mypy pass.
+pass Metal Shader Validation. After adding the final execution-row guard, all
+51 affine and BGE model cases pass together with Shader Validation enabled.
+Ruff and strict mypy pass.
 
 Compact evidence is in `benchmarks/native-metal/bge-affine-20260912/summary.json`.
 Full samples, vectors, normal command counters and frozen initial harness are
