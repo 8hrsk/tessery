@@ -134,18 +134,11 @@ class BertBackend:
             )
 
         def linear(x: Buffer, y: Buffer, name: str, outputs: int, inputs: int) -> None:
-            rt._matmul_f32(
-                [x, self.weights[name + ".weight"], y],
+            rt._matmul_bias_f32(
+                [x, self.weights[name + ".weight"], y, self.weights[name + ".bias"]],
                 rows=tokens,
                 cols=outputs,
                 k=inputs,
-            )
-            rt._dispatch(
-                "add_bias",
-                [y, self.weights[name + ".bias"]],
-                threads=tokens * outputs,
-                n=tokens * outputs,
-                cols=outputs,
             )
 
         def add(x: Buffer, y: Buffer) -> None:

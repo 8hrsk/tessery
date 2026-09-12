@@ -686,6 +686,37 @@ class MetalRuntime:
             k=k,
         )
 
+    def _matmul_bias_f32(self, buffers: Sequence[Buffer], *, rows: int, cols: int, k: int) -> None:
+        """Affine BGE projection; buffers are input, transposed weight, output, bias."""
+        if (cols, k) not in ((384, 384), (1536, 384), (384, 1536)):
+            self._matmul_f32(buffers[:3], rows=rows, cols=cols, k=k)
+            self._dispatch(
+                "add_bias", [buffers[2], buffers[3]], threads=rows * cols, n=rows * cols, cols=cols
+            )
+            return
+        complete = rows // 8
+        if complete:
+            self._dispatch(
+                "matmul_bias_f32_chunk32",
+                buffers,
+                threads=complete * (cols // 32) * 128,
+                group_size=128,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+        if rows % 8:
+            self._dispatch(
+                "matmul_bias_f32",
+                buffers,
+                threads=((rows % 8 + 3) // 4) * cols * 32,
+                group_size=32,
+                n=complete * 8,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+
     def add(self, a: NDArray[np.float32], b: NDArray[np.float32]) -> NDArray[np.float32]:
         """Reusable elementwise GPU addition, independent of any model."""
         if a.shape != b.shape or a.dtype != np.float32 or b.dtype != np.float32 or not a.size:

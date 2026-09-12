@@ -217,3 +217,27 @@ def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
         assert calls[1][1][0] == [buffers[0], *buffers[4:7], buffers[8]]
         assert calls[2][1] == ("silu_gate", buffers[7:])
         assert calls[2][2] == dict(threads=rows * cols, n=rows * cols)
+
+
+@pytest.mark.parametrize("rows", [1, 7, 8, 9, 15, 16, 129, 4096])
+@pytest.mark.parametrize("cols,k", [(384, 384), (1536, 384), (384, 1536), (385, 384)])
+def test_bge_affine_guarded_dispatch(rows, cols, k):
+    calls = []
+    runtime = SimpleNamespace(
+        _dispatch=lambda *a, **kw: calls.append((a, kw)),
+        _matmul_f32=lambda *a, **kw: calls.append((("old_matmul", *a), kw)),
+    )
+    buffers = [object() for _ in range(4)]
+    metal.MetalRuntime._matmul_bias_f32(runtime, buffers, rows=rows, cols=cols, k=k)
+    if cols == 385:
+        assert [c[0][0] for c in calls] == ["old_matmul", "add_bias"]
+        assert calls[0][0][1] == buffers[:3]
+        assert calls[1][0][1] == buffers[2:]
+    else:
+        expected = (["matmul_bias_f32_chunk32"] if rows >= 8 else []) + (
+            ["matmul_bias_f32"] if rows % 8 else []
+        )
+        assert [c[0][0] for c in calls] == expected
+        assert all(c[0][1] == buffers for c in calls)
+        if rows % 8:
+            assert calls[-1][1]["n"] == rows // 8 * 8

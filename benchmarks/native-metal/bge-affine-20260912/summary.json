@@ -1,0 +1,1475 @@
+{
+  "baseline_revision": "368d00a",
+  "purpose": "Isolated affine fusion without native execution plans",
+  "native_tests": 51,
+  "shader_validation_tests": 44,
+  "unit_tests": 231,
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "36c32fed20c198fea25eff3a589a77194defc2417158b771df19b35f97060818",
+    "src/metal_inference/api.py": "348edfaf2260c4dd9808ffd74eebfe5201ad5ebbec9afc43018797d23e19d20a",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+    "src/metal_inference/bert.py": "6aa7ddc18d844ec77758ea56eb9ec87e16de739c4ba84fb8334732f68aeab68c",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "a704360d6033a4466ee31eabe0e233b5e858be91e8d70789933854420495e1c0",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "88ee447cbda18ce8d198e91e2b664d2a5b5780e1dd1d3acf7af5ec0ca464c380",
+    "src/metal_inference/native/kernels.metal": "9ddcd8fccbb73c4bb7a04dc0483330029aab3de673ca3fd87bb784f162c456d4",
+    "src/metal_inference/native/runtime.mm": "d9f65c761acf54015eaebdfdb6633d86ac68cb3ea21dfa06bb61945745a218a1",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "b4bab11813834265637d7d2813ab01e5e5d7ada94965a54a8dfdc9246e65be02",
+    "src/metal_inference/retrieval.py": "01aec03469481317934b08e98481d1935790ff6b718bbb01ff4517fd4a5adeb5",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "runs": {
+    "first": {
+      "file_sha256": "b8add7677dc5e0905b9b2181b4e75248ccbb3ec5fe3ced288941a03e9970cbf4",
+      "harness_sha256": "930d8c8e7faacfc163b61f5167a5e5758b73527a85148960344efd1dd4bacaf5",
+      "samples_per_label": 30,
+      "reverse_cases": false,
+      "cases": [
+        {
+          "lengths": [
+            3
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ]
+          ],
+          "input_ids_sha256": "91d9ee7dfc0b5361353c50e3e81ac6275ba27245ae9925a1917382e4882c97be",
+          "exact_baseline_equality": true,
+          "speedup": 1.0716911728079643,
+          "identical_control_a_over_b": 1.006429631994113,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            -0.00016115755521847532,
+            0.0008334706353101259
+          ],
+          "vectors_sha256": "1111645d9c5f24b138d1861312056e9cfbf85a7c8620fa7fc5af06f71e55b94a",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.0065154790063388646,
+              "p95_seconds": 0.008979362368700092,
+              "texts_per_second": 152.72713447171503
+            },
+            "previous_b": {
+              "p50_seconds": 0.006473854504292831,
+              "p95_seconds": 0.009953976739780044,
+              "texts_per_second": 147.68912830087012
+            },
+            "selected": {
+              "p50_seconds": 0.0060618755233008415,
+              "p95_seconds": 0.009051308009657076,
+              "texts_per_second": 158.99086504273419
+            }
+          }
+        },
+        {
+          "lengths": [
+            7
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              8
+            ]
+          ],
+          "input_ids_sha256": "6bf1c780c74e204dc8f2f6b401ebd64f37b3ee7e9e49f66c67e76c5acfeb36d7",
+          "exact_baseline_equality": true,
+          "speedup": 1.1302869915644729,
+          "identical_control_a_over_b": 0.9803190252783469,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.000427120220653402,
+            0.0014265388803323727
+          ],
+          "vectors_sha256": "34238e6a70cf6db65c6a455c78e23859aa935e26c5088a43e4f119bc7358bb6d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.006355020508635789,
+              "p95_seconds": 0.00935247252928093,
+              "texts_per_second": 154.97675700497405
+            },
+            "previous_b": {
+              "p50_seconds": 0.0064826044836081564,
+              "p95_seconds": 0.009527062362758442,
+              "texts_per_second": 156.46595328802357
+            },
+            "selected": {
+              "p50_seconds": 0.005663458519848064,
+              "p95_seconds": 0.008712581254076212,
+              "texts_per_second": 179.41180088706673
+            }
+          }
+        },
+        {
+          "lengths": [
+            17
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "b842ed1b0a6ecc74ebf8f722bbdb23a50e67d75d51951e28b94d3f2bdf15458d",
+          "exact_baseline_equality": true,
+          "speedup": 1.0446358983750734,
+          "identical_control_a_over_b": 1.0782075091261563,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            -0.00021201341878622737,
+            0.0005544013440764196
+          ],
+          "vectors_sha256": "5c8e7e67e08703ed08206769e1dfdcd92cbb6014193ac0d426b96ee3f72e3c9d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.006591958517674357,
+              "p95_seconds": 0.014008756107068601,
+              "texts_per_second": 125.04532934255089
+            },
+            "previous_b": {
+              "p50_seconds": 0.006113812472904101,
+              "p95_seconds": 0.010811293730512261,
+              "texts_per_second": 147.2402879427285
+            },
+            "selected": {
+              "p50_seconds": 0.00601720847771503,
+              "p95_seconds": 0.010850414703600104,
+              "texts_per_second": 139.43652062020823
+            }
+          }
+        },
+        {
+          "lengths": [
+            24
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "f9f32d2797ad5515ca433b8f1366271e0c63f51ae0d0c4a62e0069721b482ee1",
+          "exact_baseline_equality": true,
+          "speedup": 1.1499989776202322,
+          "identical_control_a_over_b": 0.8221333022924344,
+          "control_within_10_percent": false,
+          "mean_latency_saved_seconds_ci95": [
+            -1.1784801608882845e-05,
+            0.0018754784764799602
+          ],
+          "vectors_sha256": "21c1eae6c9229ba5d57e2d959b4c15534fc37c47d8c4e44fbba137fe7d8db19b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.007339937495999038,
+              "p95_seconds": 0.010825602454133332,
+              "texts_per_second": 128.28212825706464
+            },
+            "previous_b": {
+              "p50_seconds": 0.008927916525863111,
+              "p95_seconds": 0.011027748076594433,
+              "texts_per_second": 117.91790330711015
+            },
+            "selected": {
+              "p50_seconds": 0.006974354037083685,
+              "p95_seconds": 0.010052735614590342,
+              "texts_per_second": 135.86356385715234
+            }
+          }
+        },
+        {
+          "lengths": [
+            159
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "542d678d4b6e41ba5e0911bd98b37dfd9cfc36606babf7e532e5e9ae66affa59",
+          "exact_baseline_equality": true,
+          "speedup": 1.0658650726965315,
+          "identical_control_a_over_b": 0.9745849895152475,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009053048910573139,
+            0.001499740322469735
+          ],
+          "vectors_sha256": "8141aced53544a0d494a133048b92cffd0382983c26fd3943a7c1ab40a380d5b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.021176229522097856,
+              "p95_seconds": 0.02296481235534884,
+              "texts_per_second": 47.14828501386379
+            },
+            "previous_b": {
+              "p50_seconds": 0.021728458523284644,
+              "p95_seconds": 0.023119260591920463,
+              "texts_per_second": 46.318955193047714
+            },
+            "selected": {
+              "p50_seconds": 0.020032749976962805,
+              "p95_seconds": 0.02205801859672647,
+              "texts_per_second": 49.49378507397448
+            }
+          }
+        },
+        {
+          "lengths": [
+            160
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "07df5fbabdb17ad6a7c8c9edcc64fd6321cbfaecc9bb6d31f70543133de6159b",
+          "exact_baseline_equality": true,
+          "speedup": 1.0406101964478474,
+          "identical_control_a_over_b": 0.9852916576239957,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0004651137685868875,
+            0.0011223445947204404
+          ],
+          "vectors_sha256": "e3fe90ea1ed83bcdae76367098e40813634fe6652a05af3631324972e04d12c2",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.021023209003033116,
+              "p95_seconds": 0.022602362517500293,
+              "texts_per_second": 47.9025213586143
+            },
+            "previous_b": {
+              "p50_seconds": 0.02133704151492566,
+              "p95_seconds": 0.02230860465206206,
+              "texts_per_second": 47.481173448157186
+            },
+            "selected": {
+              "p50_seconds": 0.020420770480995998,
+              "p95_seconds": 0.021413495659362524,
+              "texts_per_second": 49.49976708150957
+            }
+          }
+        },
+        {
+          "lengths": [
+            161
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              168
+            ]
+          ],
+          "input_ids_sha256": "63c922edb02a2a623b5573dd4b8515797ebd99a2ef15c7506427e7ec6f3796c3",
+          "exact_baseline_equality": true,
+          "speedup": 1.042614125526005,
+          "identical_control_a_over_b": 1.0073613636051533,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0005970979138510323,
+            0.0012820706799781582
+          ],
+          "vectors_sha256": "c03669f58cb3edd4275462d1a8e2d574ab05ddae57e374753e9e6adea3098047",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.025187916471622884,
+              "p95_seconds": 0.02646363372623455,
+              "texts_per_second": 40.70509148277317
+            },
+            "previous_b": {
+              "p50_seconds": 0.025003854010719806,
+              "p95_seconds": 0.02581794536963571,
+              "texts_per_second": 40.94740944102176
+            },
+            "selected": {
+              "p50_seconds": 0.02408727101283148,
+              "p95_seconds": 0.024940577446250244,
+              "texts_per_second": 42.5515290820995
+            }
+          }
+        },
+        {
+          "lengths": [
+            256
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              256
+            ]
+          ],
+          "input_ids_sha256": "2b31dec38e2f9d8e3d68e0c2346cc272d0da5055c8929767946b98e6104a04c1",
+          "exact_baseline_equality": true,
+          "speedup": 1.0359798846388666,
+          "identical_control_a_over_b": 1.0036233165079984,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0008132320266061782,
+            0.001448841866416231
+          ],
+          "vectors_sha256": "e2ec69c0969914250c2e86bf3ef24a80373e99fae20379a889876e11cc84017f",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.0346005205065012,
+              "p95_seconds": 0.0371582417137688,
+              "texts_per_second": 28.89739220086369
+            },
+            "previous_b": {
+              "p50_seconds": 0.0344756044796668,
+              "p95_seconds": 0.03736894986650441,
+              "texts_per_second": 28.946708844935127
+            },
+            "selected": {
+              "p50_seconds": 0.03330566646764055,
+              "p95_seconds": 0.03618971250252798,
+              "texts_per_second": 29.90011871263053
+            }
+          }
+        },
+        {
+          "lengths": [
+            512
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              512
+            ]
+          ],
+          "input_ids_sha256": "72c6b763642a62f613ab899618dfdec0327e427208ec59e92ecb3ab97659717c",
+          "exact_baseline_equality": true,
+          "speedup": 1.0293054988280446,
+          "identical_control_a_over_b": 1.000998125793324,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.002412217463521904,
+            0.0037249562543972105
+          ],
+          "vectors_sha256": "eb22c359f673288dcc9833e7ab349a900c425909c509af28f5d33162e37992a1",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.077806771005271,
+              "p95_seconds": 0.08003607896389439,
+              "texts_per_second": 12.954880245839375
+            },
+            "previous_b": {
+              "p50_seconds": 0.0777291874983348,
+              "p95_seconds": 0.07987050435913261,
+              "texts_per_second": 12.923270994288455
+            },
+            "selected": {
+              "p50_seconds": 0.0755702710011974,
+              "p95_seconds": 0.07680068488698452,
+              "texts_per_second": 13.459646629757518
+            }
+          }
+        },
+        {
+          "lengths": [
+            33,
+            33,
+            33,
+            33
+          ],
+          "plans": [
+            [
+              [
+                0,
+                1,
+                2,
+                3
+              ],
+              40
+            ]
+          ],
+          "input_ids_sha256": "07aa0877bfbfe71c8da269a7cab7f479ecea0460417152f3fb9df9bcb45319f5",
+          "exact_baseline_equality": true,
+          "speedup": 1.037483457849235,
+          "identical_control_a_over_b": 1.0030306211431614,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0003709615790285184,
+            0.0011883358403186619
+          ],
+          "vectors_sha256": "76b6f9632fef544cd18705b834bee4e08654135303ffacae57f7e2aa237f1d0e",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.023664020496653393,
+              "p95_seconds": 0.02588792032911442,
+              "texts_per_second": 169.33156283209215
+            },
+            "previous_b": {
+              "p50_seconds": 0.023592520505189896,
+              "p95_seconds": 0.02551733472791966,
+              "texts_per_second": 169.8474342545966
+            },
+            "selected": {
+              "p50_seconds": 0.022763374989153817,
+              "p95_seconds": 0.02484313937602565,
+              "texts_per_second": 175.55271219326275
+            }
+          }
+        },
+        {
+          "lengths": [
+            3,
+            7,
+            10
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ],
+            [
+              [
+                1,
+                2
+              ],
+              10
+            ]
+          ],
+          "input_ids_sha256": "59c3cc9e12f59cb96cd084996a9e22bbda3205145e891bf3081c602701824b69",
+          "exact_baseline_equality": true,
+          "speedup": 1.1403282395859886,
+          "identical_control_a_over_b": 1.0060092221711312,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009703062814272322,
+            0.0018365303170867272
+          ],
+          "vectors_sha256": "a6226d7deaaaf505b6c77002eacc4ef86717796985c5cf58d7fc0dca1f610431",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.013842959015164524,
+              "p95_seconds": 0.020054541708668692,
+              "texts_per_second": 207.0076119483549
+            },
+            "previous_b": {
+              "p50_seconds": 0.013760270492639393,
+              "p95_seconds": 0.017660418906598353,
+              "texts_per_second": 208.44384760158457
+            },
+            "selected": {
+              "p50_seconds": 0.012126479501603171,
+              "p95_seconds": 0.016273112813360056,
+              "texts_per_second": 230.08727743403696
+            }
+          }
+        }
+      ]
+    },
+    "reverse": {
+      "file_sha256": "0a400e06347ce4c1bc346a74b0e0fd803a1a6635e51da0088626a82ed74fab2a",
+      "harness_sha256": "930d8c8e7faacfc163b61f5167a5e5758b73527a85148960344efd1dd4bacaf5",
+      "samples_per_label": 30,
+      "reverse_cases": true,
+      "cases": [
+        {
+          "lengths": [
+            3,
+            7,
+            10
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ],
+            [
+              [
+                1,
+                2
+              ],
+              10
+            ]
+          ],
+          "input_ids_sha256": "59c3cc9e12f59cb96cd084996a9e22bbda3205145e891bf3081c602701824b69",
+          "exact_baseline_equality": true,
+          "speedup": 1.0907756396603325,
+          "identical_control_a_over_b": 0.9828066274228603,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.000964266162676116,
+            0.0017980758052241676
+          ],
+          "vectors_sha256": "a6226d7deaaaf505b6c77002eacc4ef86717796985c5cf58d7fc0dca1f610431",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.016793666989542544,
+              "p95_seconds": 0.019392560230335216,
+              "texts_per_second": 175.50971478442227
+            },
+            "previous_b": {
+              "p50_seconds": 0.01708745802170597,
+              "p95_seconds": 0.01981001888634637,
+              "texts_per_second": 172.3989446814942
+            },
+            "selected": {
+              "p50_seconds": 0.01556677048210986,
+              "p95_seconds": 0.019213670783210544,
+              "texts_per_second": 189.55367980344772
+            }
+          }
+        },
+        {
+          "lengths": [
+            33,
+            33,
+            33,
+            33
+          ],
+          "plans": [
+            [
+              [
+                0,
+                1,
+                2,
+                3
+              ],
+              40
+            ]
+          ],
+          "input_ids_sha256": "07aa0877bfbfe71c8da269a7cab7f479ecea0460417152f3fb9df9bcb45319f5",
+          "exact_baseline_equality": true,
+          "speedup": 1.0571990800564663,
+          "identical_control_a_over_b": 0.9846586324376453,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0011000478746912748,
+            0.0015553811283704518
+          ],
+          "vectors_sha256": "76b6f9632fef544cd18705b834bee4e08654135303ffacae57f7e2aa237f1d0e",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.023662208492169157,
+              "p95_seconds": 0.025714931086986324,
+              "texts_per_second": 170.32071690057074
+            },
+            "previous_b": {
+              "p50_seconds": 0.024030874978052452,
+              "p95_seconds": 0.0261444540170487,
+              "texts_per_second": 166.58741270332615
+            },
+            "selected": {
+              "p50_seconds": 0.022649332997389138,
+              "p95_seconds": 0.023830599852954035,
+              "texts_per_second": 178.40777740150693
+            }
+          }
+        },
+        {
+          "lengths": [
+            512
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              512
+            ]
+          ],
+          "input_ids_sha256": "72c6b763642a62f613ab899618dfdec0327e427208ec59e92ecb3ab97659717c",
+          "exact_baseline_equality": true,
+          "speedup": 1.0230045247952466,
+          "identical_control_a_over_b": 1.0014607392891093,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009779813466593624,
+            0.003472954220099683
+          ],
+          "vectors_sha256": "eb22c359f673288dcc9833e7ab349a900c425909c509af28f5d33162e37992a1",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.07778508300543763,
+              "p95_seconds": 0.07893046060053166,
+              "texts_per_second": 12.963712699980011
+            },
+            "previous_b": {
+              "p50_seconds": 0.07767162501113489,
+              "p95_seconds": 0.07981470827944577,
+              "texts_per_second": 12.938003521838482
+            },
+            "selected": {
+              "p50_seconds": 0.0759642290067859,
+              "p95_seconds": 0.07738234376301989,
+              "texts_per_second": 13.312188921070982
+            }
+          }
+        },
+        {
+          "lengths": [
+            256
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              256
+            ]
+          ],
+          "input_ids_sha256": "2b31dec38e2f9d8e3d68e0c2346cc272d0da5055c8929767946b98e6104a04c1",
+          "exact_baseline_equality": true,
+          "speedup": 1.0343907843363669,
+          "identical_control_a_over_b": 1.0121175080870992,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009088025273861898,
+            0.0018697465420700568
+          ],
+          "vectors_sha256": "e2ec69c0969914250c2e86bf3ef24a80373e99fae20379a889876e11cc84017f",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.034687312494497746,
+              "p95_seconds": 0.036992495669983326,
+              "texts_per_second": 28.780527148888538
+            },
+            "previous_b": {
+              "p50_seconds": 0.03427202100283466,
+              "p95_seconds": 0.03695183763629757,
+              "texts_per_second": 28.976912078025297
+            },
+            "selected": {
+              "p50_seconds": 0.033375583501765504,
+              "p95_seconds": 0.035675380952307024,
+              "texts_per_second": 30.03230854379319
+            }
+          }
+        },
+        {
+          "lengths": [
+            161
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              168
+            ]
+          ],
+          "input_ids_sha256": "63c922edb02a2a623b5573dd4b8515797ebd99a2ef15c7506427e7ec6f3796c3",
+          "exact_baseline_equality": true,
+          "speedup": 1.047027218721152,
+          "identical_control_a_over_b": 0.9862417814794449,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009596028190571815,
+            0.001275968818420855
+          ],
+          "vectors_sha256": "c03669f58cb3edd4275462d1a8e2d574ab05ddae57e374753e9e6adea3098047",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.025113249983405694,
+              "p95_seconds": 0.026951373228803276,
+              "texts_per_second": 39.40833851012711
+            },
+            "previous_b": {
+              "p50_seconds": 0.025463583529926836,
+              "p95_seconds": 0.02600818561913911,
+              "texts_per_second": 39.34159443369742
+            },
+            "selected": {
+              "p50_seconds": 0.02421868749661371,
+              "p95_seconds": 0.024893809924833477,
+              "texts_per_second": 41.176073370085405
+            }
+          }
+        },
+        {
+          "lengths": [
+            160
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "07df5fbabdb17ad6a7c8c9edcc64fd6321cbfaecc9bb6d31f70543133de6159b",
+          "exact_baseline_equality": true,
+          "speedup": 1.0131872983951806,
+          "identical_control_a_over_b": 0.9999643787064468,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            -0.0014348154774052094,
+            0.0006955507153179489
+          ],
+          "vectors_sha256": "e3fe90ea1ed83bcdae76367098e40813634fe6652a05af3631324972e04d12c2",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.018696354498388246,
+              "p95_seconds": 0.021440454653929915,
+              "texts_per_second": 53.3196716300751
+            },
+            "previous_b": {
+              "p50_seconds": 0.018697020510444418,
+              "p95_seconds": 0.02165227705845609,
+              "texts_per_second": 52.829965951169015
+            },
+            "selected": {
+              "p50_seconds": 0.018453666503774002,
+              "p95_seconds": 0.02158924826362636,
+              "texts_per_second": 52.62473919936878
+            }
+          }
+        },
+        {
+          "lengths": [
+            159
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "542d678d4b6e41ba5e0911bd98b37dfd9cfc36606babf7e532e5e9ae66affa59",
+          "exact_baseline_equality": true,
+          "speedup": 1.046364089103395,
+          "identical_control_a_over_b": 1.0422656610519174,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            -0.0028179599224434555,
+            0.0013626125602362073
+          ],
+          "vectors_sha256": "8141aced53544a0d494a133048b92cffd0382983c26fd3943a7c1ab40a380d5b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.02190310397418216,
+              "p95_seconds": 0.023587018757825717,
+              "texts_per_second": 46.444017155472096
+            },
+            "previous_b": {
+              "p50_seconds": 0.02101489552296698,
+              "p95_seconds": 0.02306112515798304,
+              "texts_per_second": 47.7998208479493
+            },
+            "selected": {
+              "p50_seconds": 0.020302167016780004,
+              "p95_seconds": 0.022332182983518578,
+              "texts_per_second": 46.76947645323727
+            }
+          }
+        },
+        {
+          "lengths": [
+            24
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "f9f32d2797ad5515ca433b8f1366271e0c63f51ae0d0c4a62e0069721b482ee1",
+          "exact_baseline_equality": true,
+          "speedup": 1.0918329355654128,
+          "identical_control_a_over_b": 1.0355650619589731,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0002977081632707268,
+            0.0008961062713448572
+          ],
+          "vectors_sha256": "21c1eae6c9229ba5d57e2d959b4c15534fc37c47d8c4e44fbba137fe7d8db19b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.008602396002970636,
+              "p95_seconds": 0.010514231098932214,
+              "texts_per_second": 115.45349802386058
+            },
+            "previous_b": {
+              "p50_seconds": 0.008306958508910611,
+              "p95_seconds": 0.010347517015179618,
+              "texts_per_second": 115.24320267931888
+            },
+            "selected": {
+              "p50_seconds": 0.007718271022895351,
+              "p95_seconds": 0.010147943589254282,
+              "texts_per_second": 123.51009425911406
+            }
+          }
+        },
+        {
+          "lengths": [
+            17
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "b842ed1b0a6ecc74ebf8f722bbdb23a50e67d75d51951e28b94d3f2bdf15458d",
+          "exact_baseline_equality": true,
+          "speedup": 0.9458335892505488,
+          "identical_control_a_over_b": 0.9897980126867062,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            -0.0002451819852770612,
+            0.0005811305532309541
+          ],
+          "vectors_sha256": "5c8e7e67e08703ed08206769e1dfdcd92cbb6014193ac0d426b96ee3f72e3c9d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.008034478989429772,
+              "p95_seconds": 0.009615868888795375,
+              "texts_per_second": 121.87071698135779
+            },
+            "previous_b": {
+              "p50_seconds": 0.00811729149427265,
+              "p95_seconds": 0.010433764380286446,
+              "texts_per_second": 117.695481952138
+            },
+            "selected": {
+              "p50_seconds": 0.008529270999133587,
+              "p95_seconds": 0.009572324977489189,
+              "texts_per_second": 123.19177525557777
+            }
+          }
+        },
+        {
+          "lengths": [
+            7
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              8
+            ]
+          ],
+          "input_ids_sha256": "6bf1c780c74e204dc8f2f6b401ebd64f37b3ee7e9e49f66c67e76c5acfeb36d7",
+          "exact_baseline_equality": true,
+          "speedup": 1.2099773420979594,
+          "identical_control_a_over_b": 0.9698661005293852,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0008724271426520618,
+            0.002148826495977118
+          ],
+          "vectors_sha256": "34238e6a70cf6db65c6a455c78e23859aa935e26c5088a43e4f119bc7358bb6d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.00710154147236608,
+              "p95_seconds": 0.0097638772072969,
+              "texts_per_second": 132.6572238672221
+            },
+            "previous_b": {
+              "p50_seconds": 0.007322187535464764,
+              "p95_seconds": 0.009796266723424195,
+              "texts_per_second": 132.0860732118453
+            },
+            "selected": {
+              "p50_seconds": 0.005910166015382856,
+              "p95_seconds": 0.008980881422758102,
+              "texts_per_second": 164.55213598947995
+            }
+          }
+        },
+        {
+          "lengths": [
+            3
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ]
+          ],
+          "input_ids_sha256": "91d9ee7dfc0b5361353c50e3e81ac6275ba27245ae9925a1917382e4882c97be",
+          "exact_baseline_equality": true,
+          "speedup": 1.1255561699057677,
+          "identical_control_a_over_b": 1.0383513017975718,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0004916860324253016,
+            0.0013193028678263848
+          ],
+          "vectors_sha256": "1111645d9c5f24b138d1861312056e9cfbf85a7c8620fa7fc5af06f71e55b94a",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.006843124981969595,
+              "p95_seconds": 0.010311629064381121,
+              "texts_per_second": 141.11955126966112
+            },
+            "previous_b": {
+              "p50_seconds": 0.006590375502128154,
+              "p95_seconds": 0.010936560918344183,
+              "texts_per_second": 141.6385180443802
+            },
+            "selected": {
+              "p50_seconds": 0.005969937512418255,
+              "p95_seconds": 0.008694033542997203,
+              "texts_per_second": 162.33762619734628
+            }
+          }
+        }
+      ]
+    },
+    "targeted-first": {
+      "file_sha256": "85812943d36d49b34e131d4c09ef9773c317bfe75791d78c8fe2ac53dd0b58b9",
+      "harness_sha256": "d118bd8849809a8adc93f61bf7574f842499e4a569f726733d11a639eb9ee013",
+      "samples_per_label": 60,
+      "reverse_cases": false,
+      "cases": [
+        {
+          "lengths": [
+            3
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ]
+          ],
+          "input_ids_sha256": "91d9ee7dfc0b5361353c50e3e81ac6275ba27245ae9925a1917382e4882c97be",
+          "exact_baseline_equality": true,
+          "speedup": 1.2576786304539191,
+          "identical_control_a_over_b": 0.8410589542293075,
+          "control_within_10_percent": false,
+          "mean_latency_saved_seconds_ci95": [
+            0.0007811118728689812,
+            0.0016130011984690402
+          ],
+          "vectors_sha256": "1111645d9c5f24b138d1861312056e9cfbf85a7c8620fa7fc5af06f71e55b94a",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.007836811972083524,
+              "p95_seconds": 0.010501417267369107,
+              "texts_per_second": 120.13758924411209
+            },
+            "previous_b": {
+              "p50_seconds": 0.009317791496869177,
+              "p95_seconds": 0.010461977394879795,
+              "texts_per_second": 114.27459614375903
+            },
+            "selected": {
+              "p50_seconds": 0.006776854017516598,
+              "p95_seconds": 0.009319252040586434,
+              "texts_per_second": 135.83467761359623
+            }
+          }
+        },
+        {
+          "lengths": [
+            17
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "b842ed1b0a6ecc74ebf8f722bbdb23a50e67d75d51951e28b94d3f2bdf15458d",
+          "exact_baseline_equality": true,
+          "speedup": 1.1178268739575137,
+          "identical_control_a_over_b": 1.0069013648063867,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0003542573563148235,
+            0.0010532728816057594
+          ],
+          "vectors_sha256": "5c8e7e67e08703ed08206769e1dfdcd92cbb6014193ac0d426b96ee3f72e3c9d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.008200687501812354,
+              "p95_seconds": 0.010636464235722088,
+              "texts_per_second": 123.55423241427029
+            },
+            "previous_b": {
+              "p50_seconds": 0.008144479477778077,
+              "p95_seconds": 0.010856260088621637,
+              "texts_per_second": 119.87341328384072
+            },
+            "selected": {
+              "p50_seconds": 0.007307687512366101,
+              "p95_seconds": 0.009681460083811544,
+              "texts_per_second": 133.49405784226957
+            }
+          }
+        },
+        {
+          "lengths": [
+            24
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "f9f32d2797ad5515ca433b8f1366271e0c63f51ae0d0c4a62e0069721b482ee1",
+          "exact_baseline_equality": true,
+          "speedup": 1.113086952630445,
+          "identical_control_a_over_b": 0.9903442316023774,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.00020466728145644705,
+            0.0010562247168127213
+          ],
+          "vectors_sha256": "21c1eae6c9229ba5d57e2d959b4c15534fc37c47d8c4e44fbba137fe7d8db19b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.008436020521912724,
+              "p95_seconds": 0.010380147604155354,
+              "texts_per_second": 118.70870584464247
+            },
+            "previous_b": {
+              "p50_seconds": 0.00851827097358182,
+              "p95_seconds": 0.011027940225903875,
+              "texts_per_second": 115.61459370682323
+            },
+            "selected": {
+              "p50_seconds": 0.007597582996822894,
+              "p95_seconds": 0.009554580945405176,
+              "texts_per_second": 127.3158563048962
+            }
+          }
+        },
+        {
+          "lengths": [
+            159
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "542d678d4b6e41ba5e0911bd98b37dfd9cfc36606babf7e532e5e9ae66affa59",
+          "exact_baseline_equality": true,
+          "speedup": 1.0417807765327463,
+          "identical_control_a_over_b": 0.999740831633966,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0008153229344801129,
+            0.0011413841974475276
+          ],
+          "vectors_sha256": "8141aced53544a0d494a133048b92cffd0382983c26fd3943a7c1ab40a380d5b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.02233872952638194,
+              "p95_seconds": 0.02341404612234328,
+              "texts_per_second": 45.088947806031165
+            },
+            "previous_b": {
+              "p50_seconds": 0.02234452051925473,
+              "p95_seconds": 0.023528522576089016,
+              "texts_per_second": 45.054101703777825
+            },
+            "selected": {
+              "p50_seconds": 0.021443270990857854,
+              "p95_seconds": 0.02233169405371882,
+              "texts_per_second": 47.13323089492319
+            }
+          }
+        },
+        {
+          "lengths": [
+            160
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "07df5fbabdb17ad6a7c8c9edcc64fd6321cbfaecc9bb6d31f70543133de6159b",
+          "exact_baseline_equality": true,
+          "speedup": 1.0426102519021658,
+          "identical_control_a_over_b": 1.0014115362562677,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009666401134988212,
+            0.0013023616860421783
+          ],
+          "vectors_sha256": "e3fe90ea1ed83bcdae76367098e40813634fe6652a05af3631324972e04d12c2",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.02236283346428536,
+              "p95_seconds": 0.023999790163361467,
+              "texts_per_second": 45.52707989219328
+            },
+            "previous_b": {
+              "p50_seconds": 0.022331312007736415,
+              "p95_seconds": 0.023620573565131052,
+              "texts_per_second": 45.65784417071287
+            },
+            "selected": {
+              "p50_seconds": 0.02143458349746652,
+              "p95_seconds": 0.022420621156925336,
+              "texts_per_second": 48.074414501749274
+            }
+          }
+        },
+        {
+          "lengths": [
+            3,
+            7,
+            10
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ],
+            [
+              [
+                1,
+                2
+              ],
+              10
+            ]
+          ],
+          "input_ids_sha256": "59c3cc9e12f59cb96cd084996a9e22bbda3205145e891bf3081c602701824b69",
+          "exact_baseline_equality": true,
+          "speedup": 1.0622070806627575,
+          "identical_control_a_over_b": 0.9761767793219347,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0005090059018039029,
+            0.0012382700254238437
+          ],
+          "vectors_sha256": "a6226d7deaaaf505b6c77002eacc4ef86717796985c5cf58d7fc0dca1f610431",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.01633141652564518,
+              "p95_seconds": 0.02031373154022731,
+              "texts_per_second": 183.73156513597436
+            },
+            "previous_b": {
+              "p50_seconds": 0.016729978495277464,
+              "p95_seconds": 0.020915326479007488,
+              "texts_per_second": 179.0824788290565
+            },
+            "selected": {
+              "p50_seconds": 0.015637624979717657,
+              "p95_seconds": 0.019718509787344372,
+              "texts_per_second": 191.45486479149383
+            }
+          }
+        }
+      ]
+    },
+    "targeted-reverse": {
+      "file_sha256": "38c31ea2f2316f532b50b94629d37de8c3481fdc138c3e7aad70fa136d0f77da",
+      "harness_sha256": "d118bd8849809a8adc93f61bf7574f842499e4a569f726733d11a639eb9ee013",
+      "samples_per_label": 60,
+      "reverse_cases": true,
+      "cases": [
+        {
+          "lengths": [
+            3,
+            7,
+            10
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ],
+            [
+              [
+                1,
+                2
+              ],
+              10
+            ]
+          ],
+          "input_ids_sha256": "59c3cc9e12f59cb96cd084996a9e22bbda3205145e891bf3081c602701824b69",
+          "exact_baseline_equality": true,
+          "speedup": 1.0735843500104623,
+          "identical_control_a_over_b": 1.029313104454546,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.000999132625026202,
+            0.0020989007791528524
+          ],
+          "vectors_sha256": "a6226d7deaaaf505b6c77002eacc4ef86717796985c5cf58d7fc0dca1f610431",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.01732458348851651,
+              "p95_seconds": 0.02118267324985936,
+              "texts_per_second": 169.41326593950566
+            },
+            "previous_b": {
+              "p50_seconds": 0.016831208515213802,
+              "p95_seconds": 0.02108266105351504,
+              "texts_per_second": 171.7647392280491
+            },
+            "selected": {
+              "p50_seconds": 0.015992979489965364,
+              "p95_seconds": 0.018260558947804383,
+              "texts_per_second": 186.48089493839834
+            }
+          }
+        },
+        {
+          "lengths": [
+            160
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "07df5fbabdb17ad6a7c8c9edcc64fd6321cbfaecc9bb6d31f70543133de6159b",
+          "exact_baseline_equality": true,
+          "speedup": 1.0571397228457944,
+          "identical_control_a_over_b": 1.001927244485041,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0009190407156832713,
+            0.0013191001531959053
+          ],
+          "vectors_sha256": "e3fe90ea1ed83bcdae76367098e40813634fe6652a05af3631324972e04d12c2",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.02222466649254784,
+              "p95_seconds": 0.023228183336323125,
+              "texts_per_second": 46.0894067564787
+            },
+            "previous_b": {
+              "p50_seconds": 0.022181916516274214,
+              "p95_seconds": 0.023496224667178465,
+              "texts_per_second": 46.372543170709115
+            },
+            "selected": {
+              "p50_seconds": 0.021023395500378683,
+              "p95_seconds": 0.022203064922359773,
+              "texts_per_second": 48.74401555191304
+            }
+          }
+        },
+        {
+          "lengths": [
+            159
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              160
+            ]
+          ],
+          "input_ids_sha256": "542d678d4b6e41ba5e0911bd98b37dfd9cfc36606babf7e532e5e9ae66affa59",
+          "exact_baseline_equality": true,
+          "speedup": 1.042506390776026,
+          "identical_control_a_over_b": 0.9901041914825345,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0008050887627420407,
+            0.0011163822844537205
+          ],
+          "vectors_sha256": "8141aced53544a0d494a133048b92cffd0382983c26fd3943a7c1ab40a380d5b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.02226391652948223,
+              "p95_seconds": 0.023255679177236744,
+              "texts_per_second": 45.60652557365575
+            },
+            "previous_b": {
+              "p50_seconds": 0.022486438014311716,
+              "p95_seconds": 0.023843785130884497,
+              "texts_per_second": 44.99912240107608
+            },
+            "selected": {
+              "p50_seconds": 0.021429624495794997,
+              "p95_seconds": 0.022299151474726386,
+              "texts_per_second": 47.39285176750322
+            }
+          }
+        },
+        {
+          "lengths": [
+            24
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "f9f32d2797ad5515ca433b8f1366271e0c63f51ae0d0c4a62e0069721b482ee1",
+          "exact_baseline_equality": true,
+          "speedup": 1.0994388555831738,
+          "identical_control_a_over_b": 0.9749846508937764,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0005426771312462127,
+            0.001068918675373425
+          ],
+          "vectors_sha256": "21c1eae6c9229ba5d57e2d959b4c15534fc37c47d8c4e44fbba137fe7d8db19b",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.008280666486825794,
+              "p95_seconds": 0.011091662468970753,
+              "texts_per_second": 118.53999292300274
+            },
+            "previous_b": {
+              "p50_seconds": 0.008493124973028898,
+              "p95_seconds": 0.010847392023424617,
+              "texts_per_second": 113.21843279853857
+            },
+            "selected": {
+              "p50_seconds": 0.007648333499673754,
+              "p95_seconds": 0.009312910403241403,
+              "texts_per_second": 127.63244037032605
+            }
+          }
+        },
+        {
+          "lengths": [
+            17
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              24
+            ]
+          ],
+          "input_ids_sha256": "b842ed1b0a6ecc74ebf8f722bbdb23a50e67d75d51951e28b94d3f2bdf15458d",
+          "exact_baseline_equality": true,
+          "speedup": 1.053252849643502,
+          "identical_control_a_over_b": 1.090408680551273,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0005825332128127531,
+            0.0013099924641816563
+          ],
+          "vectors_sha256": "5c8e7e67e08703ed08206769e1dfdcd92cbb6014193ac0d426b96ee3f72e3c9d",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.007706145494012162,
+              "p95_seconds": 0.010536330635659395,
+              "texts_per_second": 135.5421823172316
+            },
+            "previous_b": {
+              "p50_seconds": 0.007067208498483524,
+              "p95_seconds": 0.01034363335056696,
+              "texts_per_second": 139.08514783117997
+            },
+            "selected": {
+              "p50_seconds": 0.00683295849012211,
+              "p95_seconds": 0.008421334804734214,
+              "texts_per_second": 157.54945852982
+            }
+          }
+        },
+        {
+          "lengths": [
+            3
+          ],
+          "plans": [
+            [
+              [
+                0
+              ],
+              3
+            ]
+          ],
+          "input_ids_sha256": "91d9ee7dfc0b5361353c50e3e81ac6275ba27245ae9925a1917382e4882c97be",
+          "exact_baseline_equality": true,
+          "speedup": 1.1150665338306514,
+          "identical_control_a_over_b": 0.9848561073866278,
+          "control_within_10_percent": true,
+          "mean_latency_saved_seconds_ci95": [
+            0.0003774240978600574,
+            0.0013561868878605309
+          ],
+          "vectors_sha256": "1111645d9c5f24b138d1861312056e9cfbf85a7c8620fa7fc5af06f71e55b94a",
+          "timings": {
+            "previous_a": {
+              "p50_seconds": 0.00711837550625205,
+              "p95_seconds": 0.010214908019406721,
+              "texts_per_second": 135.18020683065117
+            },
+            "previous_b": {
+              "p50_seconds": 0.007227833033539355,
+              "p95_seconds": 0.010203744424507022,
+              "texts_per_second": 134.04241894685012
+            },
+            "selected": {
+              "p50_seconds": 0.006444458500482142,
+              "p95_seconds": 0.009377835073973984,
+              "texts_per_second": 152.49064966904538
+            }
+          }
+        }
+      ]
+    }
+  }
+}
