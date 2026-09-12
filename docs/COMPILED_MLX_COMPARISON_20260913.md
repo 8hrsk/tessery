@@ -92,6 +92,10 @@ The existing 1351-test and 40-Shader-Validation evidence belongs to qualificatio
 
 ## Next bounded experiments
 
+The profiling and fused32 work below is now complete; see the
+[follow-up report](FUSED32_EXPERIMENT_20260913.md). Both prototypes remain on an
+isolated experiment branch, and main retains the qualified runtime.
+
 1. **Profile the remaining quantized projections and fused MLP against MLX.**
    Current backend measurements locate the gap inside that path but do not
    identify its per-kernel shares. Refresh shape-level evidence before selecting
