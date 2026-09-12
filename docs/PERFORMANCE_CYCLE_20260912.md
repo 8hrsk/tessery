@@ -116,6 +116,13 @@ remain later options, subject to correctness and full-API evidence.
 - Wheel/sdist verification, isolated installed-wheel smoke on both models and
   installed dependency-policy checks passed. Local artifacts retain the logs.
 
+The first Linux CI/Kaggle attempt exposed a test-collection import that depended
+on running `python -m pytest` with the repository root on `sys.path`. The ranking
+test now owns its small fake model; ordinary `pytest` collects it without that
+assumption. This follow-up changes tests/documentation only, leaving the measured
+library, wheel bytes and running native qualification snapshot unchanged. Kaggle
+records its corrected test-suite commit separately from the native snapshot.
+
 The prior 2h Qwen + 2h BGE and 4h Kaggle runs passed for **368d00a only**. New long
 runs use an immutable source/wheel snapshot and must complete before this candidate
 is called long-run qualified. Kaggle exercises portable CPU behavior, not Metal.

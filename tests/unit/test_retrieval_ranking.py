@@ -1,10 +1,32 @@
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 
+from metal_inference import ModelDescriptor
 from metal_inference.errors import InvalidInputError
 from metal_inference.index import Chunk, DocumentIndex, _contract
 from metal_inference.retrieval import _stable_top_k, cosine_search
-from tests.unit.test_index import Model
+
+
+class Model:
+    """Local fake: test collection must not depend on the repository root on sys.path."""
+
+    descriptor = ModelDescriptor()
+    dimensions = 32
+    max_length = 64
+    _tokenizer = SimpleNamespace(
+        batch=lambda texts, max_length: (
+            None,
+            np.array([min(len(t) + 1, max_length) for t in texts]),
+        )
+    )
+
+    def encode(self, texts):
+        vectors = np.zeros((len(texts), self.dimensions), np.float32)
+        for row, text in enumerate(texts):
+            vectors[row, 0 if "Paris" in text else 1] = 1
+        return vectors
 
 
 @pytest.mark.parametrize("count", [0, 10, 127, 128, 129, 1000, 10000])
