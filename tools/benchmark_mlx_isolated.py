@@ -35,6 +35,35 @@ def process_memory():
     }
 
 
+def prepared_forward(model, ids, lengths):
+    """Same execution plan as encode; tokenization and packing outside timed calls."""
+    prepared = []
+    for rows, width in execution_batches(
+        lengths,
+        model._backend.max_padded_tokens,
+        model.max_length,
+        model.descriptor.architecture,
+    ):
+        batch_ids = np.ascontiguousarray(ids[rows, :width])
+        if width > ids.shape[1]:
+            padded = np.full((len(rows), width), model._tokenizer.pad_id, np.uint32)
+            padded[:, : ids.shape[1]] = batch_ids
+            batch_ids = padded
+        prepared.append((rows, batch_ids, np.ascontiguousarray(lengths[rows])))
+
+    def run():
+        output = np.empty((len(lengths), model.dimensions), np.float32)
+        for rows, batch_ids, batch_lengths in prepared:
+            output[rows] = model._backend.forward(
+                batch_ids,
+                batch_lengths,
+                dimensions=model.dimensions,
+            )
+        return output
+
+    return run
+
+
 def worker(args):
     profile = ModelProfile.from_file(args.profile_file) if args.profile_file else QWEN3_PROFILE
     bert = profile.architecture == "bert_f32"
@@ -49,12 +78,16 @@ def worker(args):
     if args.engine == "mlx":
         data = read_json(args.model_dir, "tokenizer.json", profile=profile)
         if bert:
-            backend = MLXBertReference(args.model_dir, profile)
+            backend = MLXBertReference(args.model_dir, profile, compiled=args.mlx_compile)
             tokenizer = WordPieceTokenizer(data)
         else:
             assert profile.identity_sha256 == QWEN3_PROFILE.identity_sha256
             validate_qwen_profile(data)
-            backend = MLXReference(args.model_dir, causal_fast_path=args.mlx_mask == "causal")
+            backend = MLXReference(
+                args.model_dir,
+                causal_fast_path=args.mlx_mask == "causal",
+                compiled=args.mlx_compile,
+            )
             tokenizer = QwenTokenizer(data)
         model = EmbeddingModel(
             backend,
@@ -68,6 +101,8 @@ def worker(args):
         model = EmbeddingModel.load(args.model_dir, profile=profile)
     payload = {
         "engine": args.engine,
+        "timing_scope": args.timing_scope,
+        "mlx_compile": args.mlx_compile if args.engine == "mlx" else False,
         "model_id": model.descriptor.model_id,
         "compatibility_id": model.descriptor.compatibility_id,
         "profile_sha256": profile.identity_sha256,
@@ -115,24 +150,35 @@ def worker(args):
         for case_id in order:
             texts = cases[case_id]
             ids, lengths = model._tokenizer.batch(texts, max_length=model.max_length)
+            call = (
+                prepared_forward(model, ids, lengths)
+                if args.timing_scope == "backend"
+                else lambda texts=texts: model.encode(texts)
+            )
+            # Validate the prepared route independently against the public batching path.
+            if args.timing_scope == "backend":
+                np.testing.assert_array_equal(call(), model.encode(texts))
             warm_start = time.perf_counter()
             warmups = 0
             while warmups < 3 or (args.paired_controls and time.perf_counter() - warm_start < 0.1):
-                model.encode(texts)
+                call()
                 warmups += 1
+            warm_traces = backend.runner.traces if args.engine == "mlx" else None
             controls = {label: [] for label in (["a", "b"] if args.paired_controls else ["a"])}
             reference = None
             rng = np.random.default_rng(1000 + int(case_id))
             for _ in range(args.samples):
                 for label in rng.permutation(list(controls)):
                     started = time.perf_counter()
-                    output = model.encode(texts)
+                    output = call()
                     controls[label].append(time.perf_counter() - started)
                     if reference is None:
                         reference = output
                     else:
                         np.testing.assert_array_equal(output, reference)
                     assert np.isfinite(output).all()
+            if args.engine == "mlx":
+                assert backend.runner.traces == warm_traces, "Compilation entered steady-state"
             latencies = [value for values in controls.values() for value in values]
             control_ratio = (
                 float(np.median(controls["a"]) / np.median(controls["b"]))
@@ -168,6 +214,7 @@ def worker(args):
         if args.engine == "mlx":
             import mlx.core as mx
 
+            payload["compilation"] = backend.runner.diagnostics()
             payload["mlx_version"] = importlib.metadata.version("mlx")
             payload["mlx_device"] = mx.device_info()
             payload["allocator"] = {
@@ -201,6 +248,8 @@ def main():
     parser.add_argument(
         "--lengths", nargs="+", type=int, help="Override cases with uniform lengths"
     )
+    parser.add_argument("--mlx-compile", action="store_true", help="Compile pure MLX graph")
+    parser.add_argument("--timing-scope", choices=["api", "backend"], default="api")
     parser.add_argument("--mlx-mask", choices=["dense", "causal"], default="dense")
     parser.add_argument(
         "--engine-order", choices=["tessery-first", "mlx-first"], default="tessery-first"
@@ -226,7 +275,13 @@ def main():
     payload = {
         "status": "running",
         "platform": platform.platform(),
-        "scope": "isolated_process_full_embedding_public_api",
+        "scope": "isolated_process_embedding_" + args.timing_scope,
+        "timing_scope": args.timing_scope,
+        "mlx_compile": args.mlx_compile,
+        "timing_note": (
+            "backend: pretokenized/prepacked common batches, forward plus output assembly; "
+            "api: full encode including tokenization, admission and batching"
+        ),
         "baseline": "independent public MLX F32 graph; not mlx-embeddings",
         "conditions": (
             "sequential fresh processes; >=3 warmups (>=100ms with paired controls); "
@@ -246,6 +301,9 @@ def main():
         "requested_lengths": args.lengths,
         "include_batches": args.include_batches,
         "reference_file": reference_file,
+        "runner_sha256": hashlib.sha256(
+            Path(__file__).with_name("mlx_reference_runner.py").read_bytes()
+        ).hexdigest(),
         "mlx_mask": args.mlx_mask,
         "engine_order": args.engine_order,
         "paired_controls": args.paired_controls,
@@ -280,6 +338,9 @@ def main():
                     str(result),
                     "--mlx-mask",
                     args.mlx_mask,
+                    "--timing-scope",
+                    args.timing_scope,
+                    *(["--mlx-compile"] if args.mlx_compile else []),
                     *(["--profile-file", args.profile_file] if args.profile_file else []),
                     *(["--include-batches"] if args.include_batches else []),
                     *(["--paired-controls"] if args.paired_controls else []),

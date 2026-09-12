@@ -6,6 +6,7 @@ BGE pack. This module is never imported by Tessery's runtime.
 
 import mlx.core as mx
 import numpy as np
+from mlx_reference_runner import ReferenceRunner
 
 from metal_inference.weights import SafeTensors, read_artifact, read_json
 
@@ -13,7 +14,8 @@ from metal_inference.weights import SafeTensors, read_artifact, read_json
 class MLXBertReference:
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir, profile):
+    def __init__(self, model_dir, profile, *, compiled=False):
+        self.runner = ReferenceRunner(mx, compiled=compiled)
         assert profile.architecture == "bert_f32" and profile.pooling == "cls"
         config = read_json(model_dir, "config.json", profile=profile)
         assert config["model_type"] == "bert" and config["hidden_act"] == "gelu"
@@ -38,6 +40,16 @@ class MLXBertReference:
 
     def forward(self, ids, lengths, *, dimensions):
         assert dimensions == self.hidden
+        seq = ids.shape[1]
+        dynamic_ids = mx.array(ids)
+        dynamic_lengths = mx.array(lengths.astype(np.int32))
+        mask = None
+        if not np.all(lengths == seq):
+            valid = mx.arange(seq)[None, None, None, :] < dynamic_lengths[:, None, None, None]
+            mask = mx.where(valid, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
+        return self.runner.run(self._graph, dynamic_ids, dynamic_lengths, mask, dimensions)
+
+    def _graph(self, ids, lengths, mask, dimensions):
         batch, seq = ids.shape
         w = self.weights
 
@@ -47,14 +59,10 @@ class MLXBertReference:
         def linear(x, prefix):
             return mx.addmm(w[prefix + ".bias"], x, w[prefix + ".weight"].T)
 
-        x = w["embeddings.word_embeddings.weight"][mx.array(ids)]
+        x = w["embeddings.word_embeddings.weight"][ids]
         x = x + w["embeddings.position_embeddings.weight"][mx.arange(seq)][None, :, :]
         x = x + w["embeddings.token_type_embeddings.weight"][0]
         x = norm(x, "embeddings.LayerNorm")
-        mask = None
-        if not np.all(lengths == seq):
-            valid = mx.arange(seq)[None, None, None, :] < mx.array(lengths)[:, None, None, None]
-            mask = mx.where(valid, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
         for layer in range(self.layers):
             prefix = f"encoder.layer.{layer}"
             q, k, v = [
@@ -76,9 +84,9 @@ class MLXBertReference:
             x = norm(x + linear(activated, prefix + ".output.dense"), prefix + ".output.LayerNorm")
         pooled = x[:, 0, :]
         result = pooled * mx.rsqrt(mx.sum(pooled * pooled, axis=-1, keepdims=True))
-        mx.eval(result)
-        return np.array(result)
+        return result
 
     def close(self):
+        self.runner.clear()
         self.weights.clear()
         mx.clear_cache()

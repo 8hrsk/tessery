@@ -15,6 +15,7 @@ from pathlib import Path
 
 import mlx.core as mx
 import numpy as np
+from mlx_reference_runner import ReferenceRunner
 
 from metal_inference.profiles import QWEN3_PROFILE
 from metal_inference.weights import SafeTensors, read_artifact, read_json
@@ -24,7 +25,8 @@ from tessery import EmbeddingModel
 class MLXReference:
     max_padded_tokens = 4096
 
-    def __init__(self, model_dir, *, causal_fast_path=False):
+    def __init__(self, model_dir, *, causal_fast_path=False, compiled=False):
+        self.runner = ReferenceRunner(mx, compiled=compiled)
         self.causal_fast_path = causal_fast_path
         config = read_json(model_dir, "config.json")
         self.layers = config["num_hidden_layers"]
@@ -52,9 +54,23 @@ class MLXReference:
         return [self.weights[prefix + "." + key] for key in ("weight", "scales", "biases")]
 
     def forward(self, ids, lengths, *, dimensions):
-        batch, seq = ids.shape
+        seq = ids.shape[1]
+        dynamic_ids = mx.array(ids)
+        dynamic_lengths = mx.array(lengths.astype(np.int32))
+        if self.causal_fast_path and np.all(lengths == seq):
+            mask = "causal"
+        else:
+            positions = mx.arange(seq)
+            allowed = (positions[None, :] <= positions[:, None])[None, None, :, :]
+            allowed = allowed & (
+                positions[None, None, None, :] < dynamic_lengths[:, None, None, None]
+            )
+            mask = mx.where(allowed, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
+        return self.runner.run(self._graph, dynamic_ids, dynamic_lengths, mask, dimensions)
+
+    def _graph(self, tokens, lengths, mask, dimensions):
+        batch, seq = tokens.shape
         weight, scales, biases = self.quant("model.embed_tokens")
-        tokens = mx.array(ids)
         x = mx.dequantize(weight[tokens], scales[tokens], biases[tokens], group_size=64, bits=4)
 
         def norm(value, prefix):
@@ -63,15 +79,6 @@ class MLXReference:
         def linear(value, prefix):
             return mx.quantized_matmul(value, *self.quant(prefix), group_size=64, bits=4)
 
-        if self.causal_fast_path and np.all(lengths == seq):
-            mask = "causal"
-        else:
-            positions = mx.arange(seq)
-            allowed = (positions[None, :] <= positions[:, None])[None, None, :, :]
-            allowed = allowed & (
-                positions[None, None, None, :] < mx.array(lengths)[:, None, None, None]
-            )
-            mask = mx.where(allowed, mx.array(0, mx.float32), mx.array(-float("inf"), mx.float32))
         for layer in range(self.layers):
             prefix = f"model.layers.{layer}"
             attention = prefix + ".self_attn"
@@ -115,14 +122,12 @@ class MLXReference:
             gate = linear(normalized, prefix + ".mlp.gate_proj")
             up = linear(normalized, prefix + ".mlp.up_proj")
             x = x + linear(gate * mx.sigmoid(gate) * up, prefix + ".mlp.down_proj")
-        pooled = norm(x, "model.norm")[
-            mx.arange(batch), mx.array(lengths.astype(np.int32) - 1), :dimensions
-        ]
+        pooled = norm(x, "model.norm")[mx.arange(batch), lengths - 1, :dimensions]
         result = pooled * mx.rsqrt(mx.sum(pooled * pooled, axis=-1, keepdims=True))
-        mx.eval(result)
-        return np.array(result)
+        return result
 
     def close(self):
+        self.runner.clear()
         self.weights.clear()
         mx.clear_cache()
 

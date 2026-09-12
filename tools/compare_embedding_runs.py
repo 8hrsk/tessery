@@ -24,6 +24,9 @@ def compare(first, second):
         "samples_per_label",
     ):
         assert first[key] == second[key]
+    # Missing keys retain compatibility with archived pre-compile reports.
+    for key, default in (("timing_scope", "api"), ("mlx_compile", False), ("runner_sha256", None)):
+        assert first.get(key, default) == second.get(key, default)
     workers = [
         first["workers"]["tessery"],
         first["workers"]["mlx"],
