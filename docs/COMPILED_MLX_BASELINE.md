@@ -70,3 +70,7 @@ In backend scope, the exact API/prepared-route validation also creates an
 executor-thread specialization. Allocator diagnostics therefore include that
 validation-only graph alongside the directly measured thread's graph; they are
 not a minimal standalone compiled-backend memory measurement.
+
+Measured comparison of the subsequently qualified long-Qwen runtime:
+[2026-09-13 results](COMPILED_MLX_COMPARISON_20260913.md), with separate API/backend
+pairs and all nine cases passing numerical and timing screens.

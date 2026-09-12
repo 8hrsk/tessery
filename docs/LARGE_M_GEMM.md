@@ -2,7 +2,12 @@
 
 Baseline `e49b39c`; candidate runtime source `6bc4035`; Apple M1, 2026-09-12.
 Selected for the four guarded execution heights after the controls below.
-Two-hour qualification of this new runtime is a separate pending gate.
+The two-hour qualification of this runtime passed: 48,772 Qwen calls across
+16 scenarios in 7200.104 seconds, with exact repeatability, bounded caches and
+zero active/cached runtime bytes after close. Sources, wheel, loaded shader/native
+library, supervisor and exact kernel counters were independently verified.
+The qualified commit is `d7edc5bcda8926b411f5dff36b90ec8446b9187d`; local final reports
+are in `artifacts/qualification-large-m-20260912/`.
 This is the next bounded experiment from the performance plan. Existing local
 Qwen3-Embedding-0.6B DWQ weights were reused without downloads.
 
@@ -127,7 +132,7 @@ Its shader remains in a separate experimental branch. Only its report is retaine
 with the selected change.
 
 The previous multi-hour qualification belongs to the previous runtime. This
-change needs its own pinned native qualification. A 60-second rehearsal passed
+change passed its own pinned native qualification described above. A 60-second rehearsal passed
 406 calls across 16 scenarios, including each selected height; exact kernel
 counters were independently checked. The installed wheel passed the standard
 Qwen/BGE smoke check and seven dedicated candidate cases (two repeats each):
@@ -136,7 +141,8 @@ runtime bytes after close. Every installed package member matches the wheel and
 source checkout; see
 [`validation-summary.json`](../benchmarks/native-metal/large-m-20260912/validation-summary.json). Final installation and qualification launch details are
 recorded under `artifacts/qualification-large-m-20260912/`. The CPU-only Kaggle
-soak does not exercise this Metal kernel. No new direct MLX comparison is claimed.
+soak does not exercise this Metal kernel. The subsequent [compiled MLX comparison](COMPILED_MLX_COMPARISON_20260913.md)
+measures this qualified runtime and records its remaining long-input gap.
 
 Machine-readable paired evidence:
 [`paired-summary.json`](../benchmarks/native-metal/large-m-20260912/paired-summary.json).
