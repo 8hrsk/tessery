@@ -1,0 +1,83 @@
+{
+  "runtime_source_commit": "6bc40351a0519034d3017d6553ded87f92c04839",
+  "tests": {
+    "passed": 1351,
+    "skipped": 1,
+    "coverage_percent": 94.59
+  },
+  "shader_validation": {
+    "passed": 40
+  },
+  "wheel": {
+    "filename": "tessery-0.6.0a1-py3-none-macosx_14_0_arm64.whl",
+    "sha256": "260ce768960940f76bb49f4c38c22c3798976b4ab8973ba2c7222142c7c6320d",
+    "all_package_members_match_checkout_and_installed": true,
+    "member_hashes": {
+      "metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+      "metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "metal_inference/_native.dylib": "4e2797b3ce6b5640ed9a26b6e5b3d099230e18995c53e3f2602feadea2d1b883",
+      "metal_inference/api.py": "a8149fd179835c7640e2c32e5589df61270325749dac1dfedc072f57a4b002f6",
+      "metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+      "metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+      "metal_inference/bert.py": "03088e388228e9e91cd4f9f42d55c4b20c674a1e61d42a1020a3c1687fdc224c",
+      "metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+      "metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+      "metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+      "metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+      "metal_inference/index.py": "09710229370fd867636bcb07808bcbb69a85e0e01c882dc7ed524ac001948fdd",
+      "metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+      "metal_inference/metal.py": "a72953a9586291a140a70481714514a67e7d2daf6d168464fcd866dc21f4053e",
+      "metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+      "metal_inference/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "metal_inference/qwen3.py": "7bdbe11b4d7254fd4adec8691344b4b6d16f56619111d2598f05596d8d508f6d",
+      "metal_inference/retrieval.py": "d2ccc404c9975e0567e10844ad4d0818fe8a3f3c65c936272367bc96839c885b",
+      "metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+      "metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+      "metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+      "metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+      "metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f",
+      "metal_inference/native/kernels.metal": "ab31c90b6e489ba8c017dc42f981cfc3b1d68b2c7547315e69e068dde07d04ab",
+      "metal_inference/native/runtime.mm": "615c119ca9240a677e0b0373d918dde2d8510440c474c067705a28083f87df27",
+      "tessery/__init__.py": "7ac98f463698f014324dbd1fbdb8e6056a6f5c155d36f4b57b5fcfe7ac5b7403",
+      "tessery/__main__.py": "e98fe5cd5677aef49290bcfa9305f735bfc1222ae3c96759f9c2837864811ee0",
+      "tessery/errors.py": "b0006f7d16d2a6e7b7ccddb847555ce939d0d8b8caac4be6867b1978a2268078",
+      "tessery/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tessery/server.py": "134b9b01d4ec90c416d02b0bb0c7e4174a96aaf04dd4e290f2b2e33b820bda4c",
+      "yuri_mlx_embeddings/__init__.py": "b273a3a0f9122064f38b67911bd0c9c541e8332298a2fc4a59765efd7e11ea1e",
+      "yuri_mlx_embeddings/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "yuri_mlx_embeddings/cli.py": "cbba7bad87ec91ca95b936075671034c4455f28144d6be15c07a333a99bfa42a",
+      "yuri_mlx_embeddings/config.py": "4cbf56a3677d2533fdbdac301c877238e605811158ae7480810082af429afd47",
+      "yuri_mlx_embeddings/descriptors.py": "a4f512a9d86fbb11864bca13947df2efe353fdf026e54643f3b6c4c05a885935",
+      "yuri_mlx_embeddings/errors.py": "e93757e21dbaaaa3bab437b690d6f61b927def82cd1e954ac69273827e34ba86",
+      "yuri_mlx_embeddings/manifests.py": "b0a62e91b943b6c894756807cf029983753f1b38dded13afcc56a5b5b4714c03",
+      "yuri_mlx_embeddings/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "yuri_mlx_embeddings/strict_json.py": "aaf912be6491e2672de5e14bfcae51a005ddf1b1e5a3c2e88ad0789ce463a0b9",
+      "yuri_mlx_embeddings/server/__init__.py": "40cf8c5de4c0b32c1a355165e3863fe07f3fc3df4d537669bce9b9c0e17830ae",
+      "yuri_mlx_embeddings/server/protocol_v1.py": "169d6780b86bbad9628ef34107a8d20ed2db979e6157e84101aea19941f1361c"
+    }
+  },
+  "installed_smoke": {
+    "standard_models": 2,
+    "candidate_cases": 7,
+    "repeats": 2,
+    "exact_vectors": true,
+    "target_dispatches": 1680,
+    "plan_hits": 7
+  },
+  "rehearsal": {
+    "status": "passed",
+    "elapsed_seconds": 60.07120187499095,
+    "completed_calls": 406,
+    "cases": 16,
+    "exact_new_kernel_dispatches": 28560
+  },
+  "artifact_hashes": {
+    "large-m-final-tests.log": "3957daf0adf3faa3f6056f656fb9f70037e9e03552d2d7837d4e63341cbd791d",
+    "large-m-final-shader.log": "a2f37c96d4bc44e47b8a9e79bf7ee8e470347970111f4c11008a4f6301281bb0",
+    "large-m-wheel-smoke.log": "00b1f4848552b1ff65146df624101b57de7ee15946914b4681c64a8ef969e833",
+    "large-m-wheel-candidate.log": "71e16627973cd81b26a6b8516c7d00106e88543842c04ce7ecc6e798677d9ecd",
+    "large-m-rehearsal.json": "7ddbdb7ba308e66f633a96be7eae47557fde01c54bc1e3258a6d0b6d5b3058a5"
+  },
+  "qualification_status": "two_hour_run_is_separate_pending_gate",
+  "new_mlx_comparison": false
+}

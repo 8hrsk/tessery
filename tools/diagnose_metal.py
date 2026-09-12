@@ -158,11 +158,24 @@ def soak(model, seconds, on_checkpoint=None):
         ["retrieval system"] * 32,
     ]
     special = 2 if model.descriptor.architecture == "bert_f32" else 1
-    # Exercise M16/M24/M160, the short scalar path and neighboring fallbacks.
+    # Include each large-M projection guard, short paths and neighboring fallbacks.
     # Repeat each case immediately to exercise warm replay as well as eviction.
     batches += [
         [" token" * (length - special) for length in lengths]
-        for lengths in ([3], [3, 7, 10], [33] * 4, [20] * 8, [24], [25], [159], [161], [16], [7, 7])
+        for lengths in (
+            [3],
+            [3, 7, 10],
+            [33] * 4,
+            [20] * 8,
+            [24],
+            [25],
+            [159],
+            [161],
+            [16],
+            [7, 7],
+            [128],
+            [256],
+        )
     ]
     plans = []
     for texts in batches:
