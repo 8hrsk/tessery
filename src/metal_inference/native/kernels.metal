@@ -771,3 +771,108 @@ kernel void linear4_32x32_k64(device const float *x [[buffer(0)]],
     simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
     simdgroup_store(accum2, out+(row+16)*p.cols+channel+(sg%4)*8, p.cols);
 }
+
+// Complete 32-row fused tiles: reuse both decoded weight blocks, retain K32 sums.
+kernel void gated4_32x32_k64(device const float *x [[buffer(0)]],
+    device const uint *w [[buffer(1)]], device const ushort *s [[buffer(2)]],
+    device const ushort *b [[buffer(3)]], device const uint *uw [[buffer(4)]],
+    device const ushort *us [[buffer(5)]], device const ushort *ub [[buffer(6)]],
+    device float *out [[buffer(7)]], constant Params &p [[buffer(8)]],
+    uint tile [[threadgroup_position_in_grid]],
+    uint tid [[thread_index_in_threadgroup]],
+    uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*32 + (sg/4)*8;
+    uint channel = (tile % (p.cols/32))*32;
+    threadgroup float weights[32*64], up_weights[32*64];
+    simdgroup_float8x8 accum(0.0f), up(0.0f), accum2(0.0f), up2(0.0f);
+    simdgroup_float8x8 left, left2, right;
+    for (uint base = 0; base < p.k; base += 64) {
+        uint c = channel+tid/8, col = base+(tid%8)*8;
+        uint packed = w[c*(p.k/8)+col/8], g = c*(p.k/64)+col/64;
+        uint up_packed = uw[c*(p.k/8)+col/8];
+        float scale = bf16(s[g]), bias = bf16(b[g]);
+        float up_scale = bf16(us[g]), up_bias = bf16(ub[g]);
+        for (uint j = 0; j < 8; ++j) {
+            weights[tid*8+j] = float((packed >> (j*4)) & 15)*scale+bias;
+            up_weights[tid*8+j] = float((up_packed >> (j*4)) & 15)*up_scale+up_bias;
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint part = 0; part < 64; part += 32) {
+            simdgroup_float8x8 partial(0.0f), up_partial(0.0f);
+            simdgroup_float8x8 partial2(0.0f), up_partial2(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, x+row*p.k+base+part+j, p.k);
+                simdgroup_load(left2, x+(row+16)*p.k+base+part+j, p.k);
+                simdgroup_load(right, weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(partial, left, right, partial);
+                simdgroup_multiply_accumulate(partial2, left2, right, partial2);
+                simdgroup_load(right, up_weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(up_partial, left, right, up_partial);
+                simdgroup_multiply_accumulate(up_partial2, left2, right, up_partial2);
+            }
+            for (uint e = 0; e < 2; ++e) {
+                accum.thread_elements()[e] += partial.thread_elements()[e];
+                up.thread_elements()[e] += up_partial.thread_elements()[e];
+                accum2.thread_elements()[e] += partial2.thread_elements()[e];
+                up2.thread_elements()[e] += up_partial2.thread_elements()[e];
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    for (uint e = 0; e < 2; ++e) {
+        float g = accum.thread_elements()[e], g2 = accum2.thread_elements()[e];
+        accum.thread_elements()[e] = (g / (1.0f+exp(-g))) * up.thread_elements()[e];
+        accum2.thread_elements()[e] = (g2 / (1.0f+exp(-g2))) * up2.thread_elements()[e];
+    }
+    simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
+    simdgroup_store(accum2, out+(row+16)*p.cols+channel+(sg%4)*8, p.cols);
+}
+
+// Alternative complete 32-row tile: 512 threads, one row fragment per SIMD group.
+kernel void gated4_32x32_wide_k64(device const float *x [[buffer(0)]],
+    device const uint *w [[buffer(1)]], device const ushort *s [[buffer(2)]],
+    device const ushort *b [[buffer(3)]], device const uint *uw [[buffer(4)]],
+    device const ushort *us [[buffer(5)]], device const ushort *ub [[buffer(6)]],
+    device float *out [[buffer(7)]], constant Params &p [[buffer(8)]],
+    uint tile [[threadgroup_position_in_grid]],
+    uint tid [[thread_index_in_threadgroup]],
+    uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*32 + (sg/4)*8;
+    uint channel = (tile % (p.cols/32))*32;
+    threadgroup float weights[32*64], up_weights[32*64];
+    simdgroup_float8x8 accum(0.0f), up(0.0f), left, right;
+    for (uint base = 0; base < p.k; base += 64) {
+        if (tid < 256) {
+            uint c = channel+tid/8, col = base+(tid%8)*8;
+            uint packed = w[c*(p.k/8)+col/8], g = c*(p.k/64)+col/64;
+            uint up_packed = uw[c*(p.k/8)+col/8];
+            float scale = bf16(s[g]), bias = bf16(b[g]);
+            float up_scale = bf16(us[g]), up_bias = bf16(ub[g]);
+            for (uint j = 0; j < 8; ++j) {
+                weights[tid*8+j] = float((packed >> (j*4)) & 15)*scale+bias;
+                up_weights[tid*8+j] = float((up_packed >> (j*4)) & 15)*up_scale+up_bias;
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint part = 0; part < 64; part += 32) {
+            simdgroup_float8x8 partial(0.0f), up_partial(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, x+row*p.k+base+part+j, p.k);
+                simdgroup_load(right, weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(partial, left, right, partial);
+                simdgroup_load(right, up_weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(up_partial, left, right, up_partial);
+            }
+            for (uint e = 0; e < 2; ++e) {
+                accum.thread_elements()[e] += partial.thread_elements()[e];
+                up.thread_elements()[e] += up_partial.thread_elements()[e];
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    for (uint e = 0; e < 2; ++e) {
+        float g = accum.thread_elements()[e];
+        accum.thread_elements()[e] = (g / (1.0f+exp(-g))) * up.thread_elements()[e];
+    }
+    simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
+}
