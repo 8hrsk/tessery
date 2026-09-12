@@ -421,6 +421,19 @@ class MetalRuntime:
             (1024, 2048),
             (1024, 3072),
         )
+        # Full-model measured large shapes reuse decoded weights across 32 rows.
+        # Keep every other shape on the existing full-tile/tail partition below.
+        if rows in (128, 160, 256, 512) and qwen_shape:
+            self._dispatch(
+                "linear4_32x32_k64",
+                buffers,
+                threads=(rows // 32) * (cols // 32) * 256,
+                group_size=256,
+                rows=rows,
+                cols=cols,
+                k=k,
+            )
+            return
         if rows == 3 and qwen_shape:
             self._dispatch(
                 "linear4_small3",

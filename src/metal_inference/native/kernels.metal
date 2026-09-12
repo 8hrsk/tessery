@@ -729,3 +729,45 @@ kernel void gated4_8x32(device const float *x [[buffer(0)]],
     }
     simdgroup_store(accum, out+row*p.cols+channel+sg*8, p.cols);
 }
+
+// Full 32x32 tile: two independent row accumulators reuse 8 KiB decoded weights.
+// Host admits only measured aligned shapes; K32 partial sum order is unchanged.
+kernel void linear4_32x32_k64(device const float *x [[buffer(0)]],
+                             device const uint *w [[buffer(1)]],
+                             device const ushort *s [[buffer(2)]],
+                             device const ushort *b [[buffer(3)]],
+                             device float *out [[buffer(4)]],
+                             constant Params &p [[buffer(8)]],
+                             uint tile [[threadgroup_position_in_grid]],
+                             uint tid [[thread_index_in_threadgroup]],
+                             uint sg [[simdgroup_index_in_threadgroup]]) {
+    uint row = (tile / (p.cols/32))*32 + (sg/4)*8;
+    uint channel = (tile % (p.cols/32))*32;
+    threadgroup float weights[32*64];
+    simdgroup_float8x8 accum(0.0f), accum2(0.0f), left, right;
+    for (uint base = 0; base < p.k; base += 64) {
+        uint c = channel+tid/8, col = base+(tid%8)*8;
+        uint packed = w[c*(p.k/8)+col/8], g = c*(p.k/64)+col/64;
+        float scale = bf16(s[g]), bias = bf16(b[g]);
+        for (uint j = 0; j < 8; ++j)
+            weights[tid*8+j] = float((packed >> (j*4)) & 15)*scale+bias;
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint part = 0; part < 64; part += 32) {
+            simdgroup_float8x8 partial(0.0f), partial2(0.0f);
+            for (uint j = 0; j < 32; j += 8) {
+                simdgroup_load(left, x+row*p.k+base+part+j, p.k);
+                simdgroup_load(right, weights+(sg%4)*8*64+part+j, 64, ulong2(0), true);
+                simdgroup_multiply_accumulate(partial, left, right, partial);
+                simdgroup_load(left, x+(row+16)*p.k+base+part+j, p.k);
+                simdgroup_multiply_accumulate(partial2, left, right, partial2);
+            }
+            for (uint e = 0; e < 2; ++e) {
+                accum.thread_elements()[e] += partial.thread_elements()[e];
+                accum2.thread_elements()[e] += partial2.thread_elements()[e];
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+    }
+    simdgroup_store(accum, out+row*p.cols+channel+(sg%4)*8, p.cols);
+    simdgroup_store(accum2, out+(row+16)*p.cols+channel+(sg%4)*8, p.cols);
+}

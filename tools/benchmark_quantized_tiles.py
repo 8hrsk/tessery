@@ -29,6 +29,7 @@ def main():
     tiles = {
         "linear4_tiled": (8, 32, 128),
         "linear4_16x32_k64": (16, 32, 256),
+        "linear4_32x32_k64": (32, 32, 256),
     }
     if (
         not 3 <= args.samples <= 100

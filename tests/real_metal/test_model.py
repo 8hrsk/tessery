@@ -129,10 +129,10 @@ def test_boundaries_and_batch32(model):
 )
 def test_large_tile_and_fused_mlp_cover_all_projections_per_layer(model, tokens, fused):
     runtime = model._backend.runtime
-    kernel = "linear4_16x32_k64"
-    before = runtime.diagnostics()["dispatches"].get(kernel, 0)
+    kernels = ("linear4_16x32_k64", "linear4_32x32_k64")
+    before = sum(runtime.diagnostics()["dispatches"].get(kernel, 0) for kernel in kernels)
     model.encode([" token" * (tokens - 1)])
-    after = runtime.diagnostics()["dispatches"][kernel]
+    after = sum(runtime.diagnostics()["dispatches"].get(kernel, 0) for kernel in kernels)
     assert after - before == (5 if fused else 7) * model._backend.layers
 
 
