@@ -1,0 +1,358 @@
+{
+  "status": "passed",
+  "decision": "supports_narrow_linear32_guard",
+  "scope": "Diagnostic old/new shader libraries and old16/new32 routes on Qwen128/512; not universal performance qualification",
+  "old_revision": "e49b39c0966aceb3be7a9ac32ef90333c6339809",
+  "new_revision": "6bc40351a0519034d3017d6553ded87f92c04839",
+  "source_hashes": {
+    "src/metal_inference/__init__.py": "834638364ec9abb52959efb1944ce4bb65b39e62efe56f21ebabd2608aabd3c7",
+    "src/metal_inference/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "src/metal_inference/_native.dylib": "4e2797b3ce6b5640ed9a26b6e5b3d099230e18995c53e3f2602feadea2d1b883",
+    "src/metal_inference/api.py": "a8149fd179835c7640e2c32e5589df61270325749dac1dfedc072f57a4b002f6",
+    "src/metal_inference/backend.py": "9ece8e46eecd02e5684f88a917acc142ebc890bc7af5e4f8225ce2da76e1ae44",
+    "src/metal_inference/batching.py": "70ab72dbb039cefc893dcb6dfc88a1af390086673a16f0a9a7a07bc49cad7584",
+    "src/metal_inference/bert.py": "03088e388228e9e91cd4f9f42d55c4b20c674a1e61d42a1020a3c1687fdc224c",
+    "src/metal_inference/cancellation.py": "8b8e49f5d477c117e93db4ee50f06a9163ae48389573780d752675a2329bf98a",
+    "src/metal_inference/cli.py": "b84707966cc59f1a74292fe044e476c00fccd6373cde1237bc0bf65bd47922bb",
+    "src/metal_inference/errors.py": "3a86199aa24e1c0e864061a8ddd8b6277d5128249738f78fbbcec92edc526c43",
+    "src/metal_inference/files.py": "32301d24667a968b6b909e94b669a447fb705e3f76e62832d3c6aebe62f792fd",
+    "src/metal_inference/index.py": "09710229370fd867636bcb07808bcbb69a85e0e01c882dc7ed524ac001948fdd",
+    "src/metal_inference/json_codec.py": "e62aaf1028302c43f58af8140e09dc3f63cd2257deb97c5233deabc7a5440187",
+    "src/metal_inference/metal.py": "a72953a9586291a140a70481714514a67e7d2daf6d168464fcd866dc21f4053e",
+    "src/metal_inference/native/kernels.metal": "ab31c90b6e489ba8c017dc42f981cfc3b1d68b2c7547315e69e068dde07d04ab",
+    "src/metal_inference/native/runtime.mm": "615c119ca9240a677e0b0373d918dde2d8510440c474c067705a28083f87df27",
+    "src/metal_inference/profiles.py": "5d0bfb8320ed4f3deb83d050090f389e1c0c8e1f1d2003faf57c0c404d5115bd",
+    "src/metal_inference/qwen3.py": "7bdbe11b4d7254fd4adec8691344b4b6d16f56619111d2598f05596d8d508f6d",
+    "src/metal_inference/retrieval.py": "d2ccc404c9975e0567e10844ad4d0818fe8a3f3c65c936272367bc96839c885b",
+    "src/metal_inference/server.py": "f5ff866738e9fbe6c478878d4d3b65932d0ef4c669ab575fdc3d8b6ac7f007de",
+    "src/metal_inference/tensor.py": "65498103cb7382f8b6338ba002068902431176e74a55aae5b74b9b6401cfaaf9",
+    "src/metal_inference/tokenizer.py": "16c255d7bd0078f00f136f075b4c96ac98589fa8495a0719cf0584e6afa52397",
+    "src/metal_inference/weights.py": "f84ebba49e774ee2864dd91f7202fe8035811bcdfec1593382bd21ce9ac21888",
+    "src/metal_inference/wordpiece.py": "c58589933e36d5fc5b958700bc9c0ead375aea25f44abf45c10d51a920d85b4f"
+  },
+  "helper_hashes": {
+    "benchmark_shader_library_control.py": "606aab8adc5f378a251974062634bae18e080de155d0bbd1b0c28c1974f47826",
+    "shader_library_control.py": "dfb29a1b19f83a86fe4ba1416288f19d33e7de5838913e387e858ffacf68e8e0",
+    "diagnose_metal.py": "5833cb833e965dcd69096e522f089474fb8af181637b3df9819fc0754c5f9714"
+  },
+  "models": {
+    "baseline": {
+      "actual_shader_sha256": "9ddcd8fccbb73c4bb7a04dc0483330029aab3de673ca3fd87bb784f162c456d4",
+      "forced_route": "old16",
+      "model_id": "Qwen3-Embedding-0.6B-4bit-DWQ",
+      "compatibility_id": "metal-inference-qwen3-f32-v1",
+      "profile_sha256": "2b5938f003b6d6721d40c63d8e6a547979fa1ecf49930332045f5ad683f9cad9"
+    },
+    "legacy": {
+      "actual_shader_sha256": "ab31c90b6e489ba8c017dc42f981cfc3b1d68b2c7547315e69e068dde07d04ab",
+      "forced_route": "old16",
+      "model_id": "Qwen3-Embedding-0.6B-4bit-DWQ",
+      "compatibility_id": "metal-inference-qwen3-f32-v1",
+      "profile_sha256": "2b5938f003b6d6721d40c63d8e6a547979fa1ecf49930332045f5ad683f9cad9"
+    },
+    "candidate": {
+      "actual_shader_sha256": "ab31c90b6e489ba8c017dc42f981cfc3b1d68b2c7547315e69e068dde07d04ab",
+      "forced_route": "new32",
+      "model_id": "Qwen3-Embedding-0.6B-4bit-DWQ",
+      "compatibility_id": "metal-inference-qwen3-f32-v1",
+      "profile_sha256": "2b5938f003b6d6721d40c63d8e6a547979fa1ecf49930332045f5ad683f9cad9"
+    }
+  },
+  "samples_per_label": 24,
+  "permutations_per_case": 24,
+  "comparison_checks": {
+    "exact_vectors_across_all_models_and_runs": true,
+    "same_inputs_plans_profiles_helpers_source": true,
+    "loaded_shader_identity_verified": true,
+    "native_plan_hits_and_route_dispatches_verified": true
+  },
+  "runs": [
+    {
+      "raw_path": "artifacts/library-control-first.json",
+      "raw_sha256": "6c5c3a4f33951a12a7648953b4f874299887a80856cf09249297d6628b4bac86",
+      "allocation_order": [
+        "baseline",
+        "legacy",
+        "candidate"
+      ],
+      "reverse_cases": false,
+      "memory": {
+        "peak_rss_bytes": 993361920,
+        "rss_after_close_bytes": 163889152,
+        "pressure_levels": [
+          1
+        ],
+        "swap_start_bytes": 2204232581,
+        "maximum_swap_growth_bytes": 0
+      },
+      "results": [
+        {
+          "lengths": [
+            128
+          ],
+          "input_ids_sha256": "f73f4e938506dac25f276ecb7e1e6c9770791833012213a639a2c04865c3b743",
+          "plans": [
+            [
+              [
+                0
+              ],
+              128
+            ]
+          ],
+          "scopes": {
+            "api": {
+              "p50_ms": {
+                "baseline_a": 125.88235450675711,
+                "baseline_b": 125.79047901090235,
+                "legacy": 125.2446039870847,
+                "candidate": 116.22370852273889
+              },
+              "old_library_old_over_new_library_old": 1.0047518696574633,
+              "new_library_old_over_new_library_new": 1.0776166548031023,
+              "old_library_old_over_new_library_new": 1.0827373486874383,
+              "identical_baseline_a_over_b": 1.0007303851338925
+            },
+            "gpu": {
+              "p50_ms": {
+                "baseline_a": 118.10099997092038,
+                "baseline_b": 118.40579166891985,
+                "legacy": 118.4027916751802,
+                "candidate": 108.89291667263024
+              },
+              "old_library_old_over_new_library_old": 0.9988932553557582,
+              "new_library_old_over_new_library_new": 1.0873323563472905,
+              "old_library_old_over_new_library_new": 1.0861289570853925,
+              "identical_baseline_a_over_b": 0.9974258717102985
+            },
+            "encode": {
+              "p50_ms": {
+                "baseline_a": 1.3255210069473833,
+                "baseline_b": 1.359771005809307,
+                "legacy": 1.2316249776631594,
+                "candidate": 1.275708491448313
+              },
+              "old_library_old_over_new_library_old": 1.1003081361090206,
+              "new_library_old_over_new_library_new": 0.9654438971907245,
+              "old_library_old_over_new_library_new": 1.062285775035755,
+              "identical_baseline_a_over_b": 0.9748119361895505
+            }
+          }
+        },
+        {
+          "lengths": [
+            512
+          ],
+          "input_ids_sha256": "031df1a1cd7ab3122221a3958a6777f40b5bcc1e288a3c2a8b8145525b7d7494",
+          "plans": [
+            [
+              [
+                0
+              ],
+              512
+            ]
+          ],
+          "scopes": {
+            "api": {
+              "p50_ms": {
+                "baseline_a": 531.4742920163553,
+                "baseline_b": 531.3934790319763,
+                "legacy": 545.2919170202222,
+                "candidate": 507.2987085150089
+              },
+              "old_library_old_over_new_library_old": 0.9745119310328408,
+              "new_library_old_over_new_library_new": 1.0748931701727154,
+              "old_library_old_over_new_library_new": 1.0474962189190247,
+              "identical_baseline_a_over_b": 1.0001520774860209
+            },
+            "gpu": {
+              "p50_ms": {
+                "baseline_a": 517.7856249792967,
+                "baseline_b": 517.7941666624974,
+                "legacy": 517.6352916751057,
+                "candidate": 479.34160416480154
+              },
+              "old_library_old_over_new_library_old": 1.0002935625120783,
+              "new_library_old_over_new_library_new": 1.0798880947899914,
+              "old_library_old_over_new_library_new": 1.0802051094518614,
+              "identical_baseline_a_over_b": 0.9999835037090977
+            },
+            "encode": {
+              "p50_ms": {
+                "baseline_a": 0.8180420263670385,
+                "baseline_b": 0.9052289824467152,
+                "legacy": 0.8024374837987125,
+                "candidate": 0.8168125059455633
+              },
+              "old_library_old_over_new_library_old": 1.0589354777473092,
+              "new_library_old_over_new_library_new": 0.9824010748584097,
+              "old_library_old_over_new_library_new": 1.04029935154466,
+              "identical_baseline_a_over_b": 0.9036851915147239
+            }
+          }
+        }
+      ]
+    },
+    {
+      "raw_path": "artifacts/library-control-repeat.json",
+      "raw_sha256": "a25012c591d46595542a34e6829dab13d6ba7c1bc9a17b5903f6a0c1e913c161",
+      "allocation_order": [
+        "candidate",
+        "legacy",
+        "baseline"
+      ],
+      "reverse_cases": true,
+      "memory": {
+        "peak_rss_bytes": 1497038848,
+        "rss_after_close_bytes": 110116864,
+        "pressure_levels": [
+          1
+        ],
+        "swap_start_bytes": 2204232581,
+        "maximum_swap_growth_bytes": 0
+      },
+      "results": [
+        {
+          "lengths": [
+            128
+          ],
+          "input_ids_sha256": "f73f4e938506dac25f276ecb7e1e6c9770791833012213a639a2c04865c3b743",
+          "plans": [
+            [
+              [
+                0
+              ],
+              128
+            ]
+          ],
+          "scopes": {
+            "api": {
+              "p50_ms": {
+                "baseline_a": 125.77991696889512,
+                "baseline_b": 124.75147901568562,
+                "legacy": 125.52783350110985,
+                "candidate": 116.31802099873312
+              },
+              "old_library_old_over_new_library_old": 1.001516432882777,
+              "new_library_old_over_new_library_new": 1.0791778644727548,
+              "old_library_old_over_new_library_new": 1.0808143652728064,
+              "identical_baseline_a_over_b": 1.0082438938706306
+            },
+            "gpu": {
+              "p50_ms": {
+                "baseline_a": 118.5025833256077,
+                "baseline_b": 118.66472917608917,
+                "legacy": 118.12062497483566,
+                "candidate": 109.08381250919774
+              },
+              "old_library_old_over_new_library_old": 1.003851642190837,
+              "new_library_old_over_new_library_new": 1.0828428366938125,
+              "old_library_old_over_new_library_new": 1.087013559849668,
+              "identical_baseline_a_over_b": 0.9986335800738158
+            },
+            "encode": {
+              "p50_ms": {
+                "baseline_a": 1.253562979400158,
+                "baseline_b": 1.0847709781955928,
+                "legacy": 1.2171249836683273,
+                "candidate": 1.2063125032000244
+              },
+              "old_library_old_over_new_library_old": 0.947417098229521,
+              "new_library_old_over_new_library_new": 1.0089632499369943,
+              "old_library_old_over_new_library_new": 0.9559090344755341,
+              "identical_baseline_a_over_b": 1.1556015090718352
+            }
+          }
+        },
+        {
+          "lengths": [
+            512
+          ],
+          "input_ids_sha256": "031df1a1cd7ab3122221a3958a6777f40b5bcc1e288a3c2a8b8145525b7d7494",
+          "plans": [
+            [
+              [
+                0
+              ],
+              512
+            ]
+          ],
+          "scopes": {
+            "api": {
+              "p50_ms": {
+                "baseline_a": 531.1914169869851,
+                "baseline_b": 531.1783750075847,
+                "legacy": 546.376667014556,
+                "candidate": 506.7850415071007
+              },
+              "old_library_old_over_new_library_old": 0.9722073599691871,
+              "new_library_old_over_new_library_new": 1.0781231138743084,
+              "old_library_old_over_new_library_new": 1.0481592262615007,
+              "identical_baseline_a_over_b": 1.000024552918594
+            },
+            "gpu": {
+              "p50_ms": {
+                "baseline_a": 517.1007291646674,
+                "baseline_b": 517.4043958541006,
+                "legacy": 517.238645843463,
+                "candidate": 478.9524166553747
+              },
+              "old_library_old_over_new_library_old": 1.0002045316371095,
+              "new_library_old_over_new_library_new": 1.0799374381602438,
+              "old_library_old_over_new_library_new": 1.0801583195324465,
+              "identical_baseline_a_over_b": 0.9994130960388694
+            },
+            "encode": {
+              "p50_ms": {
+                "baseline_a": 0.7616869988851249,
+                "baseline_b": 0.8136245014611632,
+                "legacy": 0.8526664751116186,
+                "candidate": 0.8484164718538523
+              },
+              "old_library_old_over_new_library_old": 0.9177826617156466,
+              "new_library_old_over_new_library_new": 1.005009336097023,
+              "old_library_old_over_new_library_new": 0.9223801435322007,
+              "identical_baseline_a_over_b": 0.9361652672912808
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Old-library baseline and new-library candidate improve in both reversed allocation/case orders on128 and512.",
+    "The512 old-route GPU medians are similar for old and new libraries, but new-library legacy API has additional overhead. This diagnostic does not identify its cause.",
+    "Earlier four-process comparison changed sign as baseline timing drifted11-13%; its15%screen alone was not evidence of improvement. That contradiction is retained below.",
+    "No clock/thermal telemetry was collected; do not assert a proven hardware-state cause.",
+    "Three resident instances and fixed per-label executor/native-plan caches differ from single-model standalone deployment. No general release or MLX superiority claim."
+  ],
+  "earlier_conflicting_four_process_run": {
+    "artifact_directory": "/Users/user/develop/mlx-y/artifacts/performance-next-20260912/large-m/revision-final",
+    "summary_sha256": "625ed4690b9fccb677eeca1c0ab724399e248faf49c00afbaff52cefddf83dce",
+    "worker_sha256": {
+      "worker-0.json": "36a3b1b8292338a5a18b6e1b80a2203ea0f7a6ee1c197ba740874db7fe7dc3b5",
+      "worker-1.json": "2410b627c6a42d3cf15025620ebdf01b4f1066ba3e93af399e5af54b95f3bdaf",
+      "worker-2.json": "196de97a805175190ab50a9f6c46e083d74fd54bda6d824d9fd5426dce07f775",
+      "worker-3.json": "0c327bd4e4a8f0d96c220d80c286cb9e74f668a8f3e81629414663f721519a45"
+    },
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "api_p50_ms": {
+      "128": [
+        139.2432500142604,
+        129.38499997835606,
+        129.10687547991984,
+        125.46545852092095
+      ],
+      "512": [
+        600.0826875388157,
+        557.3885419871658,
+        557.0774164516479,
+        532.0521040121093
+      ]
+    }
+  }
+}
