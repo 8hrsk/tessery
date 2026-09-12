@@ -112,6 +112,9 @@ def test_boundaries_and_batch32(model):
 @pytest.mark.parametrize(
     "tokens,fused",
     [
+        (9, True),
+        (12, True),
+        (16, True),
         (17, True),
         (24, True),
         (33, False),
@@ -156,7 +159,21 @@ def test_unaligned_attention_uses_bounded_tile_per_layer(model):
 
 
 @pytest.mark.parametrize(
-    "batch,tokens", [(1, 7), (1, 128), (1, 129), (1, 256), (1, 512), (4, 32), (8, 16), (4, 64)]
+    "batch,tokens",
+    [
+        (1, 7),
+        (1, 9),
+        (1, 12),
+        (1, 16),
+        (2, 7),
+        (1, 128),
+        (1, 129),
+        (1, 256),
+        (1, 512),
+        (4, 32),
+        (8, 16),
+        (4, 64),
+    ],
 )
 def test_fused_mlp_full_vectors_equal_complete_previous_path(model, monkeypatch, batch, tokens):
     runtime = model._backend.runtime

@@ -79,3 +79,7 @@ VECLIB_MAXIMUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONPATH=src \
   python tools/benchmark_index_token_reuse.py --samples 12 --reverse \
   --output artifacts/token-reuse-reverse.json
 ```
+
+The optimized route is limited to ordinary `EmbeddingModel` instances with the
+original `encode` method. Subclasses and instance/class overrides retain calls to
+public `encode`, so their vector transformations and instrumentation are honored.

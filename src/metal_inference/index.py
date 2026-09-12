@@ -22,6 +22,7 @@ MAX_TEXT_BYTES = 16 * 1024 * 1024
 MAX_INDEX_BYTES = 128 * 1024 * 1024
 # Temporary ingestion cache, independent of persistent vector/snapshot limits.
 _MAX_PREPARED_TOKEN_BYTES = 16 * 1024 * 1024
+_STANDARD_ENCODE = EmbeddingModel.encode
 
 
 @dataclass(frozen=True)
@@ -129,7 +130,11 @@ class DocumentIndex:
         prepared: list[NDArray[np.uint32] | None] = []
         prepared_bytes = 0
         prepared_cap = model.max_length
-        reuse = isinstance(model, EmbeddingModel) and getattr(model, "_reuse_index_tokens", True)
+        reuse = (
+            type(model) is EmbeddingModel
+            and getattr(model.encode, "__func__", None) is _STANDARD_ENCODE
+            and getattr(model, "_reuse_index_tokens", True)
+        )
         total = 0
         for source, text in documents.items():
             if (

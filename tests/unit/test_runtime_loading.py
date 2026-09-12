@@ -200,7 +200,7 @@ def test_fused_gated_projection_guard_and_buffer_binding(rows, cols, k):
     )
     buffers = [object() for _ in range(9)]
     metal.MetalRuntime._gated4(runtime, buffers, rows=rows, cols=cols, k=k)
-    if rows in (24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
+    if rows in (16, 24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
         assert len(calls) == (2 if rows == 24 else 1)
         assert calls[0][1] == ("gated4_16x32_k64", buffers[:8])
         assert calls[0][2] == dict(

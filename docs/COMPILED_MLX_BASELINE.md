@@ -65,3 +65,8 @@ Repeat in a fresh process with `--engine-order mlx-first --reverse-cases` and a
 new output path. Use `tools/compare_embedding_runs.py` on the two reports. Run
 API scope separately; do not mix scopes when computing a speed ratio. Preserve
 uncompiled baselines in separate outputs. All engines must run sequentially.
+
+In backend scope, the exact API/prepared-route validation also creates an
+executor-thread specialization. Allocator diagnostics therefore include that
+validation-only graph alongside the directly measured thread's graph; they are
+not a minimal standalone compiled-backend memory measurement.

@@ -217,3 +217,43 @@ def test_probe_cap_change_and_restore_disables_reuse(model, monkeypatch):
     actual = build(model, True)
     assert actual.chunks == expected.chunks
     np.testing.assert_array_equal(actual._vectors, expected._vectors)
+
+
+@pytest.mark.parametrize("override", ["subclass", "instance", "class"])
+def test_index_preserves_custom_encode_semantics(model, monkeypatch, override):
+    base_encode = EmbeddingModel.encode
+
+    def shifted(self, texts, *, dimensions=None):
+        return np.roll(base_encode(self, texts, dimensions=dimensions), 1, axis=1)
+
+    if override == "subclass":
+
+        class CustomModel(EmbeddingModel):
+            encode = shifted
+
+        active = CustomModel(Backend(), CountingTokenizer(), 384, 64, 2)
+    elif override == "instance":
+        from types import MethodType
+
+        monkeypatch.setattr(model, "encode", MethodType(shifted, model))
+        active = model
+    else:
+        monkeypatch.setattr(EmbeddingModel, "encode", shifted)
+        active = model
+    try:
+        expected = build(active, False)
+        old_calls = active._tokenizer.text_count
+        active._tokenizer.text_count = 0
+
+        def forbidden(*args, **kwargs):
+            raise AssertionError("custom encode must retain control")
+
+        monkeypatch.setattr(active, "_encode_prepared", forbidden)
+        actual = build(active, True)
+        assert actual.chunks == expected.chunks
+        np.testing.assert_array_equal(actual._vectors, expected._vectors)
+        assert active._tokenizer.text_count == old_calls
+        assert actual.search(active, "Paris") == expected.search(active, "Paris")
+    finally:
+        if active is not model:
+            active.close()

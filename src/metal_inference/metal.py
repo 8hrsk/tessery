@@ -489,7 +489,7 @@ class MetalRuntime:
         # x, gate weight/scale/bias, up weight/scale/bias, gate output, up scratch.
         # Only measured full-model shapes use the fused epilogue. Keep the
         # original complete path for all other heights and projection shapes.
-        if rows in (24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
+        if rows in (16, 24, 128, 160, 256, 512) and (cols, k) == (3072, 1024):
             self._dispatch(
                 "gated4_16x32_k64",
                 buffers[:8],

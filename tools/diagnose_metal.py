@@ -73,6 +73,8 @@ def delta(before, after):
         "submit_wait_seconds",
     ):
         out[key] = after[key] - before[key]
+    for key in ("plan_hits", "plan_builds"):
+        out[key] = after.get(key, 0) - before.get(key, 0)
     out["dispatches"] = {
         k: v - before["dispatches"].get(k, 0)
         for k, v in after["dispatches"].items()
@@ -156,11 +158,11 @@ def soak(model, seconds, on_checkpoint=None):
         ["retrieval system"] * 32,
     ]
     special = 2 if model.descriptor.architecture == "bert_f32" else 1
-    # Exercise both new MLP heights, the short scalar path, and neighboring
-    # fallback widths during every cycle of a long qualification run.
+    # Exercise M16/M24/M160, the short scalar path and neighboring fallbacks.
+    # Repeat each case immediately to exercise warm replay as well as eviction.
     batches += [
         [" token" * (length - special) for length in lengths]
-        for lengths in ([3], [3, 7, 10], [33] * 4, [20] * 8, [24], [25], [159], [161])
+        for lengths in ([3], [3, 7, 10], [33] * 4, [20] * 8, [24], [25], [159], [161], [16], [7, 7])
     ]
     plans = []
     for texts in batches:
@@ -203,7 +205,7 @@ def soak(model, seconds, on_checkpoint=None):
 
     checkpoint()
     while time.perf_counter() - started < seconds:
-        i = count % len(batches)
+        i = (count // 2) % len(batches)
         np.testing.assert_array_equal(model.encode(batches[i]), references[i])
         stats = model.memory_stats()
         if (
@@ -211,8 +213,13 @@ def soak(model, seconds, on_checkpoint=None):
             != baseline["active_bytes"] - baseline["cache_bytes"]
         ):
             raise AssertionError("Live Metal buffers grew between completed requests")
-        if stats.cache_bytes > model._backend.runtime.workspace_limit_bytes:
-            raise AssertionError("Workspace cache exceeded its budget")
+        if (
+            stats.cache_bytes + stats.plan_cache_bytes
+            > model._backend.runtime.workspace_limit_bytes
+        ):
+            raise AssertionError("Workspace and plan cache exceeded its shared budget")
+        if model._backend.runtime.diagnostics()["plan_cache_entries"] > 4:
+            raise AssertionError("Native plan count exceeded its bound")
         plans[i]["completed_calls"] += 1
         count += 1
         elapsed = time.perf_counter() - started
@@ -230,6 +237,7 @@ def soak(model, seconds, on_checkpoint=None):
         "bitwise_repeatability": True,
         "live_buffers_stable": True,
         "workspace_cache_bounded": True,
+        "execution_plan_cache_bounded": True,
         "rss_end_minus_start_bytes": rss[-1] - rss[0],
         "rss_sample_range_bytes": max(rss) - min(rss),
         "checkpoints": points,
