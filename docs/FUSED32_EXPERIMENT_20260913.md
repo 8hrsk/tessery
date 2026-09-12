@@ -163,3 +163,7 @@ for other shapes. Measure full `encode()` alongside kernel time and unchanged
 controls. At 512 tokens, attention data reuse is the second independent target;
 a traversal-only rearrangement is not sufficient. Short 3-token inference
 remains a separate workload, as established by the compiled comparison.
+
+The down-projection layout/row-reuse experiment has since been completed; see
+[its report](DOWN_PROJECTION_EXPERIMENT_20260913.md). Both candidates remain
+isolated, with no production selection change.
