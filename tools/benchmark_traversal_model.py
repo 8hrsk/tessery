@@ -50,6 +50,7 @@ def main():
             model = EmbeddingModel.load(args.model_dir)
         with model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             selection = install_route(rt)
             payload["model"] = model.descriptor.model_id
             payload["compatibility_id"] = model.descriptor.compatibility_id

@@ -54,6 +54,7 @@ def install_model_route(model):
     All non-aligned shapes retain the original complete path.
     """
     rt = model._backend.runtime
+    rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
     if hasattr(rt, "_gated4"):
         selected = rt._gated4
         state = {"kernel": None, "pending": None, "skip": None}

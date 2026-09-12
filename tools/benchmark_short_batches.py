@@ -38,6 +38,7 @@ def previous_batches(lengths, max_padded_tokens, max_length, architecture):
 
 def stage_profile(model, texts, reference):
     rt = model._backend.runtime
+    rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
     # profile_kernels holds the runtime lock: run directly in the caller thread,
     # not through the API worker. Normal timings below always use public encode.
     ids, lengths = model._tokenizer.batch(texts, max_length=model.max_length)
@@ -119,6 +120,7 @@ def main():
     try:
         with EmbeddingModel.load(args.model_dir) as model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             payload["model"] = model.descriptor.model_id
             payload["compatibility_id"] = model.descriptor.compatibility_id
             order = list(reversed(cases)) if args.reverse_cases else cases

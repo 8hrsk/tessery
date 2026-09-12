@@ -43,6 +43,7 @@ def main():
             payload["model"] = model.descriptor.model_id
             payload["compatibility_id"] = model.descriptor.compatibility_id
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             selected = rt._attention
 
             def previous(buffers, *, tokens, seq, heads, kv_heads, dim, bidirectional=0):

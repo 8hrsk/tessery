@@ -6,6 +6,7 @@
 #include <cstring>
 #include <mutex>
 #include <vector>
+#include <array>
 
 struct Runtime {
     id<MTLDevice> device;
@@ -22,6 +23,21 @@ struct Runtime {
 
 };
 struct Buffer { id<MTLBuffer> metal; };
+
+// Plans own pipelines and integer binding slots, never activation/weight buffers.
+// Each replay binds the current workspace; no GPU allocation survives via a plan.
+struct PlanOp {
+    id<MTLComputePipelineState> pipeline;
+    std::array<uint32_t, 8> slots;
+    std::array<uint8_t, 64> params;
+    uint32_t count, group;
+    uint64_t threads;
+};
+struct Plan {
+    Runtime *owner;
+    std::vector<uint64_t> sizes;
+    std::vector<PlanOp> ops;
+};
 
 extern "C" {
 void *mi_create(const char *source) {
@@ -125,6 +141,75 @@ int mi_dispatch(void *runtime, const char *name, void **buffers, uint32_t count,
         [r->encoder dispatchThreads:MTLSizeMake(threads, 1, 1)
              threadsPerThreadgroup:MTLSizeMake(group, 1, 1)];
         if (r->samples) { [r->encoder endEncoding]; r->encoder = nil; }
+        return 0;
+    }
+}
+
+void *mi_plan_create(void *runtime, void **buffers, uint32_t count) {
+    @autoreleasepool {
+        auto r = static_cast<Runtime *>(runtime);
+        if (!r->command || r->samples || !count || count > 2048) return nullptr;
+        auto p = new Plan{r, {}, {}};
+        for (uint32_t i = 0; i < count; ++i) {
+            if (!buffers[i]) { delete p; return nullptr; }
+            p->sizes.push_back(static_cast<Buffer *>(buffers[i])->metal.length);
+        }
+        return p;
+    }
+}
+
+int mi_plan_add(void *plan, const char *name, const uint32_t *slots, uint32_t count,
+                const void *params, uint64_t threads, uint32_t group) {
+    @autoreleasepool {
+        auto p = static_cast<Plan *>(plan);
+        auto r = p->owner;
+        if (!r->command || r->samples || !count || count > 8 || !threads || !group
+            || p->ops.size() >= 2048) return 1;
+        PlanOp op{};
+        op.pipeline = r->pipelines[[NSString stringWithUTF8String:name]];
+        if (!op.pipeline || group > op.pipeline.maxTotalThreadsPerThreadgroup) return 1;
+        for (uint32_t i = 0; i < count; ++i) {
+            if (slots[i] >= p->sizes.size()) return 1;
+            op.slots[i] = slots[i];
+        }
+        std::memcpy(op.params.data(), params, 64);
+        op.count = count; op.group = group; op.threads = threads;
+        p->ops.push_back(op);
+        return 0;
+    }
+}
+
+uint64_t mi_plan_bytes(void *plan) {
+    auto p = static_cast<Plan *>(plan);
+    return sizeof(Plan) + p->sizes.capacity()*sizeof(uint64_t)
+        + p->ops.capacity()*sizeof(PlanOp);
+}
+
+void mi_plan_free(void *plan) {
+    @autoreleasepool { delete static_cast<Plan *>(plan); }
+}
+
+int mi_plan_run(void *runtime, void *plan, void **buffers, uint32_t count) {
+    @autoreleasepool {
+        auto r = static_cast<Runtime *>(runtime);
+        auto p = static_cast<Plan *>(plan);
+        if (p->owner != r || !r->command || !r->encoder || r->samples
+            || count != p->sizes.size() || p->ops.empty()) return 1;
+        // Validate every slot before encoding any work.
+        for (uint32_t i = 0; i < count; ++i) {
+            if (!buffers[i] || static_cast<Buffer *>(buffers[i])->metal.length != p->sizes[i])
+                return 1;
+        }
+        for (const auto &op : p->ops) {
+            [r->encoder setComputePipelineState:op.pipeline];
+            for (uint32_t i = 0; i < op.count; ++i) {
+                auto b = static_cast<Buffer *>(buffers[op.slots[i]]);
+                [r->encoder setBuffer:b->metal offset:0 atIndex:i];
+            }
+            [r->encoder setBytes:op.params.data() length:64 atIndex:8];
+            [r->encoder dispatchThreads:MTLSizeMake(op.threads, 1, 1)
+                 threadsPerThreadgroup:MTLSizeMake(op.group, 1, 1)];
+        }
         return 0;
     }
 }

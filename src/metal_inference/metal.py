@@ -51,6 +51,22 @@ def _library() -> Any:
         "mi_abort": ([ct.c_void_p], None),
         "mi_profile_enable": ([ct.c_void_p, ct.c_int], ct.c_int),
         "mi_profile_read": ([ct.c_void_p, ct.POINTER(ct.c_double), ct.c_uint32], ct.c_int),
+        "mi_plan_create": ([ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_uint32], ct.c_void_p),
+        "mi_plan_add": (
+            [
+                ct.c_void_p,
+                ct.c_char_p,
+                ct.POINTER(ct.c_uint32),
+                ct.c_uint32,
+                ct.c_void_p,
+                ct.c_uint64,
+                ct.c_uint32,
+            ],
+            ct.c_int,
+        ),
+        "mi_plan_bytes": ([ct.c_void_p], ct.c_uint64),
+        "mi_plan_free": ([ct.c_void_p], None),
+        "mi_plan_run": ([ct.c_void_p, ct.c_void_p, ct.POINTER(ct.c_void_p), ct.c_uint32], ct.c_int),
         "mi_dispatch": (
             [
                 ct.c_void_p,
@@ -131,8 +147,15 @@ class WorkspaceLease:
         self.closed = True
         rt = self.runtime
         for buffer, reusable in self.buffers:
-            if reusable and buffer.pointer and buffer.size <= rt.workspace_limit_bytes:
-                while rt._scratch and rt.cache_bytes + buffer.size > rt.workspace_limit_bytes:
+            if (
+                reusable
+                and buffer.pointer
+                and buffer.size <= rt.workspace_limit_bytes - rt._plan_bytes
+            ):
+                while (
+                    rt._scratch
+                    and rt.cache_bytes + rt._plan_bytes + buffer.size > rt.workspace_limit_bytes
+                ):
                     old = rt._scratch.pop(0)
                     rt.cache_bytes -= old.size
                     old.close()
@@ -151,6 +174,12 @@ class MetalRuntime:
             raise InferenceError()
         self.workspace_limit_bytes = workspace_limit_bytes
         self.cache_bytes = 0
+        self._plans_enabled = True
+        self._plans: dict[tuple[Any, ...], tuple[int, int, Counter[str]]] = {}
+        self._plan_capture: tuple[int, dict[Buffer, int], Counter[str]] | None = None
+        self._plan_bytes = 0
+        self._plan_hits = 0
+        self._plan_builds = 0
         self._scratch: list[Buffer] = []
         self._workspace_active = False
         self._lib = _library()
@@ -197,6 +226,10 @@ class MetalRuntime:
                 "dispatches": dict(self._dispatches),
                 "active_bytes": self.active_bytes,
                 "cache_bytes": self.cache_bytes,
+                "plan_cache_bytes": self._plan_bytes,
+                "plan_cache_entries": len(self._plans),
+                "plan_hits": self._plan_hits,
+                "plan_builds": self._plan_builds,
                 "peak_bytes": self.peak_bytes,
             }
 
@@ -244,10 +277,75 @@ class MetalRuntime:
     def trim_workspace(self) -> None:
         """Release retained scratch buffers; waits for the current forward."""
         with self._lock:
+            self._clear_plans()
             for buffer in self._scratch:
                 buffer.close()
             self._scratch.clear()
             self.cache_bytes = 0
+
+    def _clear_plans(self) -> None:
+        for pointer, _, _ in self._plans.values():
+            self._lib.mi_plan_free(pointer)
+        self._plans.clear()
+        self._plan_bytes = 0
+
+    @contextmanager
+    def _execution_plan(self, key: tuple[Any, ...], bindings: Sequence[Buffer]) -> Iterator[bool]:
+        """Internal static graph capture; True means replay already encoded the graph.
+
+        Call within command/workspace after all dynamic buffers are allocated.
+        The backend supplies a complete, stable ordering of weights and scratch slots.
+        Profiling bypasses plans to retain per-dispatch counter records.
+        """
+        if not self._recording or not self._workspace_active or self._plan_capture is not None:
+            raise InferenceError()
+        if not self._plans_enabled or self._profile is not None or not self.workspace_limit_bytes:
+            yield False
+            return
+        if any(not b.pointer or b.runtime is not self for b in bindings):
+            raise InferenceError()
+        pointers = (ct.c_void_p * len(bindings))(*(b.pointer for b in bindings))
+        self._inflight.extend(bindings)
+        cached = self._plans.get(key)
+        if cached is not None:
+            if self._lib.mi_plan_run(self._pointer, cached[0], pointers, len(bindings)):
+                raise InferenceError()
+            self._dispatches.update(cached[2])
+            self._plan_hits += 1
+            yield True
+            return
+        pointer = self._lib.mi_plan_create(self._pointer, pointers, len(bindings))
+        if not pointer:
+            raise InferenceError()
+        counts: Counter[str] = Counter()
+        self._plan_capture = (pointer, {b: i for i, b in enumerate(bindings)}, counts)
+        try:
+            yield False
+            size = int(self._lib.mi_plan_bytes(pointer))
+            if size <= self.workspace_limit_bytes:
+                # Bound metadata and scratch together; plans own no model/workspace data.
+                while self._plans and (
+                    len(self._plans) >= 4 or self._plan_bytes + size > self.workspace_limit_bytes
+                ):
+                    oldest = next(iter(self._plans))
+                    old, used, _ = self._plans.pop(oldest)
+                    self._lib.mi_plan_free(old)
+                    self._plan_bytes -= used
+                while (
+                    self._scratch
+                    and self.cache_bytes + self._plan_bytes + size > self.workspace_limit_bytes
+                ):
+                    old_buffer = self._scratch.pop(0)
+                    self.cache_bytes -= old_buffer.size
+                    old_buffer.close()
+                self._plans[key] = (pointer, size, counts)
+                self._plan_bytes += size
+                self._plan_builds += 1
+                pointer = None
+        finally:
+            self._plan_capture = None
+            if pointer:
+                self._lib.mi_plan_free(pointer)
 
     def tensor(self, data: NDArray[np.float32]) -> Tensor:
         """Upload a nonempty float32 array into an owned, contiguous Metal tensor."""
@@ -306,6 +404,9 @@ class MetalRuntime:
                 if gpu_seconds >= 0:
                     self._gpu_seconds += gpu_seconds
                     self._gpu_samples += 1
+            except BaseException:
+                self._clear_plans()
+                raise
             finally:
                 self._lib.mi_abort(self._pointer)
                 self._recording = False
@@ -511,6 +612,14 @@ class MetalRuntime:
             group_size,
         ):
             raise InferenceError()
+        if self._plan_capture is not None:
+            plan, slots, counts = self._plan_capture
+            indices = (ct.c_uint32 * len(buffers))(*(slots[b] for b in buffers))
+            if self._lib.mi_plan_add(
+                plan, name.encode("ascii"), indices, len(buffers), parameters, threads, group_size
+            ):
+                raise InferenceError()
+            counts[name] += 1
         self._dispatches[name] += 1
         if self._profile is not None:
             self._profile_command.append(

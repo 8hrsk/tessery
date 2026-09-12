@@ -43,6 +43,7 @@ def main():
     try:
         with EmbeddingModel.load(args.model_dir) as model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             selected = rt._linear4
 
             def previous(buffers, *, rows, cols, k):

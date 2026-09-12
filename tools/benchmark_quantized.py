@@ -73,6 +73,7 @@ def model_samples(model_dir):
     results = []
     with EmbeddingModel.load(model_dir) as model:
         rt = model._backend.runtime
+        rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
         selected = rt._linear4
 
         def baseline(buffers, *, rows, cols, k):

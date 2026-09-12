@@ -36,6 +36,7 @@ def main():
         rng = np.random.default_rng(77)
         with EmbeddingModel.load(args.model_dir) as model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             current = rt._linear4
 
             def previous(buffers, *, rows, cols, k):

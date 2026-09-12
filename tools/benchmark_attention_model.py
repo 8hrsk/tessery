@@ -40,6 +40,7 @@ def main():
         )
         with EmbeddingModel.load(args.model_dir, profile=profile) as model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             selected = rt._attention
 
             def previous(buffers, *, tokens, seq, heads, kv_heads, dim, bidirectional=0):

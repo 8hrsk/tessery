@@ -144,3 +144,10 @@ class/exception identity, model lifecycle and compatibility IDs are unchanged.
 Importing `tessery` does not initialize Metal or load/download a model.
 `metal_inference` remains a compatibility namespace; implementation-only submodules
 are not mirrored under `tessery`. See [distribution migration](PUBLISHING.md).
+
+Prepared execution plans report retained native command/slot storage separately as
+`MemoryStats.plan_cache_bytes`. This is CPU metadata, not a Metal buffer; the
+meaning of `active_bytes - cache_bytes` is unchanged. The workspace retention
+budget covers `cache_bytes + plan_cache_bytes`, with at most four plans. Python
+object overhead and Metal driver/pipeline allocations are not included in these
+owned-allocation counters. `trim_memory()` clears both scratch and plans.

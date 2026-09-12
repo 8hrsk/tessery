@@ -90,6 +90,7 @@ class MemoryStats:
     active_bytes: int
     peak_bytes: int
     cache_bytes: int = 0
+    plan_cache_bytes: int = 0
 
 
 class EmbeddingModel:
@@ -298,7 +299,10 @@ class EmbeddingModel:
         with self._metal_lock:
             runtime = self._backend.runtime
             return MemoryStats(
-                runtime.active_bytes, runtime.peak_bytes, getattr(runtime, "cache_bytes", 0)
+                runtime.active_bytes,
+                runtime.peak_bytes,
+                getattr(runtime, "cache_bytes", 0),
+                getattr(runtime, "_plan_bytes", 0),
             )
 
     def trim_memory(self) -> None:

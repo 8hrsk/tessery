@@ -162,80 +162,132 @@ class Qwen3Backend:
                 k, v = (new(tokens * self.kv_heads * self.head_dim * 4) for _ in range(2))
                 gate, up = (new(tokens * self.intermediate * 4) for _ in range(2))
                 output = new(batch * dimensions * 4)
-                rt._dispatch(
-                    "embedding4",
-                    [token_buffer, *self._quant("model.embed_tokens"), x],
-                    threads=tokens * self.hidden,
-                    n=tokens * self.hidden,
-                    cols=self.hidden,
-                )
-                for layer in range(self.layers):
-                    prefix = f"model.layers.{layer}"
-                    attn = prefix + ".self_attn"
-                    norm(x, normalized, prefix + ".input_layernorm", tokens, self.hidden)
-                    linear(normalized, q, attn + ".q_proj", self.heads * self.head_dim, self.hidden)
-                    linear(
-                        normalized, k, attn + ".k_proj", self.kv_heads * self.head_dim, self.hidden
-                    )
-                    linear(
-                        normalized, v, attn + ".v_proj", self.kv_heads * self.head_dim, self.hidden
-                    )
-                    for value, heads, name in ((q, self.heads, "q"), (k, self.kv_heads, "k")):
-                        norm(value, value, attn + f".{name}_norm", tokens * heads, self.head_dim)
-                        count = tokens * heads * self.head_dim // 2
-                        rt._dispatch(
-                            "rope",
-                            [value],
-                            threads=count,
-                            n=count,
-                            heads=heads,
-                            seq=seq,
-                            dim=self.head_dim,
-                            theta=self.theta,
-                        )
-                    rt._attention(
-                        [q, k, v, length_buffer, attended],
-                        tokens=tokens,
-                        seq=seq,
-                        heads=self.heads,
-                        kv_heads=self.kv_heads,
-                        dim=self.head_dim,
-                    )
-                    linear(
-                        attended,
+                with rt._execution_plan(
+                    ("qwen", batch, seq, dimensions),
+                    [
+                        *self.weights.values(),
+                        token_buffer,
+                        length_buffer,
+                        x,
+                        normalized,
                         projected,
-                        attn + ".o_proj",
-                        self.hidden,
-                        self.heads * self.head_dim,
-                    )
-                    residual(x, projected)
-                    norm(x, normalized, prefix + ".post_attention_layernorm", tokens, self.hidden)
-                    rt._gated4(
-                        [
-                            normalized,
-                            *self._quant(prefix + ".mlp.gate_proj"),
-                            *self._quant(prefix + ".mlp.up_proj"),
-                            gate,
-                            up,
-                        ],
-                        rows=tokens,
-                        cols=self.intermediate,
-                        k=self.hidden,
-                    )
-                    linear(
-                        gate, projected, prefix + ".mlp.down_proj", self.hidden, self.intermediate
-                    )
-                    residual(x, projected)
-                norm(x, normalized, "model.norm", tokens, self.hidden)
-                rt._dispatch(
-                    "pool_project",
-                    [normalized, length_buffer, output],
-                    threads=batch * 32,
-                    group_size=32,
-                    seq=seq,
-                    cols=self.hidden,
-                    dim=dimensions,
-                )
+                        q,
+                        attended,
+                        k,
+                        v,
+                        gate,
+                        up,
+                        output,
+                    ],
+                ) as replayed:
+                    if not replayed:
+                        rt._dispatch(
+                            "embedding4",
+                            [token_buffer, *self._quant("model.embed_tokens"), x],
+                            threads=tokens * self.hidden,
+                            n=tokens * self.hidden,
+                            cols=self.hidden,
+                        )
+                        for layer in range(self.layers):
+                            prefix = f"model.layers.{layer}"
+                            attn = prefix + ".self_attn"
+                            norm(x, normalized, prefix + ".input_layernorm", tokens, self.hidden)
+                            linear(
+                                normalized,
+                                q,
+                                attn + ".q_proj",
+                                self.heads * self.head_dim,
+                                self.hidden,
+                            )
+                            linear(
+                                normalized,
+                                k,
+                                attn + ".k_proj",
+                                self.kv_heads * self.head_dim,
+                                self.hidden,
+                            )
+                            linear(
+                                normalized,
+                                v,
+                                attn + ".v_proj",
+                                self.kv_heads * self.head_dim,
+                                self.hidden,
+                            )
+                            for value, heads, name in (
+                                (q, self.heads, "q"),
+                                (k, self.kv_heads, "k"),
+                            ):
+                                norm(
+                                    value,
+                                    value,
+                                    attn + f".{name}_norm",
+                                    tokens * heads,
+                                    self.head_dim,
+                                )
+                                count = tokens * heads * self.head_dim // 2
+                                rt._dispatch(
+                                    "rope",
+                                    [value],
+                                    threads=count,
+                                    n=count,
+                                    heads=heads,
+                                    seq=seq,
+                                    dim=self.head_dim,
+                                    theta=self.theta,
+                                )
+                            rt._attention(
+                                [q, k, v, length_buffer, attended],
+                                tokens=tokens,
+                                seq=seq,
+                                heads=self.heads,
+                                kv_heads=self.kv_heads,
+                                dim=self.head_dim,
+                            )
+                            linear(
+                                attended,
+                                projected,
+                                attn + ".o_proj",
+                                self.hidden,
+                                self.heads * self.head_dim,
+                            )
+                            residual(x, projected)
+                            norm(
+                                x,
+                                normalized,
+                                prefix + ".post_attention_layernorm",
+                                tokens,
+                                self.hidden,
+                            )
+                            rt._gated4(
+                                [
+                                    normalized,
+                                    *self._quant(prefix + ".mlp.gate_proj"),
+                                    *self._quant(prefix + ".mlp.up_proj"),
+                                    gate,
+                                    up,
+                                ],
+                                rows=tokens,
+                                cols=self.intermediate,
+                                k=self.hidden,
+                            )
+                            linear(
+                                gate,
+                                projected,
+                                prefix + ".mlp.down_proj",
+                                self.hidden,
+                                self.intermediate,
+                            )
+                            residual(x, projected)
+                        norm(x, normalized, "model.norm", tokens, self.hidden)
+                        rt._dispatch(
+                            "pool_project",
+                            [normalized, length_buffer, output],
+                            threads=batch * 32,
+                            group_size=32,
+                            seq=seq,
+                            cols=self.hidden,
+                            dim=dimensions,
+                        )
             result = rt.read(output, (batch, dimensions))
             if not np.isfinite(result).all() or not np.allclose(
                 np.linalg.norm(result, axis=1), 1.0, atol=1e-4, rtol=0.0

@@ -61,6 +61,7 @@ def main():
             model = EmbeddingModel.load(args.model_dir)
         with model:
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             current = rt._gated4
             state = {"label": "previous_a"}
 

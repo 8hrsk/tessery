@@ -67,6 +67,7 @@ def test_semantics_repeat_and_no_framework(model):
 @pytest.mark.parametrize("dimensions", [32, 1024])
 def test_three_row_projection_preserves_distinct_embeddings(model, monkeypatch, dimensions):
     rt = model._backend.runtime
+    monkeypatch.setattr(rt, "_plans_enabled", False)
     original = rt._dispatch
 
     def scalar(name, buffers, **kwargs):
@@ -159,6 +160,7 @@ def test_unaligned_attention_uses_bounded_tile_per_layer(model):
 )
 def test_fused_mlp_full_vectors_equal_complete_previous_path(model, monkeypatch, batch, tokens):
     runtime = model._backend.runtime
+    monkeypatch.setattr(runtime, "_plans_enabled", False)
     texts = [" token" * (tokens - 1)] * batch
     selected = model.encode(texts)
 

@@ -158,73 +158,98 @@ class BertBackend:
                 x, projected, q, k, v, attended = (new(tokens * self.hidden * 4) for _ in range(6))
                 activated = new(tokens * self.intermediate * 4)
                 output = new(batch * dimensions * 4)
-                rt._dispatch(
-                    "embedding_position",
+                with rt._execution_plan(
+                    ("bert", batch, seq, dimensions),
                     [
+                        *self.weights.values(),
                         token_buffer,
-                        self.weights["embeddings.word_embeddings.weight"],
-                        self.weights["embeddings.position_embeddings.weight"],
-                        self.weights["embeddings.token_type_embeddings.weight"],
+                        length_buffer,
                         x,
-                    ],
-                    threads=tokens * self.hidden,
-                    n=tokens * self.hidden,
-                    cols=self.hidden,
-                    seq=seq,
-                )
-                norm(x, x, "embeddings.LayerNorm")
-                for layer in range(self.layers):
-                    prefix = f"encoder.layer.{layer}"
-                    for target, name in ((q, "query"), (k, "key"), (v, "value")):
-                        linear(
-                            x, target, prefix + ".attention.self." + name, self.hidden, self.hidden
-                        )
-                    rt._attention(
-                        [q, k, v, length_buffer, attended],
-                        tokens=tokens,
-                        seq=seq,
-                        heads=self.heads,
-                        kv_heads=self.heads,
-                        dim=self.head_dim,
-                        bidirectional=True,
-                    )
-                    linear(
+                        projected,
+                        q,
+                        k,
+                        v,
                         attended,
-                        projected,
-                        prefix + ".attention.output.dense",
-                        self.hidden,
-                        self.hidden,
-                    )
-                    add(x, projected)
-                    norm(x, x, prefix + ".attention.output.LayerNorm")
-                    linear(
-                        x, activated, prefix + ".intermediate.dense", self.intermediate, self.hidden
-                    )
-                    rt._dispatch(
-                        "gelu_f32",
-                        [activated],
-                        threads=tokens * self.intermediate,
-                        n=tokens * self.intermediate,
-                    )
-                    linear(
                         activated,
-                        projected,
-                        prefix + ".output.dense",
-                        self.hidden,
-                        self.intermediate,
-                    )
-                    add(x, projected)
-                    norm(x, x, prefix + ".output.LayerNorm")
-                rt._dispatch(
-                    "pool_project",
-                    [x, length_buffer, output],
-                    threads=batch * 32,
-                    group_size=32,
-                    seq=seq,
-                    cols=self.hidden,
-                    dim=dimensions,
-                    first_token=True,
-                )
+                        output,
+                    ],
+                ) as replayed:
+                    if not replayed:
+                        rt._dispatch(
+                            "embedding_position",
+                            [
+                                token_buffer,
+                                self.weights["embeddings.word_embeddings.weight"],
+                                self.weights["embeddings.position_embeddings.weight"],
+                                self.weights["embeddings.token_type_embeddings.weight"],
+                                x,
+                            ],
+                            threads=tokens * self.hidden,
+                            n=tokens * self.hidden,
+                            cols=self.hidden,
+                            seq=seq,
+                        )
+                        norm(x, x, "embeddings.LayerNorm")
+                        for layer in range(self.layers):
+                            prefix = f"encoder.layer.{layer}"
+                            for target, name in ((q, "query"), (k, "key"), (v, "value")):
+                                linear(
+                                    x,
+                                    target,
+                                    prefix + ".attention.self." + name,
+                                    self.hidden,
+                                    self.hidden,
+                                )
+                            rt._attention(
+                                [q, k, v, length_buffer, attended],
+                                tokens=tokens,
+                                seq=seq,
+                                heads=self.heads,
+                                kv_heads=self.heads,
+                                dim=self.head_dim,
+                                bidirectional=True,
+                            )
+                            linear(
+                                attended,
+                                projected,
+                                prefix + ".attention.output.dense",
+                                self.hidden,
+                                self.hidden,
+                            )
+                            add(x, projected)
+                            norm(x, x, prefix + ".attention.output.LayerNorm")
+                            linear(
+                                x,
+                                activated,
+                                prefix + ".intermediate.dense",
+                                self.intermediate,
+                                self.hidden,
+                            )
+                            rt._dispatch(
+                                "gelu_f32",
+                                [activated],
+                                threads=tokens * self.intermediate,
+                                n=tokens * self.intermediate,
+                            )
+                            linear(
+                                activated,
+                                projected,
+                                prefix + ".output.dense",
+                                self.hidden,
+                                self.intermediate,
+                            )
+                            add(x, projected)
+                            norm(x, x, prefix + ".output.LayerNorm")
+                        rt._dispatch(
+                            "pool_project",
+                            [x, length_buffer, output],
+                            threads=batch * 32,
+                            group_size=32,
+                            seq=seq,
+                            cols=self.hidden,
+                            dim=dimensions,
+                            first_token=True,
+                        )
             result = rt.read(output, (batch, dimensions))
             if not np.isfinite(result).all() or not np.allclose(
                 np.linalg.norm(result, axis=1), 1, atol=1e-4, rtol=0

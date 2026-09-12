@@ -92,6 +92,7 @@ def main():
             payload["model"] = model.descriptor.model_id
             payload["compatibility_id"] = model.descriptor.compatibility_id
             rt = model._backend.runtime
+            rt._plans_enabled = False  # These experiments mutate kernel routing between calls.
             selected = rt._linear4
 
             rng = np.random.default_rng(273)
