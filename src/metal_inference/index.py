@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 from .api import EmbeddingModel
 from .errors import InvalidInputError, ManifestError
 from .json_codec import dumps, loads
-from .retrieval import cosine_search
+from .retrieval import _cached_cosine_search, _prepare_document_norms
 
 MAX_CHUNKS = 10000
 MAX_TEXT_BYTES = 16 * 1024 * 1024
@@ -97,6 +97,7 @@ class DocumentIndex:
         self.chunks = chunks
         self._vectors = np.array(vectors, dtype=np.float32, order="C", copy=True)
         self._vectors.flags.writeable = False
+        self._document_norms = _prepare_document_norms(self._vectors)
 
     @classmethod
     def build(
@@ -199,7 +200,7 @@ class DocumentIndex:
         vector = model.encode([self._metadata["query_prefix"] + query])[0]
         return [
             RetrievalHit(self.chunks[hit.index], hit.score)
-            for hit in cosine_search(vector, self._vectors, k=k)
+            for hit in _cached_cosine_search(vector, self._vectors, self._document_norms, k=k)
         ]
 
     def save(self, path: str | Path) -> None:

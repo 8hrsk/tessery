@@ -1,0 +1,2266 @@
+{
+  "runs": [
+    {
+      "platform": "macOS-26.3-arm64-arm-64bit",
+      "python": "3.12.13 (main, Mar  3 2026, 15:35:03) [Clang 21.1.4 ]",
+      "numpy": "2.5.2",
+      "scope": "CPU retrieval only; fake query encoder; no tokenization/model inference",
+      "samples_per_case": 60,
+      "reverse_cases": false,
+      "source_sha256": {
+        "src/metal_inference/retrieval.py": "d2ccc404c9975e0567e10844ad4d0818fe8a3f3c65c936272367bc96839c885b",
+        "src/metal_inference/index.py": "d23bd07a5a4ef915730b388cd7fffaaff66211311b68eb750cf0792f78a14657",
+        "tools/benchmark_retrieval.py": "94ebe161011a6ad013ec5a42c107311ead4a4e1a12592939642c6f9d0cbdc561"
+      },
+      "cases": [
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.026958,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1948217171543516,
+          "paired_mean_saving_ms_ci95": [
+            0.0026236154166666666,
+            0.005334255416666667
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0173745,
+              "p95_ms": 0.02040835,
+              "peak_traced_bytes": 6384
+            },
+            "generic_partial": {
+              "p50_ms": 0.017459,
+              "p95_ms": 0.019518749999999998,
+              "peak_traced_bytes": 6384
+            },
+            "cached_index": {
+              "p50_ms": 0.014541499999999999,
+              "p95_ms": 0.01647675,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.011916,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.159453237410072,
+          "paired_mean_saving_ms_ci95": [
+            0.0026053162500000006,
+            0.0032708866666666665
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0201455,
+              "p95_ms": 0.0217393,
+              "peak_traced_bytes": 6384
+            },
+            "generic_partial": {
+              "p50_ms": 0.020209,
+              "p95_ms": 0.0210482,
+              "peak_traced_bytes": 6384
+            },
+            "cached_index": {
+              "p50_ms": 0.017375,
+              "p95_ms": 0.0182521,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.008333,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.138203792866267,
+          "paired_mean_saving_ms_ci95": [
+            0.0015630574999999998,
+            0.002822884999999999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.023167,
+              "p95_ms": 0.0242402,
+              "peak_traced_bytes": 6384
+            },
+            "generic_partial": {
+              "p50_ms": 0.02325,
+              "p95_ms": 0.0249622,
+              "peak_traced_bytes": 6384
+            },
+            "cached_index": {
+              "p50_ms": 0.020354,
+              "p95_ms": 0.022908299999999996,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.013333,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.2603305785123966,
+          "paired_mean_saving_ms_ci95": [
+            0.0037236825000000005,
+            0.004679234583333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0190625,
+              "p95_ms": 0.01995655,
+              "peak_traced_bytes": 17180
+            },
+            "generic_partial": {
+              "p50_ms": 0.0191455,
+              "p95_ms": 0.0203747,
+              "peak_traced_bytes": 17180
+            },
+            "cached_index": {
+              "p50_ms": 0.015125,
+              "p95_ms": 0.01583715,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.089708,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.21793006993007,
+          "paired_mean_saving_ms_ci95": [
+            0.0032151791666666664,
+            0.004807749166666667
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.021770499999999998,
+              "p95_ms": 0.026332999999999978,
+              "peak_traced_bytes": 17180
+            },
+            "generic_partial": {
+              "p50_ms": 0.021875,
+              "p95_ms": 0.025576749999999995,
+              "peak_traced_bytes": 17180
+            },
+            "cached_index": {
+              "p50_ms": 0.017875,
+              "p95_ms": 0.023255599999999994,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.013125,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1978479532163742,
+          "paired_mean_saving_ms_ci95": [
+            0.0008099700000000012,
+            0.00538811875
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.025604000000000002,
+              "p95_ms": 0.03238779999999998,
+              "peak_traced_bytes": 17180
+            },
+            "generic_partial": {
+              "p50_ms": 0.025771,
+              "p95_ms": 0.03275,
+              "peak_traced_bytes": 17180
+            },
+            "cached_index": {
+              "p50_ms": 0.021375,
+              "p95_ms": 0.0255441,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.01675,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4298965285005816,
+          "paired_mean_saving_ms_ci95": [
+            0.006216948749999999,
+            0.01164503041666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0233545,
+              "p95_ms": 0.03562915,
+              "peak_traced_bytes": 42780
+            },
+            "generic_partial": {
+              "p50_ms": 0.023459,
+              "p95_ms": 0.025611899999999996,
+              "peak_traced_bytes": 42780
+            },
+            "cached_index": {
+              "p50_ms": 0.016333,
+              "p95_ms": 0.0174768,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.02175,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.3592145175882073,
+          "paired_mean_saving_ms_ci95": [
+            0.006700033333333333,
+            0.007087015416666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.025541,
+              "p95_ms": 0.026069049999999996,
+              "peak_traced_bytes": 42780
+            },
+            "generic_partial": {
+              "p50_ms": 0.0257295,
+              "p95_ms": 0.02720209999999999,
+              "peak_traced_bytes": 42780
+            },
+            "cached_index": {
+              "p50_ms": 0.018791,
+              "p95_ms": 0.01938335,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.013667,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.32123353678124,
+          "paired_mean_saving_ms_ci95": [
+            0.0066923187500000005,
+            0.007370067083333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.028791,
+              "p95_ms": 0.03025275,
+              "peak_traced_bytes": 42780
+            },
+            "generic_partial": {
+              "p50_ms": 0.028958,
+              "p95_ms": 0.031114249999999996,
+              "peak_traced_bytes": 42780
+            },
+            "cached_index": {
+              "p50_ms": 0.021791,
+              "p95_ms": 0.022584799999999995,
+              "peak_traced_bytes": 6400
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.015542,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.329234242262223,
+          "paired_mean_saving_ms_ci95": [
+            0.0050216312499999985,
+            0.008704627083333331
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.022375,
+              "p95_ms": 0.03467289999999998,
+              "peak_traced_bytes": 27780
+            },
+            "generic_partial": {
+              "p50_ms": 0.0224375,
+              "p95_ms": 0.02786215,
+              "peak_traced_bytes": 27780
+            },
+            "cached_index": {
+              "p50_ms": 0.016833,
+              "p95_ms": 0.02049135,
+              "peak_traced_bytes": 8120
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.017917,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.2945205479452055,
+          "paired_mean_saving_ms_ci95": [
+            0.004885285416666668,
+            0.0055695170833333345
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.023625,
+              "p95_ms": 0.024857999999999998,
+              "peak_traced_bytes": 27620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0236045,
+              "p95_ms": 0.0246604,
+              "peak_traced_bytes": 27620
+            },
+            "cached_index": {
+              "p50_ms": 0.01825,
+              "p95_ms": 0.01925,
+              "peak_traced_bytes": 7960
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.011833,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.0697712109343347,
+          "paired_mean_saving_ms_ci95": [
+            0.0011240208333333375,
+            0.006046502916666672
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.079208,
+              "p95_ms": 0.08494940000000001,
+              "peak_traced_bytes": 27620
+            },
+            "generic_partial": {
+              "p50_ms": 0.079416,
+              "p95_ms": 0.08588159999999997,
+              "peak_traced_bytes": 27620
+            },
+            "cached_index": {
+              "p50_ms": 0.074042,
+              "p95_ms": 0.0808559,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.041583,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.9801833851087283,
+          "paired_mean_saving_ms_ci95": [
+            0.01707574958333333,
+            0.019496551249999997
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0395205,
+              "p95_ms": 0.04688125,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0395625,
+              "p95_ms": 0.047895499999999994,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.019958,
+              "p95_ms": 0.025844399999999976,
+              "peak_traced_bytes": 7968
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.028708,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.868921348314607,
+          "paired_mean_saving_ms_ci95": [
+            0.01781523291666667,
+            0.019284872916666664
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0415835,
+              "p95_ms": 0.04300864999999998,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0416665,
+              "p95_ms": 0.0425851,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.02225,
+              "p95_ms": 0.02371905,
+              "peak_traced_bytes": 7968
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.026375,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.2275297805642633,
+          "paired_mean_saving_ms_ci95": [
+            0.016899677083333335,
+            0.019187839583333335
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0978955,
+              "p95_ms": 0.10790979999999999,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.098021,
+              "p95_ms": 0.112008,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.07975,
+              "p95_ms": 0.09236839999999998,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.051917,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.8178698197033447,
+          "paired_mean_saving_ms_ci95": [
+            0.03705878500000001,
+            0.038442984166666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0599375,
+              "p95_ms": 0.062525,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.060166,
+              "p95_ms": 0.0674726,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.0212705,
+              "p95_ms": 0.02197145,
+              "peak_traced_bytes": 7976
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.05,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.6497084424913377,
+          "paired_mean_saving_ms_ci95": [
+            0.038459446666666675,
+            0.042291707500000005
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.062708,
+              "p95_ms": 0.07636489999999999,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.062854,
+              "p95_ms": 0.07003815,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.023666,
+              "p95_ms": 0.029450599999999993,
+              "peak_traced_bytes": 7976
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.05125,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4605549644951379,
+          "paired_mean_saving_ms_ci95": [
+            0.036492347499999994,
+            0.038956392499999985
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.11806249999999999,
+              "p95_ms": 0.12883545,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.11827099999999999,
+              "p95_ms": 0.129983,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.080834,
+              "p95_ms": 0.09136635,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.046875,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.5832511621355123,
+          "paired_mean_saving_ms_ci95": [
+            0.04469108833333334,
+            0.04684017416666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.073354,
+              "p95_ms": 0.0848774,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.061563,
+              "p95_ms": 0.06585864999999999,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.028395999999999998,
+              "p95_ms": 0.029785399999999997,
+              "peak_traced_bytes": 12968
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.042709,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.3071426417824945,
+          "paired_mean_saving_ms_ci95": [
+            0.04361244583333333,
+            0.04814320625
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.076521,
+              "p95_ms": 0.09868364999999998,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.0656455,
+              "p95_ms": 0.07375385,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.033167,
+              "p95_ms": 0.038524999999999976,
+              "peak_traced_bytes": 13244
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.044292,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4202991077841447,
+          "paired_mean_saving_ms_ci95": [
+            0.04034297833333334,
+            0.04793986791666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.13347900000000001,
+              "p95_ms": 0.16327319999999998,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.126208,
+              "p95_ms": 0.14095419999999997,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.0939795,
+              "p95_ms": 0.11065799999999999,
+              "peak_traced_bytes": 20408
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.282125,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 5.126138948190939,
+          "paired_mean_saving_ms_ci95": [
+            0.15049951791666666,
+            0.156073885
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.1836875,
+              "p95_ms": 0.21263814999999997,
+              "peak_traced_bytes": 1544816
+            },
+            "generic_partial": {
+              "p50_ms": 0.1708125,
+              "p95_ms": 0.20420479999999996,
+              "peak_traced_bytes": 1544816
+            },
+            "cached_index": {
+              "p50_ms": 0.0358335,
+              "p95_ms": 0.0398756,
+              "peak_traced_bytes": 12968
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.267791,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.651647766192252,
+          "paired_mean_saving_ms_ci95": [
+            0.14290592708333333,
+            0.14745427
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.18335400000000002,
+              "p95_ms": 0.19983155,
+              "peak_traced_bytes": 1544816
+            },
+            "generic_partial": {
+              "p50_ms": 0.1740205,
+              "p95_ms": 0.19118334999999995,
+              "peak_traced_bytes": 1544816
+            },
+            "cached_index": {
+              "p50_ms": 0.039417,
+              "p95_ms": 0.05031284999999999,
+              "peak_traced_bytes": 13245
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.16425,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.4243171245676116,
+          "paired_mean_saving_ms_ci95": [
+            0.14145654916666664,
+            0.14859343166666664
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.243896,
+              "p95_ms": 0.2780003,
+              "peak_traced_bytes": 1544816
+            },
+            "generic_partial": {
+              "p50_ms": 0.235562,
+              "p95_ms": 0.25578334999999996,
+              "peak_traced_bytes": 1544816
+            },
+            "cached_index": {
+              "p50_ms": 0.100604,
+              "p95_ms": 0.11726249999999998,
+              "peak_traced_bytes": 20248
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.764375,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 7.855840982016267,
+          "paired_mean_saving_ms_ci95": [
+            0.36576826791666667,
+            0.37744261291666664
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.4211045,
+              "p95_ms": 0.49475979999999997,
+              "peak_traced_bytes": 4104816
+            },
+            "generic_partial": {
+              "p50_ms": 0.40860399999999997,
+              "p95_ms": 0.48001075,
+              "peak_traced_bytes": 4104816
+            },
+            "cached_index": {
+              "p50_ms": 0.053604,
+              "p95_ms": 0.09288924999999999,
+              "peak_traced_bytes": 12968
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.716375,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 7.350492880613363,
+          "paired_mean_saving_ms_ci95": [
+            0.360200665,
+            0.37217150166666674
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.4194375,
+              "p95_ms": 0.4996729,
+              "peak_traced_bytes": 4104816
+            },
+            "generic_partial": {
+              "p50_ms": 0.412833,
+              "p95_ms": 0.4786021,
+              "peak_traced_bytes": 4104816
+            },
+            "cached_index": {
+              "p50_ms": 0.0570625,
+              "p95_ms": 0.08931634999999999,
+              "peak_traced_bytes": 13245
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.450667,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.048197162211414,
+          "paired_mean_saving_ms_ci95": [
+            0.3673743658333333,
+            0.38557118541666674
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.48316650000000005,
+              "p95_ms": 0.5760472999999999,
+              "peak_traced_bytes": 4104816
+            },
+            "generic_partial": {
+              "p50_ms": 0.4731665,
+              "p95_ms": 0.6278523999999999,
+              "peak_traced_bytes": 4104816
+            },
+            "cached_index": {
+              "p50_ms": 0.1193535,
+              "p95_ms": 0.16000355,
+              "peak_traced_bytes": 19992
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.32975,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 11.591346153846155,
+          "paired_mean_saving_ms_ci95": [
+            0.8288342591666666,
+            0.8433809100000002
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.9041250000000001,
+              "p95_ms": 1.00691425,
+              "peak_traced_bytes": 2640816
+            },
+            "generic_partial": {
+              "p50_ms": 0.356708,
+              "p95_ms": 0.43178785000000003,
+              "peak_traced_bytes": 2640816
+            },
+            "cached_index": {
+              "p50_ms": 0.078,
+              "p95_ms": 0.11099519999999997,
+              "peak_traced_bytes": 120968
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.342458,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 10.255924515216092,
+          "paired_mean_saving_ms_ci95": [
+            0.8288712816666667,
+            0.8525091654166667
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.9168335000000001,
+              "p95_ms": 1.0183041499999999,
+              "peak_traced_bytes": 2640816
+            },
+            "generic_partial": {
+              "p50_ms": 0.3682705,
+              "p95_ms": 0.4633351,
+              "peak_traced_bytes": 2640816
+            },
+            "cached_index": {
+              "p50_ms": 0.08939549999999999,
+              "p95_ms": 0.11979759999999999,
+              "peak_traced_bytes": 120968
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.344167,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 6.316561438548312,
+          "paired_mean_saving_ms_ci95": [
+            0.8113536666666664,
+            0.8339767787499999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.9614375,
+              "p95_ms": 1.0549392499999999,
+              "peak_traced_bytes": 2640816
+            },
+            "generic_partial": {
+              "p50_ms": 0.430854,
+              "p95_ms": 0.5044784999999999,
+              "peak_traced_bytes": 2640816
+            },
+            "cached_index": {
+              "p50_ms": 0.15220899999999998,
+              "p95_ms": 0.19777919999999993,
+              "peak_traced_bytes": 120968
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 3.639375,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 6.703137638261025,
+          "paired_mean_saving_ms_ci95": [
+            2.2936597258333333,
+            2.3861544329166673
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.701646,
+              "p95_ms": 3.0845455499999996,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.1975420000000003,
+              "p95_ms": 2.64536875,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.403042,
+              "p95_ms": 0.59242535,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 3.648208,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 5.789242891540327,
+          "paired_mean_saving_ms_ci95": [
+            2.3708414129166666,
+            2.5607570975000002
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.8503540000000003,
+              "p95_ms": 3.6215601,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.2725,
+              "p95_ms": 3.1324812499999997,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.4923535,
+              "p95_ms": 0.6806871499999998,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 3.267375,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 5.091130843446581,
+          "paired_mean_saving_ms_ci95": [
+            2.3337053112500006,
+            2.4493834970833332
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.9877504999999998,
+              "p95_ms": 3.2982101,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.4152915,
+              "p95_ms": 2.8981024,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.586854,
+              "p95_ms": 0.7241943999999996,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 10.410667,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.406117356601986,
+          "paired_mean_saving_ms_ci95": [
+            5.878618060416667,
+            6.335507408333335
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 7.599083,
+              "p95_ms": 9.06157915,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 7.0516245,
+              "p95_ms": 8.766771149999999,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.7246665,
+              "p95_ms": 2.18066045,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 42.474292,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.524290383404058,
+          "paired_mean_saving_ms_ci95": [
+            5.844889280833334,
+            6.040494355833333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 7.645958,
+              "p95_ms": 8.3497,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 7.034853999999999,
+              "p95_ms": 7.7382417,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.6899795000000002,
+              "p95_ms": 2.0228181,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 6.975834,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.170781254604585,
+          "paired_mean_saving_ms_ci95": [
+            5.569204965000001,
+            5.751635684583333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 7.5010625,
+              "p95_ms": 7.98969645,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 6.978666499999999,
+              "p95_ms": 7.5347854,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.798479,
+              "p95_ms": 2.1679545,
+              "peak_traced_bytes": 121128
+            }
+          }
+        }
+      ]
+    },
+    {
+      "platform": "macOS-26.3-arm64-arm-64bit",
+      "python": "3.12.13 (main, Mar  3 2026, 15:35:03) [Clang 21.1.4 ]",
+      "numpy": "2.5.2",
+      "scope": "CPU retrieval only; fake query encoder; no tokenization/model inference",
+      "samples_per_case": 60,
+      "reverse_cases": true,
+      "source_sha256": {
+        "src/metal_inference/retrieval.py": "d2ccc404c9975e0567e10844ad4d0818fe8a3f3c65c936272367bc96839c885b",
+        "src/metal_inference/index.py": "d23bd07a5a4ef915730b388cd7fffaaff66211311b68eb750cf0792f78a14657",
+        "tools/benchmark_retrieval.py": "94ebe161011a6ad013ec5a42c107311ead4a4e1a12592939642c6f9d0cbdc561"
+      },
+      "cases": [
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 9.980375,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.197775542940538,
+          "paired_mean_saving_ms_ci95": [
+            5.3002991308333325,
+            5.597818419166666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 7.225333,
+              "p95_ms": 8.15860835,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 6.616042,
+              "p95_ms": 7.8215521,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.7212290000000001,
+              "p95_ms": 2.231836049999999,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 11.072333,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.4433634242811735,
+          "paired_mean_saving_ms_ci95": [
+            5.635483855833333,
+            5.924329805833332
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 7.4605005,
+              "p95_ms": 8.4929518,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 6.821667,
+              "p95_ms": 7.751181249999999,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.679021,
+              "p95_ms": 1.9701243499999994,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 8.140833,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 40960000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.512190074344008,
+          "paired_mean_saving_ms_ci95": [
+            5.0753996387499996,
+            5.354631844166667
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 6.682646,
+              "p95_ms": 7.597746149999999,
+              "peak_traced_bytes": 41040976
+            },
+            "generic_partial": {
+              "p50_ms": 5.943625,
+              "p95_ms": 6.638031899999999,
+              "peak_traced_bytes": 41040976
+            },
+            "cached_index": {
+              "p50_ms": 1.4810205,
+              "p95_ms": 1.8966818999999997,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 3.965834,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 5.251913550746076,
+          "paired_mean_saving_ms_ci95": [
+            2.2530157112499998,
+            2.3696376975000004
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.769292,
+              "p95_ms": 3.3534413499999998,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.2305625,
+              "p95_ms": 2.67879025,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.527292,
+              "p95_ms": 0.6676374999999999,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 3.186208,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 6.0749662011429955,
+          "paired_mean_saving_ms_ci95": [
+            2.2403375433333332,
+            2.3428314712500007
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.7095625,
+              "p95_ms": 3.06465205,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.1369585,
+              "p95_ms": 2.7459253,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.446021,
+              "p95_ms": 0.6205548,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 2.323584,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 15360000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 6.652917977457089,
+          "paired_mean_saving_ms_ci95": [
+            2.2834838645833333,
+            2.386660740416667
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 2.6847285,
+              "p95_ms": 3.17789585,
+              "peak_traced_bytes": 15440976
+            },
+            "generic_partial": {
+              "p50_ms": 2.0861875000000003,
+              "p95_ms": 2.3989107499999993,
+              "peak_traced_bytes": 15440976
+            },
+            "cached_index": {
+              "p50_ms": 0.4035415,
+              "p95_ms": 0.5132160499999998,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.5815,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 6.400900651736066,
+          "paired_mean_saving_ms_ci95": [
+            0.8285677620833333,
+            0.8441217049999999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.983604,
+              "p95_ms": 1.0796777499999997,
+              "peak_traced_bytes": 2640976
+            },
+            "generic_partial": {
+              "p50_ms": 0.4438955,
+              "p95_ms": 0.5267399,
+              "peak_traced_bytes": 2640976
+            },
+            "cached_index": {
+              "p50_ms": 0.15366649999999998,
+              "p95_ms": 0.21580239999999973,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.560458,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 9.727546633615615,
+          "paired_mean_saving_ms_ci95": [
+            0.8451430504166667,
+            1.0094012004166666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.9378960000000001,
+              "p95_ms": 1.3628749999999996,
+              "peak_traced_bytes": 2640976
+            },
+            "generic_partial": {
+              "p50_ms": 0.3769585,
+              "p95_ms": 0.5475874999999999,
+              "peak_traced_bytes": 2640976
+            },
+            "cached_index": {
+              "p50_ms": 0.0964165,
+              "p95_ms": 0.1760773999999999,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 10000,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.462875,
+          "norm_cache_bytes": 40000,
+          "vector_bytes": 2560000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 12.078370860927153,
+          "paired_mean_saving_ms_ci95": [
+            0.8401398237499998,
+            0.8678276991666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.911917,
+              "p95_ms": 1.06887085,
+              "peak_traced_bytes": 2640976
+            },
+            "generic_partial": {
+              "p50_ms": 0.35539600000000005,
+              "p95_ms": 0.40813540000000004,
+              "peak_traced_bytes": 2640976
+            },
+            "cached_index": {
+              "p50_ms": 0.0755,
+              "p95_ms": 0.14551904999999996,
+              "peak_traced_bytes": 121128
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.759584,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.035507755946226,
+          "paired_mean_saving_ms_ci95": [
+            0.3632708883333334,
+            0.38029863583333334
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.487792,
+              "p95_ms": 0.53583955,
+              "peak_traced_bytes": 4104976
+            },
+            "generic_partial": {
+              "p50_ms": 0.480062,
+              "p95_ms": 0.6307097499999996,
+              "peak_traced_bytes": 4104976
+            },
+            "cached_index": {
+              "p50_ms": 0.120875,
+              "p95_ms": 0.19995419999999997,
+              "peak_traced_bytes": 20152
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.718083,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 7.201723711340206,
+          "paired_mean_saving_ms_ci95": [
+            0.37689605333333326,
+            0.41078759624999994
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.43660449999999995,
+              "p95_ms": 0.5935541499999999,
+              "peak_traced_bytes": 4104976
+            },
+            "generic_partial": {
+              "p50_ms": 0.423896,
+              "p95_ms": 0.55930385,
+              "peak_traced_bytes": 4104976
+            },
+            "cached_index": {
+              "p50_ms": 0.060625,
+              "p95_ms": 0.10498814999999999,
+              "peak_traced_bytes": 13405
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.445042,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 4096000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 7.7302247446084,
+          "paired_mean_saving_ms_ci95": [
+            0.3733344695833334,
+            0.4023923912499999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.4256455,
+              "p95_ms": 0.6555687499999998,
+              "peak_traced_bytes": 4104976
+            },
+            "generic_partial": {
+              "p50_ms": 0.409625,
+              "p95_ms": 0.48744105,
+              "peak_traced_bytes": 4104976
+            },
+            "cached_index": {
+              "p50_ms": 0.0550625,
+              "p95_ms": 0.1099440499999997,
+              "peak_traced_bytes": 13128
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.282583,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.4301351708194447,
+          "paired_mean_saving_ms_ci95": [
+            0.14485361625000004,
+            0.1524585683333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.243875,
+              "p95_ms": 0.3017021,
+              "peak_traced_bytes": 1544976
+            },
+            "generic_partial": {
+              "p50_ms": 0.2361255,
+              "p95_ms": 0.25492469999999995,
+              "peak_traced_bytes": 1544976
+            },
+            "cached_index": {
+              "p50_ms": 0.10035450000000001,
+              "p95_ms": 0.10797354999999999,
+              "peak_traced_bytes": 20408
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.318375,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 4.636876942121618,
+          "paired_mean_saving_ms_ci95": [
+            0.14577776166666664,
+            0.15034920624999998
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.1835415,
+              "p95_ms": 0.2017851,
+              "peak_traced_bytes": 1544976
+            },
+            "generic_partial": {
+              "p50_ms": 0.1739585,
+              "p95_ms": 0.18979614999999997,
+              "peak_traced_bytes": 1544976
+            },
+            "cached_index": {
+              "p50_ms": 0.039583,
+              "p95_ms": 0.04279615,
+              "peak_traced_bytes": 13405
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.171166,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 1536000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 5.1511865271753,
+          "paired_mean_saving_ms_ci95": [
+            0.14671534,
+            0.14937671333333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.1816875,
+              "p95_ms": 0.19896185,
+              "peak_traced_bytes": 1544816
+            },
+            "generic_partial": {
+              "p50_ms": 0.171292,
+              "p95_ms": 0.18755864999999997,
+              "peak_traced_bytes": 1544816
+            },
+            "cached_index": {
+              "p50_ms": 0.035271,
+              "p95_ms": 0.042608,
+              "peak_traced_bytes": 12968
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.046667,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4249935327874477,
+          "paired_mean_saving_ms_ci95": [
+            0.041175685,
+            0.04581220666666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.134959,
+              "p95_ms": 0.1697253,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.12737500000000002,
+              "p95_ms": 0.16824404999999995,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.0947085,
+              "p95_ms": 0.10468684999999998,
+              "peak_traced_bytes": 20408
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.0525,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.329714145503619,
+          "paired_mean_saving_ms_ci95": [
+            0.04374719833333333,
+            0.047051692083333325
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.075958,
+              "p95_ms": 0.09728539999999998,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.06535450000000001,
+              "p95_ms": 0.07642884999999999,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.032604,
+              "p95_ms": 0.03825065,
+              "peak_traced_bytes": 13244
+            }
+          }
+        },
+        {
+          "count": 1000,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.045959,
+          "norm_cache_bytes": 4000,
+          "vector_bytes": 256000,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.6496,
+          "paired_mean_saving_ms_ci95": [
+            0.04489091,
+            0.047511431666666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.071208,
+              "p95_ms": 0.08891454999999997,
+              "peak_traced_bytes": 264816
+            },
+            "generic_partial": {
+              "p50_ms": 0.060625,
+              "p95_ms": 0.06628574999999999,
+              "peak_traced_bytes": 264816
+            },
+            "cached_index": {
+              "p50_ms": 0.026875,
+              "p95_ms": 0.031096149999999996,
+              "peak_traced_bytes": 12968
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.05175,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4647747886241351,
+          "paired_mean_saving_ms_ci95": [
+            0.037146496666666654,
+            0.039713920833333326
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.1191045,
+              "p95_ms": 0.13323395,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.1192085,
+              "p95_ms": 0.12775625,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.08131250000000001,
+              "p95_ms": 0.08966519999999999,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.052375,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.649037037037037,
+          "paired_mean_saving_ms_ci95": [
+            0.03646287083333333,
+            0.040517334583333335
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0625835,
+              "p95_ms": 0.07383574999999999,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0625,
+              "p95_ms": 0.07033299999999999,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.023625,
+              "p95_ms": 0.029585100000000003,
+              "peak_traced_bytes": 7976
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.0515,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 409600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 2.8264047619047616,
+          "paired_mean_saving_ms_ci95": [
+            0.03731295875,
+            0.03959263583333332
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0593545,
+              "p95_ms": 0.07027354999999999,
+              "peak_traced_bytes": 411620
+            },
+            "generic_partial": {
+              "p50_ms": 0.059583,
+              "p95_ms": 0.06754825,
+              "peak_traced_bytes": 411620
+            },
+            "cached_index": {
+              "p50_ms": 0.021,
+              "p95_ms": 0.02419615,
+              "peak_traced_bytes": 7976
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.029583,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.2234617732431388,
+          "paired_mean_saving_ms_ci95": [
+            0.01625463208333333,
+            0.01868639458333334
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0982085,
+              "p95_ms": 0.10284999999999997,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.09831300000000001,
+              "p95_ms": 0.11154410000000001,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.08027100000000001,
+              "p95_ms": 0.09009855,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.030084,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.8725977011494255,
+          "paired_mean_saving_ms_ci95": [
+            0.018633280833333335,
+            0.020778587083333338
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.040729,
+              "p95_ms": 0.050958649999999994,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0409165,
+              "p95_ms": 0.04987055,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.02175,
+              "p95_ms": 0.024835449999999995,
+              "peak_traced_bytes": 7968
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.028958,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 153600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.94912798088168,
+          "paired_mean_saving_ms_ci95": [
+            0.017905581249999997,
+            0.019310382916666664
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0383335,
+              "p95_ms": 0.0419271,
+              "peak_traced_bytes": 155620
+            },
+            "generic_partial": {
+              "p50_ms": 0.038646,
+              "p95_ms": 0.040121449999999996,
+              "peak_traced_bytes": 155620
+            },
+            "cached_index": {
+              "p50_ms": 0.019667,
+              "p95_ms": 0.02013335,
+              "peak_traced_bytes": 7968
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.016834,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.0692197717825846,
+          "paired_mean_saving_ms_ci95": [
+            0.0020422804166666713,
+            0.007028802083333337
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.08077100000000001,
+              "p95_ms": 0.08353124999999999,
+              "peak_traced_bytes": 27620
+            },
+            "generic_partial": {
+              "p50_ms": 0.080958,
+              "p95_ms": 0.0909726,
+              "peak_traced_bytes": 27620
+            },
+            "cached_index": {
+              "p50_ms": 0.075542,
+              "p95_ms": 0.08158365000000001,
+              "peak_traced_bytes": 18192
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.019458,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.2761686576119566,
+          "paired_mean_saving_ms_ci95": [
+            0.0039977025,
+            0.006927883333333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.023396,
+              "p95_ms": 0.026580649999999997,
+              "peak_traced_bytes": 27620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0235,
+              "p95_ms": 0.028075299999999977,
+              "peak_traced_bytes": 27620
+            },
+            "cached_index": {
+              "p50_ms": 0.018333,
+              "p95_ms": 0.021128849999999977,
+              "peak_traced_bytes": 7960
+            }
+          }
+        },
+        {
+          "count": 100,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.013084,
+          "norm_cache_bytes": 400,
+          "vector_bytes": 25600,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.3254387351778654,
+          "paired_mean_saving_ms_ci95": [
+            0.005131399583333334,
+            0.00602096625
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.020958499999999998,
+              "p95_ms": 0.021448249999999995,
+              "peak_traced_bytes": 27620
+            },
+            "generic_partial": {
+              "p50_ms": 0.021042,
+              "p95_ms": 0.021504199999999998,
+              "peak_traced_bytes": 27620
+            },
+            "cached_index": {
+              "p50_ms": 0.0158125,
+              "p95_ms": 0.016127100000000002,
+              "peak_traced_bytes": 7960
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 100,
+          "snapshot_build_ms": 0.01425,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.3146067415730338,
+          "paired_mean_saving_ms_ci95": [
+            0.006993764583333334,
+            0.008078522083333334
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.02925,
+              "p95_ms": 0.029968449999999997,
+              "peak_traced_bytes": 42620
+            },
+            "generic_partial": {
+              "p50_ms": 0.029375,
+              "p95_ms": 0.029694049999999996,
+              "peak_traced_bytes": 42620
+            },
+            "cached_index": {
+              "p50_ms": 0.02225,
+              "p95_ms": 0.0224601,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 5,
+          "snapshot_build_ms": 0.014584,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.353896103896104,
+          "paired_mean_saving_ms_ci95": [
+            0.005564807916666665,
+            0.007644753333333331
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0260625,
+              "p95_ms": 0.029744399999999976,
+              "peak_traced_bytes": 42620
+            },
+            "generic_partial": {
+              "p50_ms": 0.0262085,
+              "p95_ms": 0.029222599999999994,
+              "peak_traced_bytes": 42620
+            },
+            "cached_index": {
+              "p50_ms": 0.01925,
+              "p95_ms": 0.022695849999999965,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 1024,
+          "k": 1,
+          "snapshot_build_ms": 0.015584,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 40960,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.4225745981991949,
+          "paired_mean_saving_ms_ci95": [
+            0.005675653333333332,
+            0.007111230833333333
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.023146,
+              "p95_ms": 0.024791050000000002,
+              "peak_traced_bytes": 42620
+            },
+            "generic_partial": {
+              "p50_ms": 0.023292,
+              "p95_ms": 0.02421215,
+              "peak_traced_bytes": 42620
+            },
+            "cached_index": {
+              "p50_ms": 0.0162705,
+              "p95_ms": 0.0174306,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 100,
+          "snapshot_build_ms": 0.01175,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1830605050944034,
+          "paired_mean_saving_ms_ci95": [
+            0.003120817083333333,
+            0.003916097499999999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0245,
+              "p95_ms": 0.025816999999999996,
+              "peak_traced_bytes": 17020
+            },
+            "generic_partial": {
+              "p50_ms": 0.0246455,
+              "p95_ms": 0.026295199999999998,
+              "peak_traced_bytes": 17020
+            },
+            "cached_index": {
+              "p50_ms": 0.020709,
+              "p95_ms": 0.0217152,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 5,
+          "snapshot_build_ms": 0.014375,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.213,
+          "paired_mean_saving_ms_ci95": [
+            0.002679030000000001,
+            0.004180552916666668
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.021834,
+              "p95_ms": 0.025160099999999998,
+              "peak_traced_bytes": 17020
+            },
+            "generic_partial": {
+              "p50_ms": 0.0219795,
+              "p95_ms": 0.04182499999999998,
+              "peak_traced_bytes": 17020
+            },
+            "cached_index": {
+              "p50_ms": 0.018,
+              "p95_ms": 0.020476799999999986,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 384,
+          "k": 1,
+          "snapshot_build_ms": 0.011375,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 15360,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.245905986872638,
+          "paired_mean_saving_ms_ci95": [
+            0.002989599583333333,
+            0.003795984166666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.018792,
+              "p95_ms": 0.0194181,
+              "peak_traced_bytes": 17020
+            },
+            "generic_partial": {
+              "p50_ms": 0.018916,
+              "p95_ms": 0.01954405,
+              "peak_traced_bytes": 17020
+            },
+            "cached_index": {
+              "p50_ms": 0.015083,
+              "p95_ms": 0.0155441,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 100,
+          "snapshot_build_ms": 0.014209,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1401355831560194,
+          "paired_mean_saving_ms_ci95": [
+            0.0022541324999999987,
+            0.003193832499999998
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.023041,
+              "p95_ms": 0.0234181,
+              "peak_traced_bytes": 6224
+            },
+            "generic_partial": {
+              "p50_ms": 0.023084,
+              "p95_ms": 0.02329825,
+              "peak_traced_bytes": 6224
+            },
+            "cached_index": {
+              "p50_ms": 0.020209,
+              "p95_ms": 0.020460100000000002,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 5,
+          "snapshot_build_ms": 0.008083,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1587192485035942,
+          "paired_mean_saving_ms_ci95": [
+            0.002538245,
+            0.004652397499999999
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.0202295,
+              "p95_ms": 0.023423249999999986,
+              "peak_traced_bytes": 6224
+            },
+            "generic_partial": {
+              "p50_ms": 0.020375,
+              "p95_ms": 0.024450299999999998,
+              "peak_traced_bytes": 6224
+            },
+            "cached_index": {
+              "p50_ms": 0.017458500000000002,
+              "p95_ms": 0.01929615,
+              "peak_traced_bytes": 6240
+            }
+          }
+        },
+        {
+          "count": 10,
+          "dimensions": 64,
+          "k": 1,
+          "snapshot_build_ms": 0.008625,
+          "norm_cache_bytes": 40,
+          "vector_bytes": 2560,
+          "exact_scores_and_order": true,
+          "baseline_over_cached": 1.1839310344827587,
+          "paired_mean_saving_ms_ci95": [
+            0.0027154300000000004,
+            0.004023802916666666
+          ],
+          "timings": {
+            "baseline": {
+              "p50_ms": 0.017167,
+              "p95_ms": 0.0183792,
+              "peak_traced_bytes": 6224
+            },
+            "generic_partial": {
+              "p50_ms": 0.017292,
+              "p95_ms": 0.018139549999999997,
+              "peak_traced_bytes": 6224
+            },
+            "cached_index": {
+              "p50_ms": 0.0145,
+              "p95_ms": 0.01492115,
+              "peak_traced_bytes": 6240
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
